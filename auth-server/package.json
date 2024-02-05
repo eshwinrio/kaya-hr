@@ -1,0 +1,11 @@
+{
+  "name": "auth-server",
+  "version": "1.0.0",
+  "description": "Authentication module of Kaya HR",
+  "main": "bin/www/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Eshwin Rio",
+  "license": "MIT"
+}
