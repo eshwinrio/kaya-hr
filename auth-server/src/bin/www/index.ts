@@ -12,4 +12,4 @@ server.addListener("error", (e) => {
 
 server.addListener("listening", () => {
   logSystem.info(`Server started on port ${process.env.HTTP_PORT}`);
-})
+});
