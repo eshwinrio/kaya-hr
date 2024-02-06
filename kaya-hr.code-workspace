@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "auth-server",
+			"name": "Auth Server"
+		}
+	],
+	"settings": {
+		"git.openRepositoryInParentFolders": "always",
+		"editor.tabSize": 2
+	}
+}
