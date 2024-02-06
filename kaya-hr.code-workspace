@@ -3,6 +3,10 @@
 		{
 			"path": "auth-server",
 			"name": "Auth Server"
+		},
+		{
+			"path": "hr-panel",
+			"name": "HR Panel"
 		}
 	],
 	"settings": {
