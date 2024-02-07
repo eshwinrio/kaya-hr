@@ -5,8 +5,10 @@
   "main": "dist/bin/www/index.js",
   "type": "module",
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "clean:build": "rimraf dist",
+    "clean:logs": "rimraf logs/*.log",
+    "build": "tsc",
+    "prisma:dev:migrate": "prisma migrate dev --name init",
     "start": "node -r dotenv/config .",
     "start:dev": "npm run build && npm run start",
     "test": "NODE_ENV=test mocha ./dist/tests/**/*.js --exit --require dotenv/config"
@@ -21,10 +23,12 @@
     "@types/node": "^20.11.16",
     "chai": "^5.0.3",
     "mocha": "^10.2.0",
+    "prisma": "^5.9.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@prisma/client": "^5.9.1",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "http-errors": "^2.0.0",
