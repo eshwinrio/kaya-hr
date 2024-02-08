@@ -2,6 +2,7 @@ import { Router } from "express";
 import httpErrors from "http-errors";
 import httpStatus from "http-status";
 import { hash } from "bcrypt";
+import validator from "validator";
 import requireBody from "../middlewares/require-body.js";
 import prisma from "../lib/prisma.js";
 import { Bcrypt } from "../config/environment.js";
@@ -24,6 +25,10 @@ userRouter.post(
     try {
       const { firstName, middleName, lastName, email, password, roles } = req.body;
 
+      if (!validator.isEmail(email)) {
+        throw httpErrors.BadRequest('Invalid email');
+      }
+
       const matchedRoles = await prisma.roles.findMany({ where: { code: { in: roles } } });
       const unmatchedRoles = roles.filter((role) => !matchedRoles.map((role) => role.code).includes(role));
       if (unmatchedRoles.length) {
@@ -34,6 +39,9 @@ userRouter.post(
         throw httpErrors.Conflict(`User with email ${email} already exists`);
       }
 
+      if (!validator.isStrongPassword(password)) {
+        throw httpErrors.BadRequest('Password is not strong enough');
+      }
       const passwordHash = await hash(password, Bcrypt.saltRounds);
 
       const newUser = await prisma.users.create({
