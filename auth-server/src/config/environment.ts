@@ -1,3 +1,7 @@
+export namespace Bcrypt {
+  export const saltRounds = parseInt(process.env['BCRYPT_SALT_ROUNDS']!);
+}
+
 export namespace Http {
   export const port = parseInt(process.env['HTTP_PORT']!);
 }

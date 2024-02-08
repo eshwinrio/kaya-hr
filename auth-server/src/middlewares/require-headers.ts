@@ -1,6 +1,5 @@
-import { RequestHandler, Router } from 'express';
-import createHttpError from 'http-errors';
-import { BAD_REQUEST } from 'http-status';
+import { RequestHandler } from 'express';
+import httpErrors from 'http-errors';
 
 type ExpectedObject = Record<string, any>;
 type HeadersEnforcer = RequestHandler;
@@ -15,12 +14,7 @@ export default function <O extends ExpectedObject>(
       );
       if (missingKeys.length) {
         const terminationPhrase = `header${missingKeys.length > 1 ? 's' : ''}`;
-        throw createHttpError(
-          BAD_REQUEST,
-          new Error(
-            `Request is missing ${missingKeys.join()} ${terminationPhrase}`
-          )
-        );
+        throw httpErrors.BadRequest(`Request is missing ${terminationPhrase}: ${missingKeys.join()}`);
       }
       next();
     } catch (error) {

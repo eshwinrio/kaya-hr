@@ -1,5 +1,16 @@
 import { expect } from "chai";
 
+describe('Bcrypt configurations', () => {
+  it('Salt rounds', (done) => {
+    const value = process.env['BCRYPT_SALT_ROUNDS'];
+    expect(value).not.to.be.undefined;
+    const parsed = parseInt(value!);
+    expect(parsed).not.to.be.NaN;
+    expect(parsed).to.be.above(0).and.below(20);
+    done();
+  });
+});
+
 describe('Database configurations', () => {
   it('Database URL', (done) => {
     const value = process.env['DATABASE_URL'];
