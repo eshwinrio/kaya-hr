@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import validator from "validator";
 
 describe('Bcrypt configurations', () => {
   it('Salt rounds', (done) => {
@@ -26,6 +27,38 @@ describe('HTTP configurations', () => {
     const parsed = parseInt(value!);
     expect(parsed).not.to.be.NaN;
     expect(parsed).to.be.above(0).below(9999);
+    done();
+  });
+});
+
+describe('JWT configurations', () => {
+  it('Access secret', (done) => {
+    const value = process.env['JWT_ACCESS_SECRET'];
+    expect(value).not.to.be.undefined.empty;
+    expect(validator.isStrongPassword(value!), 'Weak secret').to.be.true;
+    done();
+  });
+
+  it('Access token validity', (done) => {
+    const value = process.env['JWT_ACCESS_VALIDITY'];
+    expect(value).not.to.be.undefined;
+    const parsed = parseInt(value!);
+    expect(parsed).to.be.a('number').and.not.to.be.NaN;
+    done();
+  });
+
+  it('Authorization secret', (done) => {
+    const value = process.env['JWT_AUTHORIZATION_SECRET'];
+    expect(value).not.to.be.undefined.empty;
+    expect(validator.isStrongPassword(value!), 'Weak secret').to.be.true;
+    done();
+  });
+
+  it('Authorization token validity', (done) => {
+    const value = process.env['JWT_AUTHORIZATION_VALIDITY'];
+    expect(value).not.to.be.undefined;
+    const parsed = parseInt(value!);
+    expect(parsed).to.be.a('number').and.not.to.be.NaN;
     done();
   });
 });
