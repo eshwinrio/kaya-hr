@@ -5,3 +5,4 @@ export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
 
 export const useUiPreferences = () => useAppSelector((state: RootState) => state.uiPreferences);
+export const useAuthState = () => useAppSelector((state: RootState) => state.authhentication);

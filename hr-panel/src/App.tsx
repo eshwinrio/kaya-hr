@@ -6,7 +6,7 @@ import store from './lib/redux-store';
 
 const router = createBrowserRouter([
   {
-    id: 'home',
+    id: 'root',
     path: '/',
     Component: Layout,
     children: [
