@@ -1,10 +1,11 @@
 import { Router } from "express";
-import httpErrors, { HttpError } from "http-errors";
+import httpErrors from "http-errors";
 import { compare } from "bcrypt";
-import jsonwebtoken from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 import requireBody from "../middlewares/require-body.js";
-import { JWT } from "../config/environment.js";
+import requireHeaders from "../middlewares/require-headers.js";
+import requireAccessToken from "../middlewares/require-access-token.js";
+import { generateAccessToken } from "../lib/token.js";
 
 const authRouter = Router();
 
@@ -30,15 +31,34 @@ authRouter.post(
         throw httpErrors.Unauthorized("Invalid credentials");
       }
 
-      const token = jsonwebtoken.sign({ id: user.id }, JWT.accessSecret, {
-        expiresIn: JWT.accessValidity
+      const userRoles = await prisma.userRoles.findMany({
+        where: {
+          userId: user.id
+        },
+        include: {
+          role: true
+        }
       });
+      const token = generateAccessToken(user, userRoles.map(userRole => userRole.role));
 
       return res.json({ accessToken: token });
     } catch (error) {
       next(error);
     }
   }
-)
+);
+
+authRouter.get(
+  "/auth/verify",
+  requireHeaders("authorization"),
+  requireAccessToken(),
+  async (req, res, next) => {
+    try {
+      return res.json(res.locals.accessTokenData);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default authRouter;
