@@ -1,20 +1,28 @@
-import React from 'react';
-import logo from './assets/logo-full.svg';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import Home from './Home';
+import Layout from './Layout';
+import store from './lib/redux-store';
+
+const router = createBrowserRouter([
+  {
+    id: 'home',
+    path: '/',
+    Component: Layout,
+    children: [
+      {
+        index: true,
+        Component: Home
+      }
+    ]
+  }
+]);
 
 function App() {
   return (
-    <Box sx={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <img src={logo} alt="logo" width={192} />
-      <Typography variant='subtitle1' sx={{ mt: 2 }}>Waiting to be connected to Auth module @ {process.env['REACT_APP_AUTH_API_DOMAIN']}</Typography>
-    </Box>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   );
 }
 
