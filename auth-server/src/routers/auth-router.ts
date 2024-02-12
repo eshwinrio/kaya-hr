@@ -1,11 +1,13 @@
 import { Router } from "express";
 import httpErrors from "http-errors";
+import httpStatus from "http-status";
 import { compare } from "bcrypt";
 import prisma from "../lib/prisma.js";
 import requireBody from "../middlewares/require-body.js";
 import requireHeaders from "../middlewares/require-headers.js";
 import requireAccessToken from "../middlewares/require-access-token.js";
 import { generateAccessToken } from "../lib/token.js";
+import { Http } from "../config/environment.js";
 
 const authRouter = Router();
 
@@ -41,7 +43,10 @@ authRouter.post(
       });
       const token = generateAccessToken(user, userRoles.map(userRole => userRole.role));
 
-      return res.json({ accessToken: token });
+      return res
+        .cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" })
+        .status(httpStatus.OK)
+        .json({ token }); // TODO: Remove access token from response
     } catch (error) {
       next(error);
     }
@@ -50,10 +55,13 @@ authRouter.post(
 
 authRouter.get(
   "/auth/verify",
-  requireHeaders("authorization"),
+  requireHeaders("Cookie"),
   requireAccessToken(),
   async (req, res, next) => {
     try {
+      if (Http.responseVerifyTokenCacheEnable) {
+        res.append("Cache-Control", `public, max-age=${Http.responseVerifyTokenCacheMaxAge}`);
+      }
       return res.json(res.locals.accessTokenData);
     } catch (error) {
       next(error);
