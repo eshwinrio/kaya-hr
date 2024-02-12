@@ -1,20 +1,41 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import Home from './Home';
-import Layout from './Layout';
+import Home, { homeLoader } from './Home';
 import store from './lib/redux-store';
+import Login, { loginAction } from './Login';
+import Layout, { rootLayoutLoader } from './Layout';
+import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
 
 const router = createBrowserRouter([
   {
     id: 'root',
     path: '/',
     Component: Layout,
+    loader: rootLayoutLoader,
     children: [
       {
-        index: true,
-        Component: Home
+        id: 'dash-layout',
+        Component: DashboardLayout,
+        loader: dashboardLayoutLoader,
+        children: [
+          {
+            index: true,
+            Component: Home,
+            loader: homeLoader,
+          }
+        ]
+      },
+      {
+        path: 'login',
+        action: loginAction,
+        Component: Login,
+      },
+      {
+        path: '*',
+        Component: () => <div>404</div>
       }
-    ]
+    ],
+
   }
 ]);
 
