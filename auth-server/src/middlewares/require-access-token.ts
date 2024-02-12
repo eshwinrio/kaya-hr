@@ -11,16 +11,14 @@ type AccessTokenEnforcer = RequestHandler<ParamsDictionary, any, any, qs.ParsedQ
 export default function (): AccessTokenEnforcer {
   return (request, response, next) => {
     try {
-      const bearerToken = request.get('Authorization');
-      if (!bearerToken) {
+      const accessToken = request.cookies['access_token'];
+      if (!accessToken) {
         throw httpErrors.Unauthorized('Missing access token');
       }
-
-      const [, token] = bearerToken.split(' ');
-      if (!validator.isJWT(token)) {
+      if (!validator.isJWT(accessToken)) {
         throw httpErrors.Unauthorized('Invalid access token');
       }
-      const accessTokenData = verifyAccessToken(token);
+      const accessTokenData = verifyAccessToken(accessToken);
       response.locals.accessTokenData = accessTokenData;
       next();
     } catch (error) {
