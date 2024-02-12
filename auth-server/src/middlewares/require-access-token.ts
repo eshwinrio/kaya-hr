@@ -4,6 +4,7 @@ import httpErrors from 'http-errors';
 import qs from 'qs';
 import { AccessTokenPayload, verifyAccessToken } from '../lib/token.js';
 import validator from 'validator';
+import jsonwebtoken from 'jsonwebtoken';
 
 type Locals = Record<'accessTokenData', AccessTokenPayload>;
 type AccessTokenEnforcer = RequestHandler<ParamsDictionary, any, any, qs.ParsedQs, Locals>;
@@ -22,6 +23,10 @@ export default function (): AccessTokenEnforcer {
       response.locals.accessTokenData = accessTokenData;
       next();
     } catch (error) {
+      if (error instanceof jsonwebtoken.TokenExpiredError) {
+        response.clearCookie('access_token');
+        return next(httpErrors.Unauthorized('Access token expired'));
+      }
       next(error);
     }
   };
