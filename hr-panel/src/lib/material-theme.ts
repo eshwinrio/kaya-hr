@@ -10,7 +10,7 @@ export function useMaterialTheme() {
       primary: {
         main: '#6E11E4',
         contrastText: '#fff'
-      }
+      },
     },
     breakpoints: {
       values: {
@@ -20,6 +20,9 @@ export function useMaterialTheme() {
         lg: 992,
         xl: 1200
       }
+    },
+    shape: {
+      borderRadius: 10
     }
   })
 }
