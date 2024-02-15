@@ -11,27 +11,27 @@ datasource db {
 }
 
 model Users {
-  id              Int           @id @default(autoincrement())
-  firstName       String
-  middleName      String?
-  lastName        String
-  email           String        @unique
-  dateOfBirth     DateTime
-  streetName      String
-  addressL2       String
-  city            String
-  pincode         String
-  province        String
-  phone           Int
-  country         String
-  dateJoined      DateTime
-  status          String
-  type            String
-  organizationId  Int
-  Organizations   Organizations @relation(fields: [organizationsId], references: [id])
-  UserRoles       UserRoles[]
-  organizationsId Int
-  Schedule        Schedule[]
+  id             Int           @id @default(autoincrement())
+  firstName      String
+  middleName     String?
+  lastName       String
+  email          String        @unique
+  dateOfBirth    DateTime
+  streetName     String
+  addressL2      String?
+  city           String
+  pincode        String
+  province       String
+  phone          Int
+  country        String
+  dateJoined     DateTime
+  status         String
+  type           String
+  organizationId Int
+  organization   Organizations @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  UserRoles      UserRoles[]
+  Schedule       Schedules[]
+  TimeSheet      TimeSheets[]
 }
 
 model UserRoles {
@@ -49,7 +49,7 @@ model Roles {
   description String?
   hourlyWage  Decimal
   UserRoles   UserRoles[]
-  Schedule    Schedule[]
+  Schedules   Schedules[]
 }
 
 model Organizations {
@@ -60,26 +60,29 @@ model Organizations {
   Users   Users[]
 }
 
-model Schedule {
+model Schedules {
   id            Int      @id @default(autoincrement())
   userId        Int?
   dataTimeStart DateTime
   dateTimeEnd   DateTime
   roleId        Int
   notes         String?
-  Users         Users    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  Roles         Roles    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  user          Users?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  role          Roles    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
 }
 
-model TimeSheet {
-  id         Int     @id @default(autoincrement())
+model TimeSheets {
+  id         Int          @id @default(autoincrement())
   userId     Int
   hourlyWage Decimal
+  user       Users        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ClockTimes ClockTimes[]
 }
 
 model ClockTimes {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   startTime   DateTime
-  endTime     DateTime
+  endTime     DateTime?
   timeSheetId Int
+  timesheet   TimeSheets @relation(fields: [timeSheetId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
