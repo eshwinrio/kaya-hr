@@ -10,6 +10,76 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
+model Users {
+  id              Int           @id @default(autoincrement())
+  firstName       String
+  middleName      String?
+  lastName        String
+  email           String        @unique
+  dateOfBirth     DateTime
+  streetName      String
+  addressL2       String
+  city            String
+  pincode         String
+  province        String
+  phone           Int
+  country         String
+  dateJoined      DateTime
+  status          String
+  type            String
+  organizationId  Int
+  Organizations   Organizations @relation(fields: [organizationsId], references: [id])
+  UserRoles       UserRoles[]
+  organizationsId Int
+  Schedule        Schedule[]
+}
+
+model UserRoles {
+  id     Int   @id @default(autoincrement())
+  userId Int
+  roleId Int
+  user   Users @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role   Roles @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+}
+
+model Roles {
+  id          Int         @id @default(autoincrement())
+  code        String
+  title       String
+  description String?
+  hourlyWage  Decimal
+  UserRoles   UserRoles[]
+  Schedule    Schedule[]
+}
+
+model Organizations {
+  id      Int     @id @default(autoincrement())
+  name    String
+  summary String?
+  webLink String?
+  Users   Users[]
+}
+
+model Schedule {
+  id            Int      @id @default(autoincrement())
+  userId        Int?
+  dataTimeStart DateTime
+  dateTimeEnd   DateTime
+  roleId        Int
+  notes         String?
+  Users         Users    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  Roles         Roles    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+}
+
+model TimeSheet {
+  id         Int     @id @default(autoincrement())
+  userId     Int
+  hourlyWage Decimal
+}
+
+model ClockTimes {
+  id          Int      @id @default(autoincrement())
+  startTime   DateTime
+  endTime     DateTime
+  timeSheetId Int
 }
