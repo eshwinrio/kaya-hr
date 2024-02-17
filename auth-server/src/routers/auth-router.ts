@@ -54,6 +54,19 @@ authRouter.post(
   }
 );
 
+authRouter.delete(
+  "/auth/token",
+  requireHeaders("Cookie"),
+  async (_req, res, next) => {
+    try {
+      res.clearCookie("access_token");
+      return res.sendStatus(httpStatus.OK);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 authRouter.get(
   "/auth/verify",
   requireHeaders("Cookie"),
