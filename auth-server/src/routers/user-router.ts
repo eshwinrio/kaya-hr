@@ -18,9 +18,11 @@ interface CreateUserBody {
   readonly roles: string[];
 }
 
+type RequiredKeys = "firstName" | "lastName" | "email" | "password" | "roles";
+
 userRouter.post(
   '/users/register',
-  requireBody<CreateUserBody>('firstName', 'lastName', 'email', 'password'),
+  requireBody<CreateUserBody, RequiredKeys>("firstName", "lastName", "email", "password", "roles"),
   async (req, res, next) => {
     try {
       const { firstName, middleName, lastName, email, password, roles } = req.body;
@@ -53,12 +55,12 @@ userRouter.post(
           password: passwordHash,
           UserRoles: {
             createMany: {
-              data: matchedRoles.map((role) => ({ roleId: role.id }))   
+              data: matchedRoles.map((role) => ({ roleId: role.id }))
             }
           }
         }
       })
-      .then(({ password, ...rest }) => rest);
+        .then(({ password, ...rest }) => rest);
 
       res.status(httpStatus.CREATED).json(newUser);
     } catch (error) {
