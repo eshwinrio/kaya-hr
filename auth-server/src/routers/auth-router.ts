@@ -12,9 +12,10 @@ import { Http } from "../config/environment.js";
 const authRouter = Router();
 
 type TokenGenReqBody = Record<"username" | "password", string>;
+
 authRouter.post(
   "/auth/token",
-  requireBody<TokenGenReqBody>("username", "password"),
+  requireBody<TokenGenReqBody, "username" | "password">("username", "password"),
   async (req, res, next) => {
     try {
       const { username, password } = req.body;
@@ -24,12 +25,12 @@ authRouter.post(
           email: username
         }
       });
-      
+
       if (!user) {
         throw httpErrors.NotFound("User not found");
       }
 
-      if ((await compare(password, user.password)) === false) {
+      if (await compare(password, user.password) === false) {
         throw httpErrors.Unauthorized("Invalid credentials");
       }
 
@@ -57,7 +58,7 @@ authRouter.get(
   "/auth/verify",
   requireHeaders("Cookie"),
   requireAccessToken(),
-  async (req, res, next) => {
+  async (_req, res, next) => {
     try {
       if (Http.responseVerifyTokenCacheEnable) {
         res.append("Cache-Control", `public, max-age=${Http.responseVerifyTokenCacheMaxAge}`);
