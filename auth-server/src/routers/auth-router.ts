@@ -56,7 +56,7 @@ authRouter.post(
 
 authRouter.delete(
   "/auth/token",
-  requireHeaders("Cookie"),
+  requireAccessToken(),
   async (_req, res, next) => {
     try {
       res.clearCookie("access_token");
@@ -69,7 +69,6 @@ authRouter.delete(
 
 authRouter.get(
   "/auth/verify",
-  requireHeaders("Cookie"),
   requireAccessToken(),
   async (_req, res, next) => {
     try {
