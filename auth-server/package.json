@@ -8,7 +8,6 @@
     "clean:build": "rimraf dist",
     "clean:logs": "rimraf logs/*.log",
     "build": "tsc",
-    "prisma:dev:migrate": "prisma migrate dev --name init",
     "start": "node -r dotenv/config .",
     "start:dev": "npm run build && npm run start",
     "test": "NODE_ENV=test mocha ./dist/tests/**/*.js --exit --require dotenv/config"
