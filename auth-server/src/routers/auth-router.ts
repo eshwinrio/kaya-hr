@@ -34,7 +34,7 @@ authRouter.post(
         throw httpErrors.Unauthorized("Invalid credentials");
       }
 
-      const userRoles = await prisma.userRoles.findMany({
+      const userRoles = await prisma.userRoleMappings.findMany({
         where: {
           userId: user.id
         },
