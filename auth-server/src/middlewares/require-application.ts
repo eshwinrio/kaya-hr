@@ -6,8 +6,8 @@ import jsonwebtoken from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 import { Applications } from '@prisma/client';
 
-type Locals = Record<'application', Applications>;
-type ApplicationEnforcer = RequestHandler<any, any, any, qs.ParsedQs, Locals>;
+export type Locals = Record<'application', Applications>;
+export type ApplicationEnforcer = RequestHandler<unknown, unknown, unknown, unknown, Locals>;
 
 export default function (): ApplicationEnforcer {
   return async (request, response, next) => {
@@ -29,7 +29,7 @@ export default function (): ApplicationEnforcer {
       if (!application) {
         throw httpErrors.NotFound('Application not found');
       }
-      
+
       response.locals.application = application;
       next();
     } catch (error) {
