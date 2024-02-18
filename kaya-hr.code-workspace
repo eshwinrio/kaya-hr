@@ -1,12 +1,24 @@
 {
 	"folders": [
 		{
+			"name": "Auth Server",
 			"path": "auth-server",
-			"name": "Auth Server"
+		},
+		{
+			"name": "HR Panel",
+			"path": "hr-panel"
+		},
+		{
+			"name": "HR Resource Server",
+			"path": "hr-resource"
 		}
 	],
 	"settings": {
 		"git.openRepositoryInParentFolders": "always",
-		"editor.tabSize": 2
+		"editor.tabSize": 2,
+		"files.autoSave": "onWindowChange",
+		"editor.minimap.scale": 1,
+		"workbench.activityBar.location": "top",
+		"workbench.iconTheme": "vs-seti"
 	}
 }
