@@ -11,20 +11,22 @@ datasource db {
 }
 
 model Applications {
-  id       Int       @id @default(autoincrement())
-  name     String
-  secret   String    @default(uuid())
-  validity DateTime?
-  disabled Boolean   @default(false)
-  isValid  Boolean   @default(true)
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  secret                  String                    @default(uuid())
+  validity                DateTime?
+  disabled                Boolean                   @default(false)
+  isValid                 Boolean                   @default(true)
+  ApplicationRoleMappings ApplicationRoleMappings[]
 }
 
 model Roles {
-  id                Int                 @id @default(autoincrement())
-  code              String
-  title             String
-  UserRoles         UserRoleMappings[]
-  RoleRouteMappings RoleRouteMappings[]
+  id                      Int                       @id @default(autoincrement())
+  code                    String
+  title                   String
+  UserRoles               UserRoleMappings[]
+  RoleRouteMappings       RoleRouteMappings[]
+  ApplicationRoleMappings ApplicationRoleMappings[]
 }
 
 model Users {
@@ -64,4 +66,15 @@ model RoleRouteMappings {
   route   Routes  @relation(fields: [routeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@unique([roleId, routeId])
+}
+
+model ApplicationRoleMappings {
+  id            Int          @id @default(autoincrement())
+  applicationId Int
+  roleId        Int
+  summary       String?
+  application   Applications @relation(fields: [applicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role          Roles        @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@unique([applicationId, roleId])
 }

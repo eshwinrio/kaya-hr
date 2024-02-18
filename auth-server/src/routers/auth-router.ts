@@ -8,6 +8,7 @@ import requireHeaders from "../middlewares/require-headers.js";
 import requireAccessToken from "../middlewares/require-access-token.js";
 import { generateAccessToken } from "../lib/token.js";
 import { Http } from "../config/environment.js";
+import requireApplication from "../middlewares/require-application.js";
 
 const authRouter = Router();
 
@@ -15,6 +16,8 @@ type TokenGenReqBody = Record<"username" | "password", string>;
 
 authRouter.post(
   "/auth/token",
+  requireHeaders("X-Application"),
+  requireApplication(),
   requireBody<TokenGenReqBody, "username" | "password">("username", "password"),
   async (req, res, next) => {
     try {
@@ -42,7 +45,7 @@ authRouter.post(
           role: true
         }
       });
-      const token = generateAccessToken(user, userRoles.map(userRole => userRole.role));
+      const token = generateAccessToken(user, res.locals.application, userRoles.map(userRole => userRole.role));
 
       return res
         .cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" })
