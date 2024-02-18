@@ -13,7 +13,7 @@ datasource db {
 model Applications {
   id       Int       @id @default(autoincrement())
   name     String
-  secret   String
+  secret   String    @default(uuid())
   validity DateTime?
   disabled Boolean   @default(false)
   isValid  Boolean   @default(true)

@@ -1,4 +1,3 @@
-import { ParamsDictionary } from 'express-serve-static-core';
 import { RequestHandler } from 'express';
 import httpErrors from 'http-errors';
 import qs from 'qs';
@@ -7,7 +6,7 @@ import validator from 'validator';
 import jsonwebtoken from 'jsonwebtoken';
 
 type Locals = Record<'accessTokenData', AccessTokenPayload>;
-type AccessTokenEnforcer = RequestHandler<ParamsDictionary, any, any, qs.ParsedQs, Locals>;
+type AccessTokenEnforcer = RequestHandler<any, any, any, qs.ParsedQs, Locals>;
 
 export default function (): AccessTokenEnforcer {
   return (request, response, next) => {
