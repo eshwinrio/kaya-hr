@@ -14,3 +14,15 @@ export const fetchAccessToken = (username: string, password: string) => fetch(
     body: JSON.stringify({ username, password }),
   }
 );
+
+export const signout = (requestInit?: RequestInit) => fetch(
+  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/token`,
+  {
+    method: 'DELETE',
+    headers: {
+      'X-Application': process.env['REACT_APP_APPLICATION_SECRET']!,
+    },
+    credentials: 'include',
+    ...requestInit
+  }
+);

@@ -21,6 +21,11 @@ export function useMaterialTheme() {
         xl: 1200
       }
     },
+    typography: {
+      button: {
+        textTransform: 'none'
+      }
+    },
     shape: {
       borderRadius: 10
     }
