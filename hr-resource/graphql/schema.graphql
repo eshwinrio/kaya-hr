@@ -1,3 +1,65 @@
-type Query {
+type clockTimes{
+  id: ID!,
+  startTime: Time!,
+  endTime: Time!,
+  timesheetId: Int!
+}
+
+type timesheet{
+  id: ID!,
+  userId: Int!,
+  hourlyWage: String!
+}
+
+type userRoles{
+  id: ID!,
+  userId: Int!,
+  roleId: Int!
+}
+
+type schedule{
+  id: ID!,
+  userId: Int!,
+  dateTimeStart: Time!,
+  dateTimeEnd: Time!,
+  roleId: Int!,
+  notes: String!
+}
+
+type role{
+  id: ID!,
+  code: String!,
+  title: String!,
+  description: String!,
+  hourlyWage: Int!
+}
+
+type user{
+  id: ID!,
+  firstName: String!,
+  middleName: String!,
+  lastName: String!,
+  dob: Date!,
+  streetName: String!,
+  addressL2: String!,
+  city: String!,
+  pincode: String!,
+  province: String!,
+  phone: Int!,
+  country: String!,
+  dateJoined: Date!,
+  status: String!,
+  type: String!,
+  orgId: Int!
+}
+
+type organization{
+  id: ID!,
+  name: String!,
+  summary: String!,
+  webLink: String!
+}
+
+type Query{
   helloWorld: String
 }
