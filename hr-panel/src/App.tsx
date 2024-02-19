@@ -5,6 +5,7 @@ import store from './lib/redux-store';
 import Login, { loginAction } from './Login';
 import Layout, { rootLayoutLoader } from './Layout';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
+import { signoutAction } from './components/PopoverProfile';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
         path: 'login',
         action: loginAction,
         Component: Login,
+      },
+      {
+        path: 'signout',
+        action: signoutAction,
       },
       {
         path: '*',
