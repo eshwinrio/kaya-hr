@@ -1,22 +1,31 @@
+import { useRef, useState } from "react";
+import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Outlet } from "react-router";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
+import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import ListSubheader from "@mui/material/ListSubheader";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
 import MenuIcon from '@mui/icons-material/Menu';
+import GroupsIcon from '@mui/icons-material/Groups';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { useMaterialTheme } from "./lib/material-theme";
 import logo from './assets/logo-icon.svg';
 import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
 import { setMode } from './lib/redux-slice-ui-preferences';
 import ToolbarSpacer from "./components/ToolbarSpacer";
-import { LoaderFunction, redirect } from "react-router-dom";
 import { verifyIdentity } from "./lib/fetch-requests";
-import { Avatar, Divider, Typography } from "@mui/material";
-import { useRef, useState } from "react";
 import PopoverProfile from "./components/PopoverProfile";
 
 const drawerWidth = 240;
@@ -29,6 +38,7 @@ export default function DashboardLayout() {
   const { mode } = useUiPreferences();
   const avatarRef = useRef<HTMLButtonElement>(null);
   const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
+  const [employeeDropdown, setEmployeeDropdown] = useState(false);
 
   return (
     <>
@@ -84,6 +94,33 @@ export default function DashboardLayout() {
             </Box>
           </Toolbar>
           <Divider />
+          <List
+            sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+            component="nav"
+            aria-labelledby="nested-list-subheader"
+            subheader={
+              <ListSubheader component="div" id="nested-list-subheader">
+                Team Management
+              </ListSubheader>
+            }
+          >
+            <ListItemButton onClick={() => setEmployeeDropdown(current => !current)}>
+              <ListItemIcon>
+                <GroupsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Employees" />
+            </ListItemButton>
+            <Collapse in={employeeDropdown} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/add">
+                  <ListItemIcon>
+                    <GroupAddIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Add member" />
+                </ListItemButton>
+              </List>
+            </Collapse>
+          </List>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1 }}>
           <ToolbarSpacer sx={{ marginBottom: 2 }} />

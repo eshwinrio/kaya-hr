@@ -6,6 +6,7 @@ import Login, { loginAction } from './Login';
 import Layout, { rootLayoutLoader } from './Layout';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
 import { signoutAction } from './components/PopoverProfile';
+import EmployeeAdd from './EmployeeAdd';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,15 @@ const router = createBrowserRouter([
             index: true,
             Component: Home,
             loader: homeLoader,
+          },
+          {
+            path: "employees",
+            children: [
+              {
+                path: "add",
+                Component: EmployeeAdd
+              }
+            ]
           }
         ]
       },
