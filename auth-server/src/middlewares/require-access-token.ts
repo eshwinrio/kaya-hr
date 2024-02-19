@@ -5,8 +5,8 @@ import { AccessTokenPayload, verifyAccessToken } from '../lib/token.js';
 import validator from 'validator';
 import jsonwebtoken from 'jsonwebtoken';
 
-type Locals = Record<'accessTokenData', AccessTokenPayload>;
-type AccessTokenEnforcer = RequestHandler<any, any, any, qs.ParsedQs, Locals>;
+export type Locals = Record<'accessTokenData', AccessTokenPayload>;
+export type AccessTokenEnforcer = RequestHandler<unknown, unknown, unknown, unknown, Locals>;
 
 export default function (): AccessTokenEnforcer {
   return (request, response, next) => {

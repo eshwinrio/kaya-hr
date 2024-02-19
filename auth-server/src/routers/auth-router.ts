@@ -9,6 +9,7 @@ import requireAccessToken from "../middlewares/require-access-token.js";
 import { generateAccessToken } from "../lib/token.js";
 import { Http } from "../config/environment.js";
 import requireApplication from "../middlewares/require-application.js";
+import checkApplicationRoles from "../middlewares/check-application-roles.js";
 
 const authRouter = Router();
 
@@ -72,7 +73,9 @@ authRouter.delete(
 
 authRouter.get(
   "/auth/verify",
+  requireApplication(),
   requireAccessToken(),
+  checkApplicationRoles(),
   async (_req, res, next) => {
     try {
       if (Http.responseVerifyTokenCacheEnable) {
