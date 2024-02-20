@@ -17,9 +17,10 @@ import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
-import MenuIcon from '@mui/icons-material/Menu';
-import GroupsIcon from '@mui/icons-material/Groups';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupsIcon from '@mui/icons-material/Groups';
+import MenuIcon from '@mui/icons-material/Menu';
+import WindowIcon from '@mui/icons-material/Window';
 import { useMaterialTheme } from "./lib/material-theme";
 import logo from './assets/logo-icon.svg';
 import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
@@ -95,15 +96,21 @@ export default function DashboardLayout() {
           </Toolbar>
           <Divider />
           <List
-            sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+            sx={{ width: '100%' }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
+              <ListSubheader component="div" id="nested-list-subheader" sx={{ backgroundColor: 'inherit' }}>
                 Team Management
               </ListSubheader>
             }
           >
+            <ListItemButton component={Link} to="/" replace>
+              <ListItemIcon>
+                <WindowIcon />
+              </ListItemIcon>
+              <ListItemText primary="Overview" />
+            </ListItemButton>
             <ListItemButton onClick={() => setEmployeeDropdown(current => !current)}>
               <ListItemIcon>
                 <GroupsIcon />
