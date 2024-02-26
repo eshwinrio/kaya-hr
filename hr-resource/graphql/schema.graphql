@@ -1,7 +1,7 @@
 type ClockTime {
   id: Int!
-  startTime: Time!
-  endTime: Time!
+  startTime: String!
+  endTime: String!
   timesheetId: Int!
 }
 
@@ -14,8 +14,8 @@ type Timesheet {
 type Schedule {
   id: Int!
   userId: Int!
-  dateTimeStart: Time!
-  dateTimeEnd: Time!
+  dateTimeStart: String!
+  dateTimeEnd: String!
   role: Role!
   notes: String
 }
@@ -33,7 +33,7 @@ type User {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: Date!
+  dateOfBirth: String!
   streetName: String!
   addressL2: String
   city: String!
@@ -41,7 +41,7 @@ type User {
   province: String!
   phone: Int!
   country: String!
-  dateJoined: Date!
+  dateJoined: String!
   status: String!
   type: String!
   organization: Organization!
