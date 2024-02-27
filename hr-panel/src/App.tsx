@@ -7,6 +7,8 @@ import Layout, { rootLayoutLoader } from './Layout';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
 import { signoutAction } from './components/PopoverProfile';
 import EmployeeAdd from './EmployeeAdd';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from './lib/apollo';
 
 const router = createBrowserRouter([
   {
@@ -57,7 +59,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <ApolloProvider client={apolloClient}>
+        <RouterProvider router={router} />
+      </ApolloProvider>
     </Provider>
   );
 }
