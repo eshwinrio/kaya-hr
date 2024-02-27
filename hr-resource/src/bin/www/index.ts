@@ -1,6 +1,6 @@
 import { Server as HttpServer, createServer } from "http";
 import { Server as HttpsServer } from "https";
-import app, { bindExpressMiddleware } from "../../app.js";
+import app, { bindErrorHandler, bindExpressMiddleware } from "../../app.js";
 import { logSystem } from "../../lib/logger.js";
 import prisma from "../../lib/prisma.js";
 import { Http } from "../../config/environment.js";
@@ -19,6 +19,7 @@ async function init() {
     apolloServer.addPlugin(ApolloServerPluginDrainHttpServer({ httpServer: server }));
     await apolloServer.start();
     bindExpressMiddleware();
+    bindErrorHandler();
     await new Promise<void>((resolve) => server?.listen(Http.port, resolve));
 
     process.on('beforeExit', async (code) => {

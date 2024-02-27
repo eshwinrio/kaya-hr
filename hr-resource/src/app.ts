@@ -4,6 +4,8 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { httpLogStream } from "./lib/logger.js";
 import apolloServer, { ApolloServerContext } from "./lib/apollo.js";
 import { Cors } from "./config/environment.js";
+import requireVerification from "./middlewares/require-verification.js";
+import errorHandler from "./middlewares/error-handler.js";
 
 const app = express();
 
@@ -26,9 +28,17 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(httpLogStream);
 
-const bindExpressMiddleware = () => app.use("/", expressMiddleware(apolloServer, {
-  context: async ({ req }) => ({ token: req.headers.token }),
+const bindExpressMiddleware = () => app.use(
+  "/",
+  requireVerification(),
+  expressMiddleware<ApolloServerContext>(apolloServer, {
+  context: async ({ res }) => {
+    console.log(res.locals);
+    return { email: res.locals.email };
+  },
 }));
 
-export { bindExpressMiddleware };
+const bindErrorHandler = () => app.use(errorHandler);
+
+export { bindExpressMiddleware, bindErrorHandler };
 export default app;

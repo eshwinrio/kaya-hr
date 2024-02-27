@@ -8,7 +8,7 @@ type ClockTime {
 type Timesheet {
   id: Int!
   userId: Int!
-  hourlyWage: String!
+  hourlyWage: Float!
 }
 
 type Schedule {
@@ -56,5 +56,5 @@ type Organization {
 }
 
 type Query {
-  helloWorld: String
+  currentUser: User
 }
