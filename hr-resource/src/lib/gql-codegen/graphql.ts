@@ -70,6 +70,7 @@ export type User = {
   country: Scalars['String']['output'];
   dateJoined: Scalars['String']['output'];
   dateOfBirth: Scalars['String']['output'];
+  email: Scalars['String']['output'];
   firstName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   lastName: Scalars['String']['output'];
@@ -236,6 +237,7 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   country?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   dateJoined?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   dateOfBirth?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

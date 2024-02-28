@@ -3,9 +3,9 @@ import { Provider } from 'react-redux';
 import Home, { homeLoader } from './Home';
 import store from './lib/redux-store';
 import Login, { loginAction } from './Login';
-import Layout, { rootLayoutLoader } from './Layout';
+import Layout from './Layout';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
-import { signoutAction } from './components/PopoverProfile';
+import { signoutLoader } from './components/PopoverProfile';
 import EmployeeAdd from './EmployeeAdd';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apollo';
@@ -15,7 +15,6 @@ const router = createBrowserRouter([
     id: 'root',
     path: '/',
     Component: Layout,
-    loader: rootLayoutLoader,
     children: [
       {
         id: 'dash-layout',
@@ -45,7 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'signout',
-        action: signoutAction,
+        loader: signoutLoader,
       },
       {
         path: '*',

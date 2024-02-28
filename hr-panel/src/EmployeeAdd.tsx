@@ -50,7 +50,6 @@ export default function EmployeeAdd() {
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
-    console.log(errors)
     switch (event.target.name) {
       case 'firstName':
         setErrors({

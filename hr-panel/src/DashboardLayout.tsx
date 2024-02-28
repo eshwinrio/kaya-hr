@@ -26,8 +26,11 @@ import logo from './assets/logo-icon.svg';
 import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
 import { setMode } from './lib/redux-slice-ui-preferences';
 import ToolbarSpacer from "./components/ToolbarSpacer";
-import { verifyIdentity } from "./lib/fetch-requests";
 import PopoverProfile from "./components/PopoverProfile";
+import { apolloClient } from "./lib/apollo";
+import { WHOAMI } from "./lib/gql-queries";
+import WhoamiProvider, { useWhoAmILoader } from "./lib/whoami-provider";
+import { isApolloError } from "@apollo/client";
 
 const drawerWidth = 240;
 
@@ -40,9 +43,10 @@ export default function DashboardLayout() {
   const avatarRef = useRef<HTMLButtonElement>(null);
   const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
   const [employeeDropdown, setEmployeeDropdown] = useState(false);
+  const whoamiData = useWhoAmILoader();
 
   return (
-    <>
+    <WhoamiProvider value={whoamiData}>
       <Box sx={{ display: 'flex' }}>
         <AppBar
           position="fixed"
@@ -90,7 +94,7 @@ export default function DashboardLayout() {
           <Toolbar sx={{ gap: 2 }}>
             <img src={logo} alt="logo" height={48} />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', overflow: 'hidden' }}>
-              <Typography variant="body1" noWrap>Kaya HR</Typography>
+              <Typography variant="body1" noWrap>{whoamiData.currentUser?.organization?.name || 'Kaya HR'}</Typography>
               <Typography variant="caption" noWrap>Panel v0.0.1</Typography>
             </Box>
           </Toolbar>
@@ -135,19 +139,18 @@ export default function DashboardLayout() {
         </Box>
       </Box>
       <PopoverProfile open={isProfilePopoverOpen} anchorEl={avatarRef.current} onClose={() => setIsProfilePopoverOpen(false)} />
-    </>
+    </WhoamiProvider>
   );
 }
 
 export const dashboardLayoutLoader: LoaderFunction = async () => {
-  const response = await verifyIdentity({ cache: "reload" });
-  if (response.ok) {
-    const userData = await response.json();
-    if (!userData) {
-      throw new Error('No user data');
+  try {
+    const rs = await apolloClient.query({ query: WHOAMI });
+    return rs.data;
+  } catch (error: any) {
+    if (isApolloError(error) && error.networkError?.name === 'ServerError') {
+      return redirect('/login');
     }
-    return userData;
-  } else {
-    return redirect('/login');
+    throw error;
   }
 };

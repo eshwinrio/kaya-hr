@@ -1,22 +1,20 @@
-import { LoaderFunction, useLoaderData } from 'react-router-dom'
+import { LoaderFunction } from 'react-router-dom'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { verifyIdentity } from './lib/fetch-requests';
 import { Avatar, Card, Container, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DashCard from './components/DashCard';
+import { useWhoAmI } from './lib/whoami-provider';
 
 export default function Home() {
-  const loaderData = useLoaderData() as {
-    firstName: string
-  };
+  const whoAmI = useWhoAmI();
   return (
     <Container>
 
       {/* Greeting text */}
       <Typography variant="body1" gutterBottom>
-        Hello {loaderData.firstName}!👋
+        Hello {whoAmI?.currentUser?.firstName}!👋
       </Typography>
 
       <Grid2 container spacing={2} alignItems="flex-start">
@@ -104,13 +102,11 @@ export default function Home() {
           </Card>
         </Grid2>
       </Grid2 >
-    </Container >
+    </Container>
   );
 }
 
 export const homeLoader: LoaderFunction = async () => {
-    const response = await verifyIdentity();
-    const json = await response.json()
-    return json;
-
+  // TODO: Add queries to get dashboard summary
+  return null;
 }

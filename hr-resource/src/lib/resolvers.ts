@@ -3,9 +3,9 @@ import { ApolloServerContext } from "./apollo.js";
 import { Maybe, Resolver, ResolverTypeWrapper, User } from "./gql-codegen/graphql.js";
 import prisma from "./prisma.js";
 
-export const currentUserResolver: Resolver<Maybe<ResolverTypeWrapper<User>>, {}, ApolloServerContext, {}> = async (_root, _args, { email }) => {
-  const user = await prisma.users.findFirst({
-    where: { email },
+export const currentUserResolver: Resolver<Maybe<ResolverTypeWrapper<User>>, {}, ApolloServerContext, {}> = async (_root, _args, { userId }) => {
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
     include: {
       organization: true,
     }

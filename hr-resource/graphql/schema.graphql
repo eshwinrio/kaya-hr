@@ -34,6 +34,7 @@ type User {
   middleName: String
   lastName: String!
   dateOfBirth: String!
+  email: String!
   streetName: String!
   addressL2: String
   city: String!

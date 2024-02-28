@@ -2,13 +2,11 @@ import express from "express";
 import cors, { CorsOptions } from "cors";
 import { expressMiddleware } from "@apollo/server/express4";
 import { httpLogStream } from "./lib/logger.js";
-import apolloServer, { ApolloServerContext } from "./lib/apollo.js";
+import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
 import { Cors } from "./config/environment.js";
-import requireVerification from "./middlewares/require-verification.js";
 import errorHandler from "./middlewares/error-handler.js";
 
 const app = express();
-
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
@@ -30,12 +28,8 @@ app.use(httpLogStream);
 
 const bindExpressMiddleware = () => app.use(
   "/",
-  requireVerification(),
   expressMiddleware<ApolloServerContext>(apolloServer, {
-  context: async ({ res }) => {
-    console.log(res.locals);
-    return { email: res.locals.email };
-  },
+  context: apolloServerContextFn!,
 }));
 
 const bindErrorHandler = () => app.use(errorHandler);

@@ -7,8 +7,9 @@ const errorHandler: ErrorRequestHandler = (error: HttpError, _req, res, _next) =
   if (!isHttpError(error).valueOf()) {
     error.status = 500;
   }
-  logHttp.error(error.message, { stack: error.stack });
-  res.status(error.status).json(error.message);
+  const { stack, ...rest } = error;
+  logHttp.error(rest.message, { stack });
+  res.status(error.status).json(rest);
 };
 
 export default errorHandler;
