@@ -26,10 +26,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "eject": "react-scripts eject",
+    "start": "react-scripts start",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": [
@@ -50,9 +51,10 @@
     ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.2",
-    "@graphql-codegen/client-preset": "^4.2.2",
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/client-preset": "4.2.4",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@types/dotenv": "^8.2.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.80",
     "@types/react": "^18.2.56",

@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express';
 import httpErrors from 'http-errors';
-import qs from 'qs';
 import { AccessTokenPayload, verifyAccessToken } from '../lib/token.js';
 import validator from 'validator';
 import jsonwebtoken from 'jsonwebtoken';
