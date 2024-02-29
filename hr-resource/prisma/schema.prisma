@@ -22,11 +22,11 @@ model Users {
   city           String
   pincode        String
   province       String
-  phone          Int
+  phone          String       @db.VarChar(20)
   country        String
   dateJoined     DateTime
-  status         String
-  type           String
+  status         String?
+  type           String?
   organizationId Int
   organization   Organizations @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
   UserRoles      UserRoles[]

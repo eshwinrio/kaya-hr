@@ -7,6 +7,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -24,6 +25,40 @@ export type ClockTime = {
   timesheetId: Scalars['Int']['output'];
 };
 
+export type CreateUserInput = {
+  addressL2?: InputMaybe<Scalars['String']['input']>;
+  city: Scalars['String']['input'];
+  country: Scalars['String']['input'];
+  dateJoined: Scalars['String']['input'];
+  dateOfBirth: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  middleName?: InputMaybe<Scalars['String']['input']>;
+  password: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+  pincode: Scalars['String']['input'];
+  province: Scalars['String']['input'];
+  roleIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  streetName: Scalars['String']['input'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createRole: Scalars['Int']['output'];
+  createUser: Scalars['Int']['output'];
+};
+
+
+export type MutationCreateRoleArgs = {
+  input: RoleInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  input: CreateUserInput;
+};
+
 export type Organization = {
   __typename?: 'Organization';
   id: Scalars['Int']['output'];
@@ -32,18 +67,32 @@ export type Organization = {
   webLink?: Maybe<Scalars['String']['output']>;
 };
 
+export type OrganizationInput = {
+  name: Scalars['String']['input'];
+  summary?: InputMaybe<Scalars['String']['input']>;
+  webLink?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  roles: Array<Role>;
 };
 
 export type Role = {
   __typename?: 'Role';
   code: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  hourlyWage: Scalars['Int']['output'];
+  hourlyWage?: Maybe<Scalars['Int']['output']>;
   id: Scalars['Int']['output'];
   title: Scalars['String']['output'];
+};
+
+export type RoleInput = {
+  code: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  hourlyWage?: InputMaybe<Scalars['Int']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type Schedule = {
@@ -75,14 +124,14 @@ export type User = {
   id: Scalars['Int']['output'];
   lastName: Scalars['String']['output'];
   middleName?: Maybe<Scalars['String']['output']>;
-  organization: Organization;
-  phone: Scalars['Int']['output'];
+  organization?: Maybe<Organization>;
+  phone: Scalars['String']['output'];
   pincode: Scalars['String']['output'];
   province: Scalars['String']['output'];
   roles: Array<Role>;
-  status: Scalars['String']['output'];
+  status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -159,11 +208,15 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   ClockTime: ResolverTypeWrapper<ClockTime>;
+  CreateUserInput: CreateUserInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Mutation: ResolverTypeWrapper<{}>;
   Organization: ResolverTypeWrapper<Organization>;
+  OrganizationInput: OrganizationInput;
   Query: ResolverTypeWrapper<{}>;
   Role: ResolverTypeWrapper<Role>;
+  RoleInput: RoleInput;
   Schedule: ResolverTypeWrapper<Schedule>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Timesheet: ResolverTypeWrapper<Timesheet>;
@@ -174,11 +227,15 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   ClockTime: ClockTime;
+  CreateUserInput: CreateUserInput;
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
+  Mutation: {};
   Organization: Organization;
+  OrganizationInput: OrganizationInput;
   Query: {};
   Role: Role;
+  RoleInput: RoleInput;
   Schedule: Schedule;
   String: Scalars['String']['output'];
   Timesheet: Timesheet;
@@ -193,6 +250,11 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createRole?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateRoleArgs, 'input'>>;
+  createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+}>;
+
 export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Organization'] = ResolversParentTypes['Organization']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -203,12 +265,13 @@ export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType 
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
 }>;
 
 export type RoleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Role'] = ResolversParentTypes['Role']> = ResolversObject<{
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  hourlyWage?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  hourlyWage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -242,19 +305,20 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   middleName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  organization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType>;
-  phone?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  organization?: Resolver<Maybe<ResolversTypes['Organization']>, ParentType, ContextType>;
+  phone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   pincode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   province?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   streetName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Role?: RoleResolvers<ContextType>;

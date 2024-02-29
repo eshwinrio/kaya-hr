@@ -1,23 +1,26 @@
 import { useState } from 'react';
-import { Form } from 'react-router-dom';
-import Grid2 from '@mui/material/Unstable_Grid2';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { ActionFunction, Form } from 'react-router-dom';
+import validator from 'validator';
+import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Container from '@mui/material/Container';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid2 from '@mui/material/Unstable_Grid2';
 import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import PasswordIcon from '@mui/icons-material/Password';
-import ReplayIcon from '@mui/icons-material/Replay';
-import ShuffleIcon from '@mui/icons-material/Shuffle';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import validator from 'validator';
-import dayjs from 'dayjs';
+
+import SelectRole from './components/SelectRole';
+import InputPassword from './components/InputPassword';
+import { apolloClient } from './lib/apollo';
+import { CREATE_USER } from './lib/gql-queries';
 
 type FormKeys =
   | 'firstName'
@@ -241,8 +244,8 @@ export default function EmployeeAdd() {
           {/* Section 3: Initial security details */}
           <Typography variant='h6' fontWeight='bold' sx={{ mb: 3, mt: 5 }}>Account security</Typography>
           <Grid2 container direction='row' spacing={2}>
-            <Grid2 xs={12} sm={6} md={4}>
-              <InitialPasswordField
+            <Grid2 xs={12} sm={6} lg={4}>
+              <InputPassword
                 name='password' label='Password'
                 variant='outlined' fullWidth
                 required
@@ -258,11 +261,17 @@ export default function EmployeeAdd() {
           {/* Section 4: Employment details */}
           <Typography variant='h6' fontWeight='bold' sx={{ mb: 3, mt: 5 }}>Employment setup</Typography>
           <Grid2 container direction='row' spacing={2}>
-            <Grid2>
+            <Grid2 xs={12} sm={6}>
               <DatePicker
                 name='dateJoined' label="Date of joining"
                 defaultValue={dayjs(formData.dateJoined)}
                 sx={{ width: '100%' }} />
+            </Grid2>
+            <Grid2 xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel id='inputLabel-role-select'>Role</InputLabel>
+                <SelectRole name='role' label='Role' labelId='inputLabel-role-select' />
+              </FormControl>
             </Grid2>
           </Grid2>
 
@@ -291,24 +300,31 @@ export default function EmployeeAdd() {
   );
 }
 
-type InitialPasswordFieldProps = Exclude<TextFieldProps, 'type'>;
-function InitialPasswordField(props: InitialPasswordFieldProps) {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  return (
-    <TextField
-      type={showPassword ? 'text' : 'password'}
-      InputProps={{
-        startAdornment: <PasswordIcon color='inherit' sx={{ mr: 2 }} />,
-        endAdornment: <>
-          <IconButton onClick={setShowPassword.bind(null, state => !state)}>
-            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-          </IconButton>
-          <IconButton>
-            <ShuffleIcon />
-          </IconButton>
-        </>
-      }}
-      {...props}
-    />
-  )
+export const employeeAddAction: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const response = await apolloClient.mutate({
+    mutation: CREATE_USER,
+    variables: {
+      input: {
+        firstName: formData.get('firstName')!.toString(),
+        middleName: formData.get('middleName')?.toString(),
+        lastName: formData.get('lastName')!.toString(),
+        dateOfBirth: formData.get('dateOfBirth')!.toString(),
+        email: formData.get('email')!.toString(),
+        phone: formData.get('phone')!.toString(),
+        streetName: formData.get('streetName')!.toString(),
+        addressL2: formData.get('addressL2')!.toString(),
+        city: formData.get('city')!.toString(),
+        province: formData.get('province')!.toString(),
+        pincode: formData.get('pincode')!.toString(),
+        country: formData.get('country')!.toString(),
+        password: formData.get('password')!.toString(),
+        dateJoined: formData.get('dateJoined')!.toString(),
+        roleIds: formData.get('role')!.toString().split(',').map(Number),
+      }
+    }
+  });
+
+  // TODO: Redirect to employee view using the `id` in the response
+  return response.data;
 }

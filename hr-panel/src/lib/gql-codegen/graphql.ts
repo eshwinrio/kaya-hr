@@ -24,6 +24,40 @@ export type ClockTime = {
   timesheetId: Scalars['Int']['output'];
 };
 
+export type CreateUserInput = {
+  addressL2?: InputMaybe<Scalars['String']['input']>;
+  city: Scalars['String']['input'];
+  country: Scalars['String']['input'];
+  dateJoined: Scalars['String']['input'];
+  dateOfBirth: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  middleName?: InputMaybe<Scalars['String']['input']>;
+  password: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+  pincode: Scalars['String']['input'];
+  province: Scalars['String']['input'];
+  roleIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  streetName: Scalars['String']['input'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createRole: Scalars['Int']['output'];
+  createUser: Scalars['Int']['output'];
+};
+
+
+export type MutationCreateRoleArgs = {
+  input: RoleInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  input: CreateUserInput;
+};
+
 export type Organization = {
   __typename?: 'Organization';
   id: Scalars['Int']['output'];
@@ -32,18 +66,32 @@ export type Organization = {
   webLink?: Maybe<Scalars['String']['output']>;
 };
 
+export type OrganizationInput = {
+  name: Scalars['String']['input'];
+  summary?: InputMaybe<Scalars['String']['input']>;
+  webLink?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  roles: Array<Role>;
 };
 
 export type Role = {
   __typename?: 'Role';
   code: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  hourlyWage: Scalars['Int']['output'];
+  hourlyWage?: Maybe<Scalars['Int']['output']>;
   id: Scalars['Int']['output'];
   title: Scalars['String']['output'];
+};
+
+export type RoleInput = {
+  code: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  hourlyWage?: InputMaybe<Scalars['Int']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type Schedule = {
@@ -75,20 +123,34 @@ export type User = {
   id: Scalars['Int']['output'];
   lastName: Scalars['String']['output'];
   middleName?: Maybe<Scalars['String']['output']>;
-  organization: Organization;
-  phone: Scalars['Int']['output'];
+  organization?: Maybe<Organization>;
+  phone: Scalars['String']['output'];
   pincode: Scalars['String']['output'];
   province: Scalars['String']['output'];
   roles: Array<Role>;
-  status: Scalars['String']['output'];
+  status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
-  type: Scalars['String']['output'];
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WhoAmIQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, firstName: string, lastName: string, email: string, organization: { __typename?: 'Organization', name: string } } | null };
+export type WhoAmIQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, firstName: string, lastName: string, email: string, organization?: { __typename?: 'Organization', name: string } | null } | null };
+
+export type LoadAllRolesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LoadAllRolesQuery = { __typename?: 'Query', roles: Array<{ __typename?: 'Role', id: number, code: string, title: string, description?: string | null, hourlyWage?: number | null }> };
+
+export type CreateUserMutationVariables = Exact<{
+  input: CreateUserInput;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: number };
 
 
 export const WhoAmIDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WhoAmI"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<WhoAmIQuery, WhoAmIQueryVariables>;
+export const LoadAllRolesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"LoadAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"hourlyWage"}}]}}]}}]} as unknown as DocumentNode<LoadAllRolesQuery, LoadAllRolesQueryVariables>;
+export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
