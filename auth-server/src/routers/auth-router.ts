@@ -9,7 +9,6 @@ import requireAccessToken from "../middlewares/require-access-token.js";
 import { generateAccessToken } from "../lib/token.js";
 import { Http } from "../config/environment.js";
 import requireApplication from "../middlewares/require-application.js";
-import checkApplicationRoles from "../middlewares/check-application-roles.js";
 
 const authRouter = Router();
 
@@ -38,16 +37,7 @@ authRouter.post(
         throw httpErrors.Unauthorized("Invalid credentials");
       }
 
-      const userRoles = await prisma.userRoleMappings.findMany({
-        where: {
-          userId: user.id
-        },
-        include: {
-          role: true
-        }
-      });
-      const token = generateAccessToken(user, res.locals.application, userRoles.map(userRole => userRole.role));
-
+      const token = generateAccessToken(user, res.locals.application);
       return res
         .cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" })
         .status(httpStatus.OK)
@@ -75,7 +65,6 @@ authRouter.get(
   "/auth/verify",
   requireApplication(),
   requireAccessToken(),
-  checkApplicationRoles(),
   async (_req, res, next) => {
     try {
       if (Http.responseVerifyTokenCacheEnable) {

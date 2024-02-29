@@ -15,26 +15,19 @@ interface CreateUserBody {
   readonly lastName: string;
   readonly email: string;
   readonly password: string;
-  readonly roles: string[];
 }
 
-type RequiredKeys = "firstName" | "lastName" | "email" | "password" | "roles";
+type RequiredKeys = "firstName" | "lastName" | "email" | "password";
 
 userRouter.post(
   '/users/register',
-  requireBody<CreateUserBody, RequiredKeys>("firstName", "lastName", "email", "password", "roles"),
+  requireBody<CreateUserBody, RequiredKeys>("firstName", "lastName", "email", "password"),
   async (req, res, next) => {
     try {
-      const { firstName, middleName, lastName, email, password, roles } = req.body;
+      const { firstName, middleName, lastName, email, password } = req.body;
 
       if (!validator.isEmail(email)) {
         throw httpErrors.BadRequest('Invalid email');
-      }
-
-      const matchedRoles = await prisma.roles.findMany({ where: { code: { in: roles } } });
-      const unmatchedRoles = roles.filter((role) => !matchedRoles.map((role) => role.code).includes(role));
-      if (unmatchedRoles.length) {
-        throw httpErrors.BadRequest(`Invalid roles: ${unmatchedRoles.join()}`);
       }
 
       if ((await prisma.users.count({ where: { email } })) > 0) {
@@ -53,11 +46,6 @@ userRouter.post(
           lastName,
           email,
           password: passwordHash,
-          UserRoles: {
-            createMany: {
-              data: matchedRoles.map((role) => ({ roleId: role.id }))
-            }
-          }
         }
       })
         .then(({ password, ...rest }) => rest);
