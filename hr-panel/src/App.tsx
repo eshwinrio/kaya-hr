@@ -6,7 +6,7 @@ import Login, { loginAction } from './Login';
 import Layout from './Layout';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
 import { signoutLoader } from './components/PopoverProfile';
-import EmployeeAdd from './EmployeeAdd';
+import EmployeeAdd, { employeeAddAction } from './EmployeeAdd';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apollo';
 
@@ -31,7 +31,8 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "add",
-                Component: EmployeeAdd
+                Component: EmployeeAdd,
+                action: employeeAddAction,
               }
             ]
           }

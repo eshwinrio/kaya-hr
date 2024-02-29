@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE `User`;
-
 -- CreateTable
 CREATE TABLE `Users` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -20,11 +11,11 @@ CREATE TABLE `Users` (
     `city` VARCHAR(191) NOT NULL,
     `pincode` VARCHAR(191) NOT NULL,
     `province` VARCHAR(191) NOT NULL,
-    `phone` INTEGER NOT NULL,
+    `phone` VARCHAR(20) NOT NULL,
     `country` VARCHAR(191) NOT NULL,
     `dateJoined` DATETIME(3) NOT NULL,
-    `status` VARCHAR(191) NOT NULL,
-    `type` VARCHAR(191) NOT NULL,
+    `status` VARCHAR(191) NULL,
+    `type` VARCHAR(191) NULL,
     `organizationId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Users_email_key`(`email`),

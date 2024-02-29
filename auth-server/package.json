@@ -5,11 +5,11 @@
   "main": "dist/bin/www/index.js",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "clean:build": "rimraf dist",
     "clean:logs": "rimraf logs/*.log",
-    "build": "tsc",
-    "start": "node -r dotenv/config .",
     "start:dev": "npm run build && npm run start",
+    "start": "node -r dotenv/config .",
     "test": "NODE_ENV=test mocha ./dist/tests/**/*.js --exit --require dotenv/config"
   },
   "author": "Eshwin Rio",

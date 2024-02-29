@@ -1,20 +1,18 @@
 import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { readFileSync } from "fs";
 import { Resolvers } from "./gql-codegen/graphql.js";
-import { currentUserResolver } from "./resolvers.js";
+import { mResolverCreateUser, qResolverCurrentUser, qResolverRoles } from "./resolvers.js";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
 import { verifyIdentity } from "./fetch-requests.js";
 import httpErrors, { HttpError } from "http-errors";
 import { GraphQLError } from "graphql";
-
-export interface AccessTokenPayload {
-  readonly id: number;
-  readonly roles: Array<{ readonly id: number }>;
-}
+import { Organizations, Roles, Users } from "@prisma/client";
+import prisma from "./prisma.js";
 
 export interface ApolloServerContext extends BaseContext {
-  readonly userId: AccessTokenPayload['id'];
-  readonly roleIds: AccessTokenPayload['roles'][number]['id'][];
+  readonly user: Users;
+  readonly organization: Organizations | null;
+  readonly roles: Roles[];
 }
 
 export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext>['context'] = async ({ req }) => {
@@ -32,11 +30,17 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       throw httpErrors(verificationResponse.status, errorBody.message);
     }
 
-    const responseBody = await verificationResponse.json() as AccessTokenPayload;
-    return {
-      userId: responseBody.id,
-      roleIds: responseBody.roles.map(role => role.id),
-    };
+    const responseBody = await verificationResponse.json() as { id: number };
+    const user = await prisma.users.findUnique({
+      where: { id: responseBody.id },
+      include: { organization: true, UserRoles: { include: { role: true } } },
+    });
+    if (!user) {
+      throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
+    }
+
+    const { UserRoles, organization, ...rest } = user;
+    return { user: rest, organization, roles: UserRoles.map(userRole => userRole.role) };
   } catch (error) {
     if (httpErrors.isHttpError(error)) {
       throw new GraphQLError((error as HttpError).message, { extensions: { code: (error as HttpError).statusCode } });
@@ -48,8 +52,12 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
 const typeDefs = readFileSync('graphql/schema.graphql', { encoding: 'utf-8' });
 const resolvers: Resolvers<ApolloServerContext> = {
   Query: {
-    currentUser: currentUserResolver,
+    currentUser: qResolverCurrentUser,
+    roles: qResolverRoles,
   },
+  Mutation: {
+    createUser: mResolverCreateUser
+  }
 }
 
 const apolloServerOptions: ApolloServerOptions<ApolloServerContext> = { typeDefs, resolvers };

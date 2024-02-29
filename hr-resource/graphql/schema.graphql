@@ -25,7 +25,14 @@ type Role {
   code: String!
   title: String!
   description: String
-  hourlyWage: Int!
+  hourlyWage: Int
+}
+
+input RoleInput {
+  code: String!
+  title: String!
+  description: String
+  hourlyWage: Int
 }
 
 type User {
@@ -40,13 +47,31 @@ type User {
   city: String!
   pincode: String!
   province: String!
-  phone: Int!
+  phone: String!
   country: String!
   dateJoined: String!
-  status: String!
-  type: String!
-  organization: Organization!
+  status: String
+  type: String
+  organization: Organization
   roles: [Role!]!
+}
+
+input CreateUserInput {
+  firstName: String!
+  middleName: String
+  lastName: String!
+  dateOfBirth: String!
+  email: String!
+  phone: String!
+  streetName: String!
+  addressL2: String
+  city: String!
+  pincode: String!
+  province: String!
+  country: String!
+  password: String!
+  dateJoined: String!
+  roleIds: [Int!]
 }
 
 type Organization {
@@ -56,6 +81,18 @@ type Organization {
   webLink: String
 }
 
+input OrganizationInput {
+  name: String!
+  summary: String
+  webLink: String
+}
+
 type Query {
   currentUser: User
+  roles: [Role!]!
+}
+
+type Mutation {
+  createRole(input: RoleInput!) : Int!
+  createUser(input: CreateUserInput!): Int!
 }
