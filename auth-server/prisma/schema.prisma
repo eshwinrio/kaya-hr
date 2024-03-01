@@ -36,4 +36,6 @@ model UserApplicationMap {
   applicationId Int
   user          Users        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   application   Applications @relation(fields: [applicationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([userId, applicationId])
 }

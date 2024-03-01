@@ -32,3 +32,13 @@ export namespace Logger {
   export const enableStackTrace =
     process.env['LOGGER_ENABLE_STACK_TRACE'] === 'true';
 }
+
+export namespace Seed {
+  export const defaultApplicationId = parseInt(process.env['SEED_DEFAULT_APPLICATION_ID']!, 10);
+  export const defaultApplicationName = process.env['SEED_DEFAULT_APPLICATION_NAME']!;
+  export const defaultApplicationSecret = process.env['SEED_DEFAULT_APPLICATION_SECRET']!;
+  export const defaultUserEmail = process.env['SEED_DEFAULT_USER_EMAIL']!;
+  export const defaultUserFirstName = process.env['SEED_DEFAULT_USER_FIRST_NAME']!;
+  export const defaultUserLastName = process.env['SEED_DEFAULT_USER_LAST_NAME']!;
+  export const defaultUserPassword = process.env['SEED_DEFAULT_USER_PASSWORD']!;
+}

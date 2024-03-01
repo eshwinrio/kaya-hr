@@ -29,6 +29,7 @@ CREATE TABLE `UserApplicationMap` (
     `userId` INTEGER NOT NULL,
     `applicationId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `UserApplicationMap_userId_applicationId_key`(`userId`, `applicationId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
