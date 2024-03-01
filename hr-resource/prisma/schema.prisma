@@ -22,7 +22,7 @@ model Users {
   city           String
   pincode        String
   province       String
-  phone          String       @db.VarChar(20)
+  phone          String        @db.VarChar(20)
   country        String
   dateJoined     DateTime
   status         String?
@@ -34,22 +34,24 @@ model Users {
   TimeSheet      TimeSheets[]
 }
 
+model Roles {
+  id          Int         @id @default(autoincrement())
+  code        String      @unique
+  title       String
+  description String?
+  hourlyWage  Decimal
+  UserRoles   UserRoles[]
+  Schedules   Schedules[]
+}
+
 model UserRoles {
   id     Int   @id @default(autoincrement())
   userId Int
   roleId Int
   user   Users @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   role   Roles @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-}
 
-model Roles {
-  id          Int         @id @default(autoincrement())
-  code        String
-  title       String
-  description String?
-  hourlyWage  Decimal
-  UserRoles   UserRoles[]
-  Schedules   Schedules[]
+  @@unique([userId, roleId])
 }
 
 model Organizations {

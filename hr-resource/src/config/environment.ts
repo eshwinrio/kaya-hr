@@ -21,3 +21,24 @@ export namespace Logger {
   export const enableStackTrace =
     process.env['LOGGER_ENABLE_STACK_TRACE'] === 'true';
 }
+
+export namespace Seed {
+  export const defaultUserEmail = process.env['SEED_DEFAULT_USER_EMAIL']!;
+  export const defaultUserFirstName = process.env['SEED_DEFAULT_USER_FIRST_NAME']!;
+  export const defaultUserLastName = process.env['SEED_DEFAULT_USER_LAST_NAME']!;
+  export const defaultUserDateOfBirth = process.env['SEED_DEFAULT_USER_DATE_OF_BIRTH']!;
+  export const defaultUserStreetName = process.env['SEED_DEFAULT_USER_STREET_NAME']!;
+  export const defaultUserCity = process.env['SEED_DEFAULT_USER_CITY']!;
+  export const defaultUserPincode = process.env['SEED_DEFAULT_USER_PINCODE']!;
+  export const defaultUserProvince = process.env['SEED_DEFAULT_USER_PROVINCE']!;
+  export const defaultUserPhone = process.env['SEED_DEFAULT_USER_PHONE']!;
+  export const defaultUserCountry = process.env['SEED_DEFAULT_USER_COUNTRY']!;
+  export const defaultUserDateJoined = process.env['SEED_DEFAULT_USER_DATE_JOINED']!;
+  export const defaultRoleCode = process.env['SEED_DEFAULT_ROLE_CODE']!;
+  export const defaultRoleTitle = process.env['SEED_DEFAULT_ROLE_TITLE']!;
+  export const defaultRoleDescription = process.env['SEED_DEFAULT_ROLE_DESCRIPTION']!;
+  export const defaultRoleHourlyWage = parseFloat(process.env['SEED_DEFAULT_ROLE_HOURLY_WAGE']!);
+  export const defaultOrganizationName = process.env['SEED_DEFAULT_ORGANIZATION_NAME']!;
+  export const defaultOrganizationSummary = process.env['SEED_DEFAULT_ORGANIZATION_SUMMARY']!;
+  export const defaultOrganizationWebsiteUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_WEBSITE_URL']!);
+}
