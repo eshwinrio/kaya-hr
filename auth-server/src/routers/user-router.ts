@@ -6,6 +6,10 @@ import validator from "validator";
 import requireBody from "../middlewares/require-body.js";
 import prisma from "../lib/prisma.js";
 import { Bcrypt } from "../config/environment.js";
+import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
+import requireApplication from "../middlewares/require-application.js";
+import requireUser from "../middlewares/require-user.js";
+import requireAccessToken from "../middlewares/require-access-token.js";
 
 const userRouter = Router();
 
@@ -19,8 +23,12 @@ interface CreateUserBody {
 
 type RequiredKeys = "firstName" | "lastName" | "email" | "password";
 
-userRouter.post(
+userRouter.post( 
   '/users/register',
+  requireApplication(),
+  requireAccessToken(),
+  requireUser(),
+  requireUserApplicationLink(),
   requireBody<CreateUserBody, RequiredKeys>("firstName", "lastName", "email", "password"),
   async (req, res, next) => {
     try {
@@ -39,15 +47,16 @@ userRouter.post(
       }
       const passwordHash = await hash(password, Bcrypt.saltRounds);
 
-      const newUser = await prisma.users.create({
-        data: {
-          firstName,
-          middleName,
-          lastName,
-          email,
-          password: passwordHash,
-        }
-      })
+      const newUser = await prisma.users
+        .create({
+          data: {
+            firstName,
+            middleName,
+            lastName,
+            email,
+            password: passwordHash,
+          }
+        })
         .then(({ password, ...rest }) => rest);
 
       res.status(httpStatus.CREATED).json(newUser);

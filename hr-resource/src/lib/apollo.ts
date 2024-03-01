@@ -21,9 +21,10 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value === undefined) continue;
+      if (key.match(/^content-length$/i)) continue;
       headers.append(key, Array.isArray(value) ? value.join(',') : value);
     }
-  
+
     const verificationResponse = await verifyIdentity({ headers });
     if (!verificationResponse.ok) {
       const errorBody = await verificationResponse.json() as Error;
