@@ -9,6 +9,8 @@ import requireAccessToken from "../middlewares/require-access-token.js";
 import { generateAccessToken } from "../lib/token.js";
 import { Http } from "../config/environment.js";
 import requireApplication from "../middlewares/require-application.js";
+import requireUser from "../middlewares/require-user.js";
+import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
 
 const authRouter = Router();
 
@@ -41,7 +43,7 @@ authRouter.post(
       return res
         .cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "none" })
         .status(httpStatus.OK)
-        .json({ token }); // TODO: Remove access token from response
+        .end();
     } catch (error) {
       next(error);
     }
@@ -63,8 +65,11 @@ authRouter.delete(
 
 authRouter.get(
   "/auth/verify",
+  requireHeaders("X-Application"),
   requireApplication(),
   requireAccessToken(),
+  requireUser(),
+  requireUserApplicationLink(),
   async (_req, res, next) => {
     try {
       if (Http.responseVerifyTokenCacheEnable) {
