@@ -87,6 +87,12 @@ input OrganizationInput {
   webLink: String
 }
 
+# User sync
+type UserSyncResult {
+  accepted: Int!
+  rejected: Int!
+}
+
 type Query {
   currentUser: User
   roles: [Role!]!
@@ -95,4 +101,5 @@ type Query {
 type Mutation {
   createRole(input: RoleInput!) : Int!
   createUser(input: CreateUserInput!): Int!
+  syncUsers(force: Boolean): UserSyncResult!
 }

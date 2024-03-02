@@ -1,16 +1,19 @@
-import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { readFileSync } from "fs";
-import { Resolvers } from "./gql-codegen/graphql.js";
-import { mResolverCreateUser, qResolverCurrentUser, qResolverRoles } from "./resolvers.js";
-import { ExpressMiddlewareOptions } from "@apollo/server/express4";
-import { verifyIdentity } from "./fetch-requests.js";
 import httpErrors, { HttpError } from "http-errors";
 import { GraphQLError } from "graphql";
+import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
+import { ExpressMiddlewareOptions } from "@apollo/server/express4";
 import { Organizations, Roles, Users } from "@prisma/client";
+import { Resolvers } from "./gql-codegen/graphql.js";
+import { qResolverCurrentUser, qResolverRoles } from "./query-resolvers.js";
+import { mResolverCreateUser, mResolverSyncUsers } from "./mutation-resolvers.js";
+import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import prisma from "./prisma.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: Users;
+  readonly applicationId: string;
+  readonly accessToken: string;
   readonly organization: Organizations | null;
   readonly roles: Roles[];
 }
@@ -18,12 +21,7 @@ export interface ApolloServerContext extends BaseContext {
 export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext>['context'] = async ({ req }) => {
   try {
     // Append all headers from the request to the headers object
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(req.headers)) {
-      if (value === undefined) continue;
-      if (key.match(/^content-length$/i)) continue;
-      headers.append(key, Array.isArray(value) ? value.join(',') : value);
-    }
+    const headers = getHeaders(req);
 
     const verificationResponse = await verifyIdentity({ headers });
     if (!verificationResponse.ok) {
@@ -31,7 +29,7 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       throw httpErrors(verificationResponse.status, errorBody.message);
     }
 
-    const responseBody = await verificationResponse.json() as { id: number };
+    const responseBody = await verificationResponse.json() as { id: number, application: string };
     const user = await prisma.users.findUnique({
       where: { id: responseBody.id },
       include: { organization: true, UserRoles: { include: { role: true } } },
@@ -41,7 +39,13 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
     }
 
     const { UserRoles, organization, ...rest } = user;
-    return { user: rest, organization, roles: UserRoles.map(userRole => userRole.role) };
+    return {
+      user: rest,
+      applicationId: responseBody.application,
+      accessToken: req.cookies['access_token'],
+      organization,
+      roles: UserRoles.map(userRole => userRole.role)
+    };
   } catch (error) {
     if (httpErrors.isHttpError(error)) {
       throw new GraphQLError((error as HttpError).message, { extensions: { code: (error as HttpError).statusCode } });
@@ -57,7 +61,8 @@ const resolvers: Resolvers<ApolloServerContext> = {
     roles: qResolverRoles,
   },
   Mutation: {
-    createUser: mResolverCreateUser
+    createUser: mResolverCreateUser,
+    syncUsers: mResolverSyncUsers,
   }
 }
 

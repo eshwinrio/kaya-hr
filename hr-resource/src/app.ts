@@ -1,5 +1,6 @@
 import express from "express";
 import cors, { CorsOptions } from "cors";
+import cookieParser from "cookie-parser";
 import { expressMiddleware } from "@apollo/server/express4";
 import { httpLogStream } from "./lib/logger.js";
 import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
@@ -24,6 +25,7 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 app.use(httpLogStream);
 
 const bindExpressMiddleware = () => app.use(

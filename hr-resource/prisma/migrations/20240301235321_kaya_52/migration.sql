@@ -17,17 +17,9 @@ CREATE TABLE `Users` (
     `status` VARCHAR(191) NULL,
     `type` VARCHAR(191) NULL,
     `organizationId` INTEGER NOT NULL,
+    `syncStatus` ENUM('NEVER', 'OK', 'FAIL') NOT NULL DEFAULT 'NEVER',
 
     UNIQUE INDEX `Users_email_key`(`email`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `UserRoles` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userId` INTEGER NOT NULL,
-    `roleId` INTEGER NOT NULL,
-
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -39,6 +31,17 @@ CREATE TABLE `Roles` (
     `description` VARCHAR(191) NULL,
     `hourlyWage` DECIMAL(65, 30) NOT NULL,
 
+    UNIQUE INDEX `Roles_code_key`(`code`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserRoles` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `roleId` INTEGER NOT NULL,
+
+    UNIQUE INDEX `UserRoles_userId_roleId_key`(`userId`, `roleId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
