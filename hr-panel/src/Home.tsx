@@ -1,14 +1,21 @@
-import { LoaderFunction } from 'react-router-dom'
+import { Link, LoaderFunction, useLoaderData } from 'react-router-dom'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { Avatar, Card, Container, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Button, Card, Container, IconButton, Toolbar } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import LaunchIcon from '@mui/icons-material/Launch';
 import DashCard from './components/DashCard';
 import { useWhoAmI } from './lib/whoami-provider';
+import { apolloClient } from './lib/apollo';
+import { LOAD_USERS } from './lib/gql-queries';
+import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
+import ListEmployee from './components/ListEmployee';
 
 export default function Home() {
   const whoAmI = useWhoAmI();
+  const data = useLoaderData() as LoadAllUsersQuery;
+
   return (
     <Container>
 
@@ -23,9 +30,11 @@ export default function Home() {
         <Grid2 xs={12} sm={6} xl={4}>
 
           {/* Days greeting */}
-          <Typography variant="h5" fontWeight={600} sx={{ mb: 2 }}>
-            Good morning!
-          </Typography>
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Typography variant="h5" fontWeight={600}>
+              Good morning!
+            </Typography>
+          </Toolbar>
 
           <div>
             <Grid2 container spacing={1}>
@@ -34,7 +43,7 @@ export default function Home() {
                 {
                   title: 'Total employees',
                   icon: <AssignmentIndIcon />,
-                  value: 0,
+                  value: data.users.length,
                   backgroundColor: "#CAB7EBD7",
                   color: "#482880"
                 },
@@ -78,27 +87,13 @@ export default function Home() {
 
         <Grid2 xs={12} sm={6} xl={4}>
 
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Active employees
-          </Typography>
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Typography variant="h6" fontWeight={600}>Active employees</Typography>
+            <Button size='small' startIcon={<LaunchIcon fontSize='inherit' />} component={Link} to='/employees/list'>View all</Button>
+          </Toolbar>
 
-          <Card variant='outlined' elevation={0}>
-            <List dense disablePadding>
-              {[
-                { name: 'Neutral Prajapati', position: 'Software Engineer' },
-                { name: 'Sample Rudani', position: 'Software Engineer' },
-                { name: 'Template Patel', position: 'Software Engineer' },
-              ].map((data, index) => (
-                <ListItem disablePadding key={index}>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <Avatar variant='rounded' sx={{ width: 36, height: 36 }} />
-                    </ListItemIcon>
-                    <ListItemText primary={data.name} secondary={data.position} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
+          <Card variant='outlined' elevation={0} sx={{ maxHeight: 218, height: '100%', overflowY: 'auto' }}>
+            <ListEmployee disablePadding dense />
           </Card>
         </Grid2>
       </Grid2 >
@@ -107,6 +102,5 @@ export default function Home() {
 }
 
 export const homeLoader: LoaderFunction = async () => {
-  // TODO: Add queries to get dashboard summary
-  return null;
+  return (await apolloClient.query({ query: LOAD_USERS })).data;
 }

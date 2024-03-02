@@ -42,3 +42,17 @@ export const UPDATE_ORGANIZATION = gql(`
     updateOrganization(id: $id, input: $input)
   }
 `);
+
+export const LOAD_USERS = gql(`
+  query LoadAllUsers {
+    users {
+        firstName
+        lastName
+        organization {
+          name 
+        }
+        dateOfBirth
+        country
+    }
+  }
+`);
