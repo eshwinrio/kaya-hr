@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -118,7 +119,7 @@ export default function DashboardLayout() {
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
-              <ListItemText primary="Employees" />
+              <ListItemText primary="Employees" secondary="Add, list employees" />
             </ListItemButton>
             <Collapse in={employeeDropdown} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
@@ -127,6 +128,12 @@ export default function DashboardLayout() {
                     <GroupAddIcon />
                   </ListItemIcon>
                   <ListItemText primary="Add member" />
+                </ListItemButton>
+                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/list">
+                  <ListItemIcon>
+                    <ChecklistIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="List members" />
                 </ListItemButton>
               </List>
             </Collapse>

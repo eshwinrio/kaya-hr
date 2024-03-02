@@ -21,7 +21,7 @@ export default function ListEmployee(props: ListEmployeeProps) {
             <ListItemIcon>
               <Avatar variant='rounded' sx={{ width: 36, height: 36 }}>{user?.firstName.charAt(0)}</Avatar>
             </ListItemIcon>
-            <ListItemText primary={user?.firstName} secondary={user?.country} />
+            <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} />
           </ListItemButton>
         </ListItem>
       ))}

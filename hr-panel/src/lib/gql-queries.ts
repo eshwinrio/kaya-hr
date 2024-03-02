@@ -46,13 +46,15 @@ export const UPDATE_ORGANIZATION = gql(`
 export const LOAD_USERS = gql(`
   query LoadAllUsers {
     users {
+        id
         firstName
         lastName
-        organization {
-          name 
-        }
+        email
+        phone
+        dateJoined
         dateOfBirth
-        country
+        streetName
+        pincode
     }
   }
 `);

@@ -108,7 +108,7 @@ export default function EmployeeAdd() {
   }
 
   return (
-    <Container>
+    <Container maxWidth='xl'>
       <Typography variant='h5' fontWeight='bold' sx={{ mb: 3 }}>Add employee</Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Form method='post' autoComplete='on'>
