@@ -18,7 +18,7 @@ export default function (): ApplicationEnforcer {
       }
 
       if (!validator.isUUID(applicationSecret)) {
-        throw httpErrors.Unauthorized('Invalid application secret');
+        throw httpErrors.Unauthorized(`Invalid application secret: ${applicationSecret}`);
       }
 
       const application = await prisma.applications.findFirst({

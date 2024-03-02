@@ -16,7 +16,7 @@ export default function (): AccessTokenEnforcer {
         throw httpErrors.Unauthorized('Missing access token');
       }
       if (!validator.isJWT(accessToken)) {
-        throw httpErrors.Unauthorized('Invalid access token');
+        throw httpErrors.Unauthorized(`Invalid access token: ${accessToken}`);
       }
       const accessTokenData = verifyAccessToken(accessToken);
       response.locals.accessTokenData = accessTokenData;
