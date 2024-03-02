@@ -46,6 +46,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createRole: Scalars['Int']['output'];
   createUser: Scalars['Int']['output'];
+  syncUsers: UserSyncResult;
 };
 
 
@@ -56,6 +57,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateUserArgs = {
   input: CreateUserInput;
+};
+
+
+export type MutationSyncUsersArgs = {
+  force?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Organization = {
@@ -131,6 +137,12 @@ export type User = {
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
   type?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserSyncResult = {
+  __typename?: 'UserSyncResult';
+  accepted: Scalars['Int']['output'];
+  rejected: Scalars['Int']['output'];
 };
 
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never; }>;

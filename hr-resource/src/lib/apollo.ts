@@ -5,7 +5,7 @@ import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
 import { Organizations, Roles, Users } from "@prisma/client";
 import { Resolvers } from "./gql-codegen/graphql.js";
-import { qResolverCurrentUser, qResolverRoles } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverRoles, qResolverUsers } from "./query-resolvers.js";
 import { mResolverCreateUser, mResolverSyncUsers } from "./mutation-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import prisma from "./prisma.js";
@@ -58,6 +58,7 @@ const typeDefs = readFileSync('graphql/schema.graphql', { encoding: 'utf-8' });
 const resolvers: Resolvers<ApolloServerContext> = {
   Query: {
     currentUser: qResolverCurrentUser,
+    users: qResolverUsers,
     roles: qResolverRoles,
   },
   Mutation: {
