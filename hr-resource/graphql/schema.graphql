@@ -56,6 +56,20 @@ type User {
   roles: [Role!]!
 }
 
+type Organization {
+  id: Int!
+  name: String!
+  summary: String
+  webLink: String
+}
+
+type UserSyncResult {
+  accepted: Int!
+  rejected: Int!
+}
+
+
+# Input types
 input CreateUserInput {
   firstName: String!
   middleName: String
@@ -74,27 +88,17 @@ input CreateUserInput {
   roleIds: [Int!]
 }
 
-type Organization {
-  id: Int!
-  name: String!
-  summary: String
-  webLink: String
-}
-
 input OrganizationInput {
   name: String!
   summary: String
   webLink: String
 }
 
-# User sync
-type UserSyncResult {
-  accepted: Int!
-  rejected: Int!
-}
 
+# Root types
 type Query {
   currentUser: User
+  users: [User]!
   roles: [Role!]!
 }
 
