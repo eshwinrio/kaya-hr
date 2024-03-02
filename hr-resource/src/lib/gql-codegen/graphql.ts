@@ -47,6 +47,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createRole: Scalars['Int']['output'];
   createUser: Scalars['Int']['output'];
+  syncUsers: UserSyncResult;
 };
 
 
@@ -57,6 +58,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateUserArgs = {
   input: CreateUserInput;
+};
+
+
+export type MutationSyncUsersArgs = {
+  force?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Organization = {
@@ -132,6 +138,12 @@ export type User = {
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
   type?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserSyncResult = {
+  __typename?: 'UserSyncResult';
+  accepted: Scalars['Int']['output'];
+  rejected: Scalars['Int']['output'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -221,6 +233,7 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Timesheet: ResolverTypeWrapper<Timesheet>;
   User: ResolverTypeWrapper<User>;
+  UserSyncResult: ResolverTypeWrapper<UserSyncResult>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -240,6 +253,7 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
   Timesheet: Timesheet;
   User: User;
+  UserSyncResult: UserSyncResult;
 }>;
 
 export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ClockTime'] = ResolversParentTypes['ClockTime']> = ResolversObject<{
@@ -253,6 +267,7 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createRole?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateRoleArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
 }>;
 
 export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Organization'] = ResolversParentTypes['Organization']> = ResolversObject<{
@@ -316,6 +331,12 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserSyncResultResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['UserSyncResult'] = ResolversParentTypes['UserSyncResult']> = ResolversObject<{
+  accepted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  rejected?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
@@ -325,5 +346,6 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   Schedule?: ScheduleResolvers<ContextType>;
   Timesheet?: TimesheetResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserSyncResult?: UserSyncResultResolvers<ContextType>;
 }>;
 

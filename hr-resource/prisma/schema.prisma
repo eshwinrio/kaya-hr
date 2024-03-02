@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SyncStatus {
+  NEVER
+  OK
+  FAIL
+}
+
 model Users {
   id             Int           @id @default(autoincrement())
   firstName      String
@@ -28,6 +34,7 @@ model Users {
   status         String?
   type           String?
   organizationId Int
+  syncStatus     SyncStatus    @default(NEVER)
   organization   Organizations @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
   UserRoles      UserRoles[]
   Schedule       Schedules[]

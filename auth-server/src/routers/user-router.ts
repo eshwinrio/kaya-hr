@@ -10,6 +10,7 @@ import requireUserApplicationLink from "../middlewares/require-userApplication-l
 import requireApplication from "../middlewares/require-application.js";
 import requireUser from "../middlewares/require-user.js";
 import requireAccessToken from "../middlewares/require-access-token.js";
+import userSyncRequestHandler, { ReqBody as UserSyncBody } from "../handlers/user-sync-handler.js";
 
 const userRouter = Router();
 
@@ -20,16 +21,14 @@ interface CreateUserBody {
   readonly email: string;
   readonly password: string;
 }
-
-type RequiredKeys = "firstName" | "lastName" | "email" | "password";
-
+type UserCreateRequiredBodyKeys = "firstName" | "lastName" | "email" | "password";
 userRouter.post( 
   '/users/register',
   requireApplication(),
   requireAccessToken(),
   requireUser(),
   requireUserApplicationLink(),
-  requireBody<CreateUserBody, RequiredKeys>("firstName", "lastName", "email", "password"),
+  requireBody<CreateUserBody, UserCreateRequiredBodyKeys>("firstName", "lastName", "email", "password"),
   async (req, res, next) => {
     try {
       const { firstName, middleName, lastName, email, password } = req.body;
@@ -64,6 +63,16 @@ userRouter.post(
       next(error);
     }
   }
+);
+
+userRouter.post(
+  '/users/sync',
+  requireApplication(),
+  requireAccessToken(),
+  requireUser(),
+  requireUserApplicationLink(),
+  requireBody<UserSyncBody, 'data'>("data"),
+  userSyncRequestHandler
 );
 
 export default userRouter;

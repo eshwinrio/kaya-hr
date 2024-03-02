@@ -57,5 +57,5 @@ export const httpLogStream = morgan('short', {
     write(str) {
       logHttp.debug(str);
     }
-  }
+  },
 });

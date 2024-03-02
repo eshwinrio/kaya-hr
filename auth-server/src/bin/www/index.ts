@@ -35,12 +35,12 @@ async function init() {
 }
 
 process.on("unhandledRejection", (error) => {
-  logSystem.error(error);
+  logSystem.error("UnhandledRejection", error);
   process.exit(1);
 });
 
 process.on("uncaughtException", (error) => {
-  logSystem.error(error);
+  logSystem.error('UncaughtException', error);
   process.exit(1);
 });
 
