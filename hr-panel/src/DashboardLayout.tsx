@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
 import { isApolloError } from "@apollo/client";
 import AppBar from "@mui/material/AppBar";
@@ -39,6 +39,7 @@ const drawerWidth = 240;
 export default function DashboardLayout() {
   const materialTheme = useMaterialTheme();
   const isSmallerScreen = useMediaQuery(materialTheme.breakpoints.down('md'));
+  const contentWidth = useMemo(() => (isSmallerScreen ? '100%' : `calc(100% - ${drawerWidth}px)`), [isSmallerScreen]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { mode } = useUiPreferences();
@@ -54,7 +55,7 @@ export default function DashboardLayout() {
           position="fixed"
           color="inherit"
           elevation={0}
-          sx={{ width: isSmallerScreen ? '100%' : `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}>
+          sx={{ width: contentWidth }}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
               <IconButton
@@ -144,7 +145,7 @@ export default function DashboardLayout() {
             </IconButton>
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ width: contentWidth, flexGrow: 1 }}>
           <ToolbarSpacer sx={{ marginBottom: 2 }} />
           <Outlet />
         </Box>
