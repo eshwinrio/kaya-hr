@@ -1,27 +1,43 @@
-import { useState } from 'react';
 import List, { ListProps } from '@mui/material/List';
-import { useQuery } from '@apollo/client';
-import { LOAD_USERS } from '../lib/gql-queries';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Avatar from '@mui/material/Avatar';
+import ListItem, { ListItemProps } from '@mui/material/ListItem';
+import ListItemButton, { ListItemButtonProps } from '@mui/material/ListItemButton';
+import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
+import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
+import Avatar, { AvatarProps } from '@mui/material/Avatar';
+import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
 
-type ListEmployeeProps = Exclude<ListProps, 'type'>;
-export default function ListEmployee(props: ListEmployeeProps) {
+interface ListEmployeeProps extends ListProps {
+  readonly data?: LoadAllUsersQuery;
+  readonly error?: unknown;
+  readonly loading?: boolean;
+  children?: never;
+  readonly avatarProps?: AvatarProps;
+  readonly listItemProps?: ListItemProps;
+  readonly listItemButtonProps?: ListItemButtonProps;
+  readonly listItemIconProps?: ListItemIconProps;
+  readonly listItemTextProps?: ListItemTextProps;
+}
 
-  const { data, loading } = useQuery(LOAD_USERS);
-
+export default function ListEmployee({
+  data,
+  error,
+  loading,
+  avatarProps,
+  listItemProps,
+  listItemButtonProps,
+  listItemIconProps,
+  listItemTextProps,
+  ...props
+}: ListEmployeeProps) {
   return (
     <List {...props}>
       {data?.users.map((user, index) => (
-        <ListItem disablePadding key={index}>
-          <ListItemButton>
-            <ListItemIcon>
-              <Avatar variant='rounded' sx={{ width: 36, height: 36 }}>{user?.firstName.charAt(0)}</Avatar>
+        <ListItem key={index} {...listItemProps}>
+          <ListItemButton {...listItemButtonProps}>
+            <ListItemIcon {...listItemIconProps}>
+              <Avatar variant='rounded' sx={{ width: 36, height: 36 }} {...avatarProps}>{user?.firstName.charAt(0)}</Avatar>
             </ListItemIcon>
-            <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} />
+            <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} {...listItemTextProps} />
           </ListItemButton>
         </ListItem>
       ))}

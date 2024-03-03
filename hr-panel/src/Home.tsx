@@ -93,7 +93,7 @@ export default function Home() {
           </Toolbar>
 
           <Card variant='outlined' elevation={0} sx={{ maxHeight: 218, height: '100%', overflowY: 'auto' }}>
-            <ListEmployee disablePadding dense />
+            <ListEmployee disablePadding dense data={data} />
           </Card>
         </Grid2>
       </Grid2 >

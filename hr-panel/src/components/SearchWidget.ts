@@ -7,10 +7,4 @@ export default styled('div')(({ theme }) => ({
   '&:hover': {
     backgroundColor: alpha(theme.palette.grey[400], 0.25),
   },
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
 }));
