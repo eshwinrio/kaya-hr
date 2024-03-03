@@ -58,3 +58,12 @@ export const LOAD_USERS = gql(`
     }
   }
 `);
+
+export const SYNC_USERS = gql(`
+  mutation SyncUsers($force: Boolean) {
+    syncUsers(force: $force) {
+      accepted
+      rejected
+    }
+  }
+`);

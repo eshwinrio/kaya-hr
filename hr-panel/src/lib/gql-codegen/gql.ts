@@ -18,6 +18,7 @@ const documents = {
     "\n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input)\n  }\n": types.CreateUserDocument,
     "\n  mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {\n    updateOrganization(id: $id, input: $input)\n  }\n": types.UpdateOrganizationDocument,
     "\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n": types.LoadAllUsersDocument,
+    "\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n": types.SyncUsersDocument,
 };
 
 /**
@@ -52,6 +53,10 @@ export function gql(source: "\n  mutation CreateUser($input: CreateUserInput!) {
 export function gql(source: "\n  mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {\n    updateOrganization(id: $id, input: $input)\n  }\n"): (typeof documents)["\n  mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {\n    updateOrganization(id: $id, input: $input)\n  }\n"];
 export function gql(source: "\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n"): (typeof documents)["\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n"];
 export function gql(source: "\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n"): (typeof documents)["\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n"): (typeof documents)["\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
