@@ -67,3 +67,20 @@ export const SYNC_USERS = gql(`
     }
   }
 `);
+
+export const VIEW_USER = gql(`
+  query ViewUser($id: Int!, $options: ViewUserOptionsInput) {
+    user(userId: $id, options: $options) {
+      firstName
+      lastName
+      organization {
+          name 
+      }
+      dateOfBirth
+      country
+      roles {
+          code
+      }
+    }
+}
+`);

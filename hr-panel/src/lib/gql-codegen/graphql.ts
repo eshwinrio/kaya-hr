@@ -99,7 +99,14 @@ export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
   roles: Array<Role>;
+  user: User;
   users: Array<Maybe<User>>;
+};
+
+
+export type QueryUserArgs = {
+  options?: InputMaybe<ViewUserOptionsInput>;
+  userId: Scalars['Int']['input'];
 };
 
 export type Role = {
@@ -171,6 +178,12 @@ export type UserSyncResult = {
   rejected: Scalars['Int']['output'];
 };
 
+export type ViewUserOptionsInput = {
+  roles?: InputMaybe<Scalars['Boolean']['input']>;
+  schedules?: InputMaybe<Scalars['Boolean']['input']>;
+  timesheets?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type WhoAmIQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -204,6 +217,14 @@ export type SyncUsersMutationVariables = Exact<{
 
 export type SyncUsersMutation = { __typename?: 'Mutation', syncUsers: { __typename?: 'UserSyncResult', accepted: number, rejected: number } };
 
+export type ViewUserQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+  options?: InputMaybe<ViewUserOptionsInput>;
+}>;
+
+
+export type ViewUserQuery = { __typename?: 'Query', user: { __typename?: 'User', firstName: string, lastName: string, dateOfBirth: string, country: string, organization?: { __typename?: 'Organization', name: string } | null, roles: Array<{ __typename?: 'Role', code: string }> } };
+
 
 
 export type UpdateOrganizationMutation = { __typename?: 'Mutation', updateOrganization: number };
@@ -215,3 +236,4 @@ export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const UpdateOrganizationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateOrganization"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateOrganizationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateOrganization"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<UpdateOrganizationMutation, UpdateOrganizationMutationVariables>;
 export const LoadAllUsersDocument = { "kind": "Document", "definitions": [{ "kind": "OperationDefinition", "operation": "query", "name": { "kind": "Name", "value": "LoadAllUsers" }, "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "users" }, "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "id" } }, { "kind": "Field", "name": { "kind": "Name", "value": "firstName" } }, { "kind": "Field", "name": { "kind": "Name", "value": "lastName" } }, { "kind": "Field", "name": { "kind": "Name", "value": "email" } }, { "kind": "Field", "name": { "kind": "Name", "value": "phone" } }, { "kind": "Field", "name": { "kind": "Name", "value": "dateJoined" } }, { "kind": "Field", "name": { "kind": "Name", "value": "dateOfBirth" } }, { "kind": "Field", "name": { "kind": "Name", "value": "streetName" } }, { "kind": "Field", "name": { "kind": "Name", "value": "pincode" } }] } }] } }] } as unknown as DocumentNode<LoadAllUsersQuery, LoadAllUsersQueryVariables>;
 export const SyncUsersDocument = { "kind": "Document", "definitions": [{ "kind": "OperationDefinition", "operation": "mutation", "name": { "kind": "Name", "value": "SyncUsers" }, "variableDefinitions": [{ "kind": "VariableDefinition", "variable": { "kind": "Variable", "name": { "kind": "Name", "value": "force" } }, "type": { "kind": "NamedType", "name": { "kind": "Name", "value": "Boolean" } } }], "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "syncUsers" }, "arguments": [{ "kind": "Argument", "name": { "kind": "Name", "value": "force" }, "value": { "kind": "Variable", "name": { "kind": "Name", "value": "force" } } }], "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "accepted" } }, { "kind": "Field", "name": { "kind": "Name", "value": "rejected" } }] } }] } }] } as unknown as DocumentNode<SyncUsersMutation, SyncUsersMutationVariables>;
+export const ViewUserDocument = { "kind": "Document", "definitions": [{ "kind": "OperationDefinition", "operation": "query", "name": { "kind": "Name", "value": "ViewUser" }, "variableDefinitions": [{ "kind": "VariableDefinition", "variable": { "kind": "Variable", "name": { "kind": "Name", "value": "id" } }, "type": { "kind": "NonNullType", "type": { "kind": "NamedType", "name": { "kind": "Name", "value": "Int" } } } }, { "kind": "VariableDefinition", "variable": { "kind": "Variable", "name": { "kind": "Name", "value": "options" } }, "type": { "kind": "NamedType", "name": { "kind": "Name", "value": "ViewUserOptionsInput" } } }], "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "user" }, "arguments": [{ "kind": "Argument", "name": { "kind": "Name", "value": "userId" }, "value": { "kind": "Variable", "name": { "kind": "Name", "value": "id" } } }, { "kind": "Argument", "name": { "kind": "Name", "value": "options" }, "value": { "kind": "Variable", "name": { "kind": "Name", "value": "options" } } }], "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "firstName" } }, { "kind": "Field", "name": { "kind": "Name", "value": "lastName" } }, { "kind": "Field", "name": { "kind": "Name", "value": "organization" }, "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "name" } }] } }, { "kind": "Field", "name": { "kind": "Name", "value": "dateOfBirth" } }, { "kind": "Field", "name": { "kind": "Name", "value": "country" } }, { "kind": "Field", "name": { "kind": "Name", "value": "roles" }, "selectionSet": { "kind": "SelectionSet", "selections": [{ "kind": "Field", "name": { "kind": "Name", "value": "code" } }] } }] } }] } }] } as unknown as DocumentNode<ViewUserQuery, ViewUserQueryVariables>;

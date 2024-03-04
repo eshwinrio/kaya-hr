@@ -1,4 +1,4 @@
-import { LoaderFunction, useLoaderData } from 'react-router-dom'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom'
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -76,6 +76,7 @@ const columns: GridColDef[] = [
 
 export default function EmployeeList() {
   const data = useLoaderData() as LoadAllUsersQuery;
+  const navigate = useNavigate();
   const [ syncMutate, { loading } ] = useMutation(SYNC_USERS);
   const materialTheme = useMaterialTheme();
   const isXsScreen = useMediaQuery(materialTheme.breakpoints.up('xs'));
@@ -114,6 +115,7 @@ export default function EmployeeList() {
               },
             },
           }}
+          onRowClick={params => navigate(`/employees/view/${params.id}`)}
           columnVisibilityModel={{
             streetName: isLgScreen,
             pincode: isLgScreen

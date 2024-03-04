@@ -19,6 +19,7 @@ const documents = {
     "\n  mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {\n    updateOrganization(id: $id, input: $input)\n  }\n": types.UpdateOrganizationDocument,
     "\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n": types.LoadAllUsersDocument,
     "\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n": types.SyncUsersDocument,
+    "\n  query ViewUser($id: Int!, $options: ViewUserOptionsInput) {\n    user(userId: $id, options: $options) {\n      firstName\n      lastName\n      organization {\n          name \n      }\n      dateOfBirth\n      country\n      roles {\n          code\n      }\n    }\n}\n": types.ViewUserDocument,
 };
 
 /**
@@ -57,6 +58,10 @@ export function gql(source: "\n  query LoadAllUsers {\n    users {\n        id\n
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n"): (typeof documents)["\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query ViewUser($id: Int!, $options: ViewUserOptionsInput) {\n    user(userId: $id, options: $options) {\n      firstName\n      lastName\n      organization {\n          name \n      }\n      dateOfBirth\n      country\n      roles {\n          code\n      }\n    }\n}\n"): (typeof documents)["\n  query ViewUser($id: Int!, $options: ViewUserOptionsInput) {\n    user(userId: $id, options: $options) {\n      firstName\n      lastName\n      organization {\n          name \n      }\n      dateOfBirth\n      country\n      roles {\n          code\n      }\n    }\n}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
