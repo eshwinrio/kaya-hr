@@ -1,16 +1,10 @@
-import { Link, LoaderFunction, useLoaderData } from 'react-router-dom'
-import Box from '@mui/material/Box';
+import { LoaderFunction, useLoaderData } from 'react-router-dom'
 import Typography from '@mui/material/Typography';
-import { Avatar, Button, Card, Container, IconButton, Input, Toolbar, styled } from '@mui/material';
+import { Avatar, Container, Input, styled } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import LaunchIcon from '@mui/icons-material/Launch';
-import DashCard from './components/DashCard';
-import { useWhoAmI } from './lib/whoami-provider';
 import { apolloClient } from './lib/apollo';
-import { LOAD_USERS, VIEW_USER } from './lib/gql-queries';
-import { LoadAllUsersQuery, ViewUserQuery } from './lib/gql-codegen/graphql';
-import ListEmployee from './components/ListEmployee';
+import { VIEW_USER } from './lib/gql-queries';
+import { ViewUserQuery } from './lib/gql-codegen/graphql';
 import { GraphQLError } from 'graphql';
 
 const EditableTypography = styled(Input)(({ theme }) => ({
@@ -47,7 +41,7 @@ export const viewEmployeeLoader: LoaderFunction = async ({ params }) => {
   }
   const user = await apolloClient.query({
     query: VIEW_USER,
-    variables: { id, options: { roles: true } }
+    variables: { id }
   })
   return user.data;
 }

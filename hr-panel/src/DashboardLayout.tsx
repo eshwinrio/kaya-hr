@@ -93,9 +93,22 @@ export default function DashboardLayout() {
           variant={isSmallerScreen ? 'temporary' : 'permanent'}
           anchor="left"
         >
-          <Toolbar sx={{ gap: 2 }}>
-            <img src={logo} alt="logo" height={48} />
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', overflow: 'hidden' }}>
+          <Toolbar disableGutters>
+            <Avatar
+              variant="square"
+              src={whoamiData.currentUser?.organization?.logoUrl || logo}
+              alt={whoamiData.currentUser?.organization?.name || 'Management dashboard'}
+              sx={{ width: 48, height: 48, cursor: 'pointer', mx: 1 }}
+            />
+            <Divider orientation="vertical" flexItem />
+            <Box sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              overflow: 'hidden',
+              p: 1
+              }}>
               <Typography variant="body1" noWrap>{whoamiData.currentUser?.organization?.name || 'Kaya HR'}</Typography>
               <Typography variant="caption" noWrap>Panel v0.0.1</Typography>
             </Box>

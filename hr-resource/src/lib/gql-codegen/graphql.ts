@@ -100,7 +100,13 @@ export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
   roles: Array<Role>;
+  user: User;
   users: Array<Maybe<User>>;
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['Int']['input'];
 };
 
 export type Role = {
@@ -313,6 +319,7 @@ export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
 }>;
 

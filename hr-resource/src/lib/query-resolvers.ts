@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import { QueryResolvers } from "./gql-codegen/graphql.js";
 import prisma from "./prisma.js";
 
@@ -38,4 +39,32 @@ export const qResolverUsers: QueryResolvers['users'] = async (
     dateJoined: dateJoined.toISOString(),
     ...user
   }));
+}
+
+export const qResolverUser: QueryResolvers['user'] = async (
+  _root,
+  { id },
+  _context
+) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      UserRoles: {
+        include: { role: true },
+        where: { roleId: { not: 1 } }
+      },
+      organization: true
+    }
+  });
+
+  if (!user) {
+    throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
+  };
+  
+  return {
+    ...user,
+    roles: user.UserRoles.map(({ role }) => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })),
+    dateOfBirth: user.dateOfBirth.toISOString(),
+    dateJoined: user.dateJoined.toISOString()
+  };
 }

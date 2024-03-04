@@ -69,8 +69,8 @@ export const SYNC_USERS = gql(`
 `);
 
 export const VIEW_USER = gql(`
-  query ViewUser($id: Int!, $options: ViewUserOptionsInput) {
-    user(userId: $id, options: $options) {
+  query ViewUser($id: Int!) {
+    user(id: $id) {
       firstName
       lastName
       organization {
