@@ -83,10 +83,20 @@ input CreateUserInput {
   roleIds: [Int!]
 }
 
-input OrganizationInput {
+input CreateOrganizationInput {
   name: String!
   summary: String
-  webLink: String
+  webUrl: String!
+  bannerUrl: String!
+  logoUrl: String!
+}
+
+input UpdateOrganizationInput {
+  name: String
+  summary: String
+  webUrl: String,
+  bannerUrl: String,
+  logoUrl: String
 }
 
 input RoleInput {
@@ -106,6 +116,8 @@ type Query {
 
 type Mutation {
   createRole(input: RoleInput!): Int!
+  createOrganization(input: CreateOrganizationInput!): Int!
   createUser(input: CreateUserInput!): Int!
+  updateOrganization(id: Int!, input: UpdateOrganizationInput!): Int!
   syncUsers(force: Boolean): UserSyncResult!
 }

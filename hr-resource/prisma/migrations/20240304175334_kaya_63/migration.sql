@@ -49,7 +49,7 @@ CREATE TABLE `UserRole` (
 CREATE TABLE `Organization` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `summary` VARCHAR(191) NULL,
+    `summary` VARCHAR(1000) NULL,
     `webUrl` VARCHAR(191) NULL,
     `bannerUrl` VARCHAR(191) NULL,
     `logoUrl` VARCHAR(191) NULL,

@@ -55,6 +55,59 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
     });
 };
 
+export const mResolverCreateOrganization: MutationResolvers['createOrganization'] = async (
+  _root,
+  { input },
+  { roles },
+) => {
+  if (roles.findIndex(role => role.code === 'SUPER') === -1) {
+    throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
+  }
+  try {
+    const organization = await prisma.organization
+      .create({
+        data: {
+          name: input.name,
+          summary: input.summary,
+          webUrl: input.webUrl,
+          logoUrl: input.logoUrl,
+          bannerUrl: input.bannerUrl,
+        },
+      });
+    return organization.id;
+  } catch (error) {
+    logSystem.error(error);
+    throw new GraphQLError('Could not create organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+  }
+}
+
+export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'] = async (
+  _root,
+  { id, input },
+  { roles, organization }
+) => {
+  if (roles.findIndex(role => role.code === 'SUPER') === -1 || organization?.id !== id) {
+    throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
+  }
+  return prisma.organization
+    .update({
+      where: { id },
+      data: {
+        name: input.name ?? undefined,
+        summary: input.summary,
+        webUrl: input.webUrl,
+        logoUrl: input.logoUrl,
+        bannerUrl: input.bannerUrl,
+      },
+    })
+    .then(organization => organization.id)
+    .catch(error => {
+      console.log(error);
+      logSystem.error(error);
+      throw new GraphQLError('Could not update organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+}
+
 export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
   _root,
   { force },

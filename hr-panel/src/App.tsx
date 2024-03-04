@@ -10,7 +10,7 @@ import EmployeeAdd, { employeeAddAction } from './EmployeeAdd';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apollo';
 import SettingsPage from './SettingsPage';
-import OrganizationSettingsPage from './OrganizationSettingsPage';
+import OrganizationSettingsPage, { organizationSettingsAction } from './OrganizationSettingsPage';
 
 const router = createBrowserRouter([
   {
@@ -48,7 +48,8 @@ const router = createBrowserRouter([
               },
               {
                 path: "organization",
-                Component: OrganizationSettingsPage
+                Component: OrganizationSettingsPage,
+                action: organizationSettingsAction
               }
             ]
           }

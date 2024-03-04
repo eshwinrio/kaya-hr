@@ -25,6 +25,14 @@ export type ClockTime = {
   timesheetId: Scalars['Int']['output'];
 };
 
+export type CreateOrganizationInput = {
+  bannerUrl: Scalars['String']['input'];
+  logoUrl: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  summary?: InputMaybe<Scalars['String']['input']>;
+  webUrl: Scalars['String']['input'];
+};
+
 export type CreateUserInput = {
   addressL2?: InputMaybe<Scalars['String']['input']>;
   city: Scalars['String']['input'];
@@ -45,9 +53,16 @@ export type CreateUserInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createOrganization: Scalars['Int']['output'];
   createRole: Scalars['Int']['output'];
   createUser: Scalars['Int']['output'];
   syncUsers: UserSyncResult;
+  updateOrganization: Scalars['Int']['output'];
+};
+
+
+export type MutationCreateOrganizationArgs = {
+  input: CreateOrganizationInput;
 };
 
 
@@ -65,6 +80,12 @@ export type MutationSyncUsersArgs = {
   force?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+
+export type MutationUpdateOrganizationArgs = {
+  id: Scalars['Int']['input'];
+  input: UpdateOrganizationInput;
+};
+
 export type Organization = {
   __typename?: 'Organization';
   bannerUrl?: Maybe<Scalars['String']['output']>;
@@ -73,12 +94,6 @@ export type Organization = {
   name: Scalars['String']['output'];
   summary?: Maybe<Scalars['String']['output']>;
   webUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export type OrganizationInput = {
-  name: Scalars['String']['input'];
-  summary?: InputMaybe<Scalars['String']['input']>;
-  webLink?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Query = {
@@ -119,6 +134,14 @@ export type Timesheet = {
   hourlyWage: Scalars['Float']['output'];
   id: Scalars['Int']['output'];
   userId: Scalars['Int']['output'];
+};
+
+export type UpdateOrganizationInput = {
+  bannerUrl?: InputMaybe<Scalars['String']['input']>;
+  logoUrl?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  summary?: InputMaybe<Scalars['String']['input']>;
+  webUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {
@@ -223,18 +246,19 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   ClockTime: ResolverTypeWrapper<ClockTime>;
+  CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   Organization: ResolverTypeWrapper<Organization>;
-  OrganizationInput: OrganizationInput;
   Query: ResolverTypeWrapper<{}>;
   Role: ResolverTypeWrapper<Role>;
   RoleInput: RoleInput;
   Schedule: ResolverTypeWrapper<Schedule>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Timesheet: ResolverTypeWrapper<Timesheet>;
+  UpdateOrganizationInput: UpdateOrganizationInput;
   User: ResolverTypeWrapper<User>;
   UserSyncResult: ResolverTypeWrapper<UserSyncResult>;
 }>;
@@ -243,18 +267,19 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   ClockTime: ClockTime;
+  CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
   Mutation: {};
   Organization: Organization;
-  OrganizationInput: OrganizationInput;
   Query: {};
   Role: Role;
   RoleInput: RoleInput;
   Schedule: Schedule;
   String: Scalars['String']['output'];
   Timesheet: Timesheet;
+  UpdateOrganizationInput: UpdateOrganizationInput;
   User: User;
   UserSyncResult: UserSyncResult;
 }>;
@@ -268,9 +293,11 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
 }>;
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
   createRole?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateRoleArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
+  updateOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
 }>;
 
 export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Organization'] = ResolversParentTypes['Organization']> = ResolversObject<{

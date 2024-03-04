@@ -5,13 +5,15 @@ import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import { Form } from "react-router-dom";
+import { ActionFunction, Form } from "react-router-dom";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import { useMaterialTheme } from "./lib/material-theme";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { apolloClient } from "./lib/apollo";
+import { UPDATE_ORGANIZATION } from "./lib/gql-queries";
 
 // TODO: Replace dummy data with query data
 const names = [
@@ -72,24 +74,27 @@ export default function OrganizationSettingsPage() {
       </AvatarGroup>
 
       <Form method="post">
+        <input type="hidden" name="id" value={whoAmI?.currentUser?.organization?.id} />
         <Grid2 container gap={4} direction='column'>
           <Grid2 xs={12} sm={4}>
             <TextField
-              label="Organization Name"
+              label="Name"
+              name="name"
               variant="outlined"
               fullWidth
-              value={whoAmI?.currentUser?.organization?.name || ''}
+              defaultValue={whoAmI?.currentUser?.organization?.name || ''}
               onChange={(e) => {/* handle name change */ }}
             />
           </Grid2>
-          <Grid2 xs={12} sm={6}>
+          <Grid2 xs={12} sm={8}>
             <TextField
-              label="Organization Summary"
+              label="About"
+              name="summary"
               variant="outlined"
               multiline
               fullWidth
               rows={4}
-              value={whoAmI?.currentUser?.organization?.summary || ''}
+              defaultValue={whoAmI?.currentUser?.organization?.summary || ''}
               onChange={(e) => {/* handle summary change */ }}
             />
           </Grid2>
@@ -97,6 +102,10 @@ export default function OrganizationSettingsPage() {
         <Button type="submit" variant="contained" fullWidth={!isAboveXs} sx={{ mt: 4 }}>
           Update
         </Button>
+        <br />
+        <Typography variant="caption" sx={{ pb: 4 }}>
+          Reload page after updating for changes to take effect
+        </Typography>
       </Form>
     </Container >
   );
@@ -118,3 +127,17 @@ const Banner = styled(Box)(({ theme }) => ({
   alignItems: 'flex-start',
   justifyContent: 'flex-end',
 }));
+
+export const organizationSettingsAction: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const id = parseInt(formData.get('id')?.toString()!, 10);
+  if (!id) {
+    return null;
+  }
+  const name = formData.get('name')?.toString();
+  const summary = formData.get('summary')?.toString();
+  return await apolloClient.mutate({
+    mutation: UPDATE_ORGANIZATION,
+    variables: { id, input: { name, summary } },
+  });
+}
