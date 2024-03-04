@@ -1,4 +1,4 @@
-import { Users } from "@prisma/client";
+import { User } from "@prisma/client";
 import { Api } from "../config/environment.js";
 import type { Request } from 'express';
 
@@ -19,7 +19,7 @@ export const verifyIdentity = (requestInit: RequestInit) => fetch(
 );
 
 export const syncUsers = (
-  body: Array<Pick<Users, 'firstName' | 'middleName' | 'lastName' | 'email'>>,
+  body: Array<Pick<User, 'firstName' | 'middleName' | 'lastName' | 'email'>>,
   force = false,
   requestInit?: RequestInit
 ) => fetch(

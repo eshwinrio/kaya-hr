@@ -1,36 +1,37 @@
 import { useRef, useState } from "react";
 import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { isApolloError } from "@apollo/client";
 import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import Divider from "@mui/material/Divider";
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
-import ListSubheader from "@mui/material/ListSubheader";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
+import ListSubheader from "@mui/material/ListSubheader";
+import Toolbar from '@mui/material/Toolbar';
+import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MenuIcon from '@mui/icons-material/Menu';
+import SettingsIcon from "@mui/icons-material/Settings";
 import WindowIcon from '@mui/icons-material/Window';
-import { useMaterialTheme } from "./lib/material-theme";
 import logo from './assets/logo-icon.svg';
-import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
-import { setMode } from './lib/redux-slice-ui-preferences';
-import ToolbarSpacer from "./components/ToolbarSpacer";
-import PopoverProfile from "./components/PopoverProfile";
 import { apolloClient } from "./lib/apollo";
+import { setMode } from './lib/redux-slice-ui-preferences';
+import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
+import { useMaterialTheme } from "./lib/material-theme";
 import { WHOAMI } from "./lib/gql-queries";
 import WhoamiProvider, { useWhoAmILoader } from "./lib/whoami-provider";
-import { isApolloError } from "@apollo/client";
+import ToolbarSpacer from "./components/ToolbarSpacer";
+import PopoverProfile from "./components/PopoverProfile";
 
 const drawerWidth = 240;
 
@@ -40,7 +41,7 @@ export default function DashboardLayout() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { mode } = useUiPreferences();
-  const avatarRef = useRef<HTMLButtonElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
   const [employeeDropdown, setEmployeeDropdown] = useState(false);
   const whoamiData = useWhoAmILoader();
@@ -70,8 +71,7 @@ export default function DashboardLayout() {
               </IconButton>
               <Avatar
                 ref={avatarRef}
-                component={IconButton}
-                size="small"
+                sx={{ cursor: 'pointer', width: 32, height: 32 }}
                 onClick={() => setIsProfilePopoverOpen(state => !state)}
               />
             </Box>
@@ -100,15 +100,14 @@ export default function DashboardLayout() {
           </Toolbar>
           <Divider />
           <List
-            sx={{ width: '100%' }}
+            sx={{ width: '100%', flex: 1 }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
               <ListSubheader component="div" id="nested-list-subheader" sx={{ backgroundColor: 'inherit' }}>
                 Team Management
               </ListSubheader>
-            }
-          >
+            }>
             <ListItemButton component={Link} to="/" replace>
               <ListItemIcon>
                 <WindowIcon />
@@ -132,6 +131,11 @@ export default function DashboardLayout() {
               </List>
             </Collapse>
           </List>
+          <Box sx={{ p: 1 }}>
+            <IconButton LinkComponent={Link} to="/settings" component={Link}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
         </Drawer>
         <Box component="main" sx={{ flexGrow: 1 }}>
           <ToolbarSpacer sx={{ marginBottom: 2 }} />
@@ -145,8 +149,8 @@ export default function DashboardLayout() {
 
 export const dashboardLayoutLoader: LoaderFunction = async () => {
   try {
-    const rs = await apolloClient.query({ query: WHOAMI });
-    return rs.data;
+    const whoAmI = await apolloClient.query({ query: WHOAMI });
+    return whoAmI.data;
   } catch (error: any) {
     if (isApolloError(error) && error.networkError?.name === 'ServerError') {
       return redirect('/login');

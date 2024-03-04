@@ -28,13 +28,6 @@ type Role {
   hourlyWage: Int
 }
 
-input RoleInput {
-  code: String!
-  title: String!
-  description: String
-  hourlyWage: Int
-}
-
 type User {
   id: Int!
   firstName: String!
@@ -60,7 +53,9 @@ type Organization {
   id: Int!
   name: String!
   summary: String
-  webLink: String
+  webUrl: String,
+  bannerUrl: String,
+  logoUrl: String
 }
 
 type UserSyncResult {
@@ -88,10 +83,27 @@ input CreateUserInput {
   roleIds: [Int!]
 }
 
-input OrganizationInput {
+input CreateOrganizationInput {
   name: String!
   summary: String
-  webLink: String
+  webUrl: String!
+  bannerUrl: String!
+  logoUrl: String!
+}
+
+input UpdateOrganizationInput {
+  name: String
+  summary: String
+  webUrl: String,
+  bannerUrl: String,
+  logoUrl: String
+}
+
+input RoleInput {
+  code: String!
+  title: String!
+  description: String
+  hourlyWage: Int
 }
 
 
@@ -103,7 +115,9 @@ type Query {
 }
 
 type Mutation {
-  createRole(input: RoleInput!) : Int!
+  createRole(input: RoleInput!): Int!
+  createOrganization(input: CreateOrganizationInput!): Int!
   createUser(input: CreateUserInput!): Int!
+  updateOrganization(id: Int!, input: UpdateOrganizationInput!): Int!
   syncUsers(force: Boolean): UserSyncResult!
 }

@@ -8,7 +8,12 @@ export const WHOAMI = gql(`
       lastName
       email
       organization {
+        id
         name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
       }
     }
   }
@@ -29,5 +34,11 @@ export const LOAD_ROLES = gql(`
 export const CREATE_USER = gql(`
   mutation CreateUser($input: CreateUserInput!) {
     createUser(input: $input)
+  }
+`);
+
+export const UPDATE_ORGANIZATION = gql(`
+  mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {
+    updateOrganization(id: $id, input: $input)
   }
 `);

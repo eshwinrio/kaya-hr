@@ -13,7 +13,7 @@ export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   dateOfBirth: user.dateOfBirth.toISOString(),
 });
 
-export const qResolverRoles: QueryResolvers['roles'] = async (_root, _args, { roles }) => await prisma.roles
+export const qResolverRoles: QueryResolvers['roles'] = async (_root, _args, { roles }) => await prisma.role
   .findMany()
   .then(roles => roles.map(role => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })));
 
@@ -22,7 +22,7 @@ export const qResolverUsers: QueryResolvers['users'] = async (
   _args,
   _context
 ) => {
-  const users = await prisma.users.findMany({
+  const users = await prisma.user.findMany({
     include: {
       UserRoles: {
         include: { role: true },

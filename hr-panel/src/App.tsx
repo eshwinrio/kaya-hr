@@ -9,6 +9,8 @@ import { signoutLoader } from './components/PopoverProfile';
 import EmployeeAdd, { employeeAddAction } from './EmployeeAdd';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apollo';
+import SettingsPage from './SettingsPage';
+import OrganizationSettingsPage, { organizationSettingsAction } from './OrganizationSettingsPage';
 
 const router = createBrowserRouter([
   {
@@ -31,8 +33,23 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "add",
+                index: true,
                 Component: EmployeeAdd,
                 action: employeeAddAction,
+              }
+            ]
+          },
+          {
+            path: "settings",
+            children: [
+              {
+                index: true,
+                Component: SettingsPage
+              },
+              {
+                path: "organization",
+                Component: OrganizationSettingsPage,
+                action: organizationSettingsAction
               }
             ]
           }

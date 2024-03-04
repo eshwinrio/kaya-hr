@@ -3,19 +3,20 @@ import httpErrors, { HttpError } from "http-errors";
 import { GraphQLError } from "graphql";
 import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
-import { Organizations, Roles, Users } from "@prisma/client";
+import { Organization, Role, User } from "@prisma/client";
 import { Resolvers } from "./gql-codegen/graphql.js";
 import { qResolverCurrentUser, qResolverRoles, qResolverUsers } from "./query-resolvers.js";
-import { mResolverCreateUser, mResolverSyncUsers } from "./mutation-resolvers.js";
+import { mResolverCreateOrganization, mResolverCreateUser, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import prisma from "./prisma.js";
+import { logHttp } from "./logger.js";
 
 export interface ApolloServerContext extends BaseContext {
-  readonly user: Users;
+  readonly user: User;
   readonly applicationId: string;
   readonly accessToken: string;
-  readonly organization: Organizations | null;
-  readonly roles: Roles[];
+  readonly organization: Organization | null;
+  readonly roles: Role[];
 }
 
 export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext>['context'] = async ({ req }) => {
@@ -30,7 +31,7 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
     }
 
     const responseBody = await verificationResponse.json() as { id: number, application: string };
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: responseBody.id },
       include: { organization: true, UserRoles: { include: { role: true } } },
     });
@@ -63,11 +64,17 @@ const resolvers: Resolvers<ApolloServerContext> = {
   },
   Mutation: {
     createUser: mResolverCreateUser,
+    createOrganization: mResolverCreateOrganization,
+    updateOrganization: mResolverUpdateOrganization,
     syncUsers: mResolverSyncUsers,
-  }
+  },
 }
 
-const apolloServerOptions: ApolloServerOptions<ApolloServerContext> = { typeDefs, resolvers };
+const apolloServerOptions: ApolloServerOptions<ApolloServerContext> = {
+  typeDefs,
+  resolvers,
+  logger: logHttp,
+};
 const apolloServer = new ApolloServer(apolloServerOptions);
 
 export default apolloServer;

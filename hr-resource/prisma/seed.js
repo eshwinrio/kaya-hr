@@ -3,22 +3,20 @@ import { Seed } from "../dist/config/environment.js";
 
 async function main() {
   // seed default organization
-  const defaultOrganizationUpsert = await prisma.organizations.upsert({
+  const defaultOrganizationUpsert = await prisma.organization.upsert({
     where: { id: 1 },
     create: {
       name: Seed.defaultOrganizationName,
       summary: Seed.defaultOrganizationSummary,
-      webLink: Seed.defaultOrganizationWebsiteUrl.href
+      webUrl: Seed.defaultOrganizationWebsiteUrl.href,
+      logoUrl: Seed.defaultOrganizationLogoUrl,
+      bannerUrl: Seed.defaultOrganizationBannerUrl
     },
-    update: {
-      name: Seed.defaultOrganizationName,
-      summary: Seed.defaultOrganizationSummary,
-      webLink: Seed.defaultOrganizationWebsiteUrl.href
-    }
+    update: {}
   });
 
   // Seed default role
-  const defaultRoleUpsertPromise = prisma.roles.upsert({
+  const defaultRoleUpsertPromise = prisma.role.upsert({
     where: { code: Seed.defaultRoleCode },
     create: {
       code: Seed.defaultRoleCode,
@@ -34,7 +32,7 @@ async function main() {
   });
 
   // Seed default user
-  const defaultUserUpsertPromise = prisma.users.upsert({
+  const defaultUserUpsertPromise = prisma.user.upsert({
     where: { email: Seed.defaultUserEmail },
     create: {
       email: Seed.defaultUserEmail,
@@ -70,7 +68,7 @@ async function main() {
   ]);
 
   // Link both user and role
-  await prisma.userRoles.upsert({
+  await prisma.userRole.upsert({
     where: { userId_roleId: { userId: defaultUserUpsert.id, roleId: defaultRoleUpsert.id } },
     create: {
       userId: defaultUserUpsert.id,

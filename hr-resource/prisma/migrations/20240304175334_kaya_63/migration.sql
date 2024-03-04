@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Users` (
+CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `firstName` VARCHAR(191) NOT NULL,
     `middleName` VARCHAR(191) NULL,
@@ -19,44 +19,46 @@ CREATE TABLE `Users` (
     `organizationId` INTEGER NOT NULL,
     `syncStatus` ENUM('NEVER', 'OK', 'FAIL') NOT NULL DEFAULT 'NEVER',
 
-    UNIQUE INDEX `Users_email_key`(`email`),
+    UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Roles` (
+CREATE TABLE `Role` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
     `hourlyWage` DECIMAL(65, 30) NOT NULL,
 
-    UNIQUE INDEX `Roles_code_key`(`code`),
+    UNIQUE INDEX `Role_code_key`(`code`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `UserRoles` (
+CREATE TABLE `UserRole` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
     `roleId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `UserRoles_userId_roleId_key`(`userId`, `roleId`),
+    UNIQUE INDEX `UserRole_userId_roleId_key`(`userId`, `roleId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Organizations` (
+CREATE TABLE `Organization` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `summary` VARCHAR(191) NULL,
-    `webLink` VARCHAR(191) NULL,
+    `summary` VARCHAR(1000) NULL,
+    `webUrl` VARCHAR(191) NULL,
+    `bannerUrl` VARCHAR(191) NULL,
+    `logoUrl` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Schedules` (
+CREATE TABLE `Schedule` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NULL,
     `dataTimeStart` DATETIME(3) NOT NULL,
@@ -68,7 +70,7 @@ CREATE TABLE `Schedules` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `TimeSheets` (
+CREATE TABLE `TimeSheet` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
     `hourlyWage` DECIMAL(65, 30) NOT NULL,
@@ -77,7 +79,7 @@ CREATE TABLE `TimeSheets` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ClockTimes` (
+CREATE TABLE `ClockTime` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `startTime` DATETIME(3) NOT NULL,
     `endTime` DATETIME(3) NULL,
@@ -87,22 +89,22 @@ CREATE TABLE `ClockTimes` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Users` ADD CONSTRAINT `Users_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organizations`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `User` ADD CONSTRAINT `User_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserRoles` ADD CONSTRAINT `UserRoles_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserRoles` ADD CONSTRAINT `UserRoles_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Roles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Schedules` ADD CONSTRAINT `Schedules_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Schedules` ADD CONSTRAINT `Schedules_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Roles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `TimeSheets` ADD CONSTRAINT `TimeSheets_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `TimeSheet` ADD CONSTRAINT `TimeSheet_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ClockTimes` ADD CONSTRAINT `ClockTimes_timeSheetId_fkey` FOREIGN KEY (`timeSheetId`) REFERENCES `TimeSheets`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `ClockTime` ADD CONSTRAINT `ClockTime_timeSheetId_fkey` FOREIGN KEY (`timeSheetId`) REFERENCES `TimeSheet`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
