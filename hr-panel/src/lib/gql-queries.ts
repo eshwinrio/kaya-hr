@@ -9,6 +9,10 @@ export const WHOAMI = gql(`
       email
       organization {
         name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
       }
     }
   }

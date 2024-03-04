@@ -16,7 +16,7 @@ enum SyncStatus {
   FAIL
 }
 
-model Users {
+model User {
   id             Int           @id @default(autoincrement())
   firstName      String
   middleName     String?
@@ -35,63 +35,65 @@ model Users {
   type           String?
   organizationId Int
   syncStatus     SyncStatus    @default(NEVER)
-  organization   Organizations @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  UserRoles      UserRoles[]
-  Schedule       Schedules[]
-  TimeSheet      TimeSheets[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  UserRoles      UserRole[]
+  Schedule       Schedule[]
+  TimeSheet      TimeSheet[]
 }
 
-model Roles {
+model Role {
   id          Int         @id @default(autoincrement())
   code        String      @unique
   title       String
   description String?
   hourlyWage  Decimal
-  UserRoles   UserRoles[]
-  Schedules   Schedules[]
+  UserRoles   UserRole[]
+  Schedules   Schedule[]
 }
 
-model UserRoles {
+model UserRole {
   id     Int   @id @default(autoincrement())
   userId Int
   roleId Int
-  user   Users @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  role   Roles @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  user   User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
 
   @@unique([userId, roleId])
 }
 
-model Organizations {
-  id      Int     @id @default(autoincrement())
-  name    String
-  summary String?
-  webLink String?
-  Users   Users[]
+model Organization {
+  id        Int     @id @default(autoincrement())
+  name      String
+  summary   String?
+  webUrl    String?
+  bannerUrl String?
+  logoUrl   String?
+  Users     User[]
 }
 
-model Schedules {
+model Schedule {
   id            Int      @id @default(autoincrement())
   userId        Int?
   dataTimeStart DateTime
   dateTimeEnd   DateTime
   roleId        Int
   notes         String?
-  user          Users?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  role          Roles    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  user          User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  role          Role    @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
 }
 
-model TimeSheets {
+model TimeSheet {
   id         Int          @id @default(autoincrement())
   userId     Int
   hourlyWage Decimal
-  user       Users        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  ClockTimes ClockTimes[]
+  user       User        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ClockTimes ClockTime[]
 }
 
-model ClockTimes {
+model ClockTime {
   id          Int        @id @default(autoincrement())
   startTime   DateTime
   endTime     DateTime?
   timeSheetId Int
-  timesheet   TimeSheets @relation(fields: [timeSheetId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  timesheet   TimeSheet @relation(fields: [timeSheetId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }

@@ -67,10 +67,12 @@ export type MutationSyncUsersArgs = {
 
 export type Organization = {
   __typename?: 'Organization';
+  bannerUrl?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  logoUrl?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   summary?: Maybe<Scalars['String']['output']>;
-  webLink?: Maybe<Scalars['String']['output']>;
+  webUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type OrganizationInput = {
@@ -272,10 +274,12 @@ export type MutationResolvers<ContextType = ApolloServerContext, ParentType exte
 }>;
 
 export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Organization'] = ResolversParentTypes['Organization']> = ResolversObject<{
+  bannerUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   summary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  webLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  webUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

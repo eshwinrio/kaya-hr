@@ -3,7 +3,7 @@ import { MutationResolvers } from "./gql-codegen/graphql.js";
 import prisma from "./prisma.js";
 import validator from "validator";
 import { logHttp, logSystem } from "./logger.js";
-import { getHeaders, syncUsers } from "./fetch-requests.js";
+import { syncUsers } from "./fetch-requests.js";
 import createHttpError from "http-errors";
 
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
@@ -24,11 +24,11 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   }
 
   // If user with same email already exists
-  if (await prisma.users.findUnique({ where: { email: input.email } })) {
+  if (await prisma.user.findUnique({ where: { email: input.email } })) {
     throw new GraphQLError('User with same email already exists', { extensions: { code: 'CONFLICT' } });
   }
 
-  return prisma.users
+  return prisma.user
     .create({
       data: {
         firstName: input.firstName,
@@ -60,7 +60,7 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
   { force },
   { applicationId, accessToken, organization }
 ) => {
-  const pendingUsers = await prisma.users
+  const pendingUsers = await prisma.user
     .findMany({
       where: {
         organizationId: organization?.id,
@@ -98,11 +98,11 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
 
   const response = await syncResponse.json() as { accepted: Array<string>, rejected: Array<string> };
   const [accepted, rejected] = await prisma.$transaction([
-    prisma.users.updateMany({
+    prisma.user.updateMany({
       where: { email: { in: response.accepted } },
       data: { syncStatus: 'OK' }
     }),
-    prisma.users.updateMany({
+    prisma.user.updateMany({
       where: { email: { in: response.rejected } },
       data: { syncStatus: 'FAIL' }
     }),
