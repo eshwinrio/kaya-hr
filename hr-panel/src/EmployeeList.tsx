@@ -1,10 +1,12 @@
-import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom'
+import { Link, LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom'
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
 import SearchIcon from '@mui/icons-material/Search';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { apolloClient } from './lib/apollo';
@@ -97,6 +99,20 @@ export default function EmployeeList() {
         </SearchWIdget>
       </Toolbar>
       <Toolbar disableGutters sx={{ justifyContent: 'flex-end', gap: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+         {/* Redirect to reload current page */}
+         <Button
+          component={Link}
+          to="."
+          startIcon={<RefreshIcon />}>
+          Reload
+        </Button>
+        {/* Add employee redirect */}
+        <Button
+          component={Link}
+          to="../add"
+          startIcon={<PersonAddAltIcon />}>
+          Add
+        </Button>
         {/* Sync to auth button */}
         <Button
           onClick={() => syncMutate()}

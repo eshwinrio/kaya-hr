@@ -71,16 +71,27 @@ export const SYNC_USERS = gql(`
 export const VIEW_USER = gql(`
   query ViewUser($id: Int!) {
     user(id: $id) {
+      id
       firstName
+      middleName
       lastName
+      email
+      phone
       organization {
-          name 
+        name 
       }
       dateOfBirth
+      streetName
+      addressL2
+      city
       country
+      province
+      pincode
+      dateJoined
+      dateOfBirth
       roles {
-          code
+        code
       }
     }
-}
+  }
 `);

@@ -26,6 +26,7 @@ export namespace Seed {
   export const defaultUserEmail = process.env['SEED_DEFAULT_USER_EMAIL']!;
   export const defaultUserFirstName = process.env['SEED_DEFAULT_USER_FIRST_NAME']!;
   export const defaultUserLastName = process.env['SEED_DEFAULT_USER_LAST_NAME']!;
+  export const defaultUserPassword = process.env['SEED_DEFAULT_USER_PASSWORD'];
   export const defaultUserDateOfBirth = process.env['SEED_DEFAULT_USER_DATE_OF_BIRTH']!;
   export const defaultUserStreetName = process.env['SEED_DEFAULT_USER_STREET_NAME']!;
   export const defaultUserCity = process.env['SEED_DEFAULT_USER_CITY']!;

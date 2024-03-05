@@ -5,6 +5,7 @@ import validator from "validator";
 import { logHttp, logSystem } from "./logger.js";
 import { syncUsers } from "./fetch-requests.js";
 import createHttpError from "http-errors";
+import { Seed } from "../config/environment.js";
 
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   _root,
@@ -136,7 +137,7 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
   headers.append('Accept', 'application/json');
   headers.append('X-Application', applicationId);
   headers.append('Cookie', `access_token=${accessToken}`);
-  const syncResponse = await syncUsers(pendingUsers, Boolean(force), { headers }).catch(error => {
+  const syncResponse = await syncUsers(pendingUsers.map(user => ({ ...user, password: Seed.defaultUserPassword! })), Boolean(force), { headers }).catch(error => {
     if (createHttpError.isHttpError(error)) {
       logHttp.error(error);
       throw new GraphQLError(error.message, { extensions: { code: error.statusCode } });

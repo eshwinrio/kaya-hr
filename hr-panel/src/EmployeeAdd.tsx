@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionFunction, Form } from 'react-router-dom';
+import { ActionFunction, Form, redirect } from 'react-router-dom';
 import validator from 'validator';
 import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
@@ -324,7 +324,8 @@ export const employeeAddAction: ActionFunction = async ({ request }) => {
       }
     }
   });
-
-  // TODO: Redirect to employee view using the `id` in the response
-  return response.data;
+  if (response.data) {
+    return redirect('../list', { status: 201 });
+  }
+  return null;
 }

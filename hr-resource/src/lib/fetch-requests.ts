@@ -19,7 +19,7 @@ export const verifyIdentity = (requestInit: RequestInit) => fetch(
 );
 
 export const syncUsers = (
-  body: Array<Pick<User, 'firstName' | 'middleName' | 'lastName' | 'email'>>,
+  body: Array<Pick<User, 'firstName' | 'middleName' | 'lastName' | 'email'> | Record<'password', string>>,
   force = false,
   requestInit?: RequestInit
 ) => fetch(

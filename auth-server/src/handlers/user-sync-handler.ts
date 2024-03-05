@@ -2,6 +2,9 @@ import { Users } from "@prisma/client";
 import { RequestHandler } from "express";
 import validator from "validator";
 import prisma from "../lib/prisma.js";
+import { hash } from "bcrypt";
+import { Bcrypt } from "../config/environment.js";
+import { logSystem } from "../lib/logger.js";
 
 export type ResBody = Record<'accepted', Array<string>> & Record<'rejected', Array<string>>;
 export type ReqBody = Record<'data', Array<Users>>;
@@ -14,20 +17,28 @@ const userSyncRequestHandler: UserSyncRequestHandler = async (req, res) => {
   const rejected: Array<string> = [];
   for (const user of data) {
     let isValid = true;
-    isValid &&= validator.isEmail(user.email);
-    isValid &&= !validator.isEmpty(user.lastName) && validator.isAlpha(user.firstName);
-    isValid &&= !user.middleName || validator.isAlpha(user.lastName);
-    isValid &&= !validator.isEmpty(user.lastName) && validator.isAlpha(user.lastName);
+    const { password, ...rest } = user;
+    isValid &&= validator.isEmail(rest.email);
+    isValid &&= !validator.isEmpty(rest.lastName) && validator.isAlpha(rest.firstName);
+    isValid &&= !rest.middleName || validator.isAlpha(rest.lastName);
+    isValid &&= !validator.isEmpty(rest.lastName) && validator.isAlpha(rest.lastName);
     
     if (isValid) {
-      const upsertedUserEmail = await prisma.users.upsert({
-        where: { email: user.email },
-        update: user,
-        create: {...user, password: ''},
-      }).then(document => document.email);
+      const hashedPassword = password ? await hash(password, Bcrypt.saltRounds) : '';
+      const upsertedUserEmail = await prisma.users
+        .upsert({
+        where: { email: rest.email },
+        update: rest,
+        create: {...rest, password: hashedPassword },
+      })
+      .then(document => document.email)
+      .catch(error => {
+        logSystem.error(error);
+        throw error;
+      })
       accepted.push(upsertedUserEmail);
     } else {
-      rejected.push(user.email);
+      rejected.push(rest.email);
     }
   }
   res.send({ accepted, rejected });

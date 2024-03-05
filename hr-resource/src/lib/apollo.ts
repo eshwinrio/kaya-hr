@@ -30,9 +30,9 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       throw httpErrors(verificationResponse.status, errorBody.message);
     }
 
-    const responseBody = await verificationResponse.json() as { id: number, application: string };
+    const responseBody = await verificationResponse.json() as { email: string, application: string };
     const user = await prisma.user.findUnique({
-      where: { id: responseBody.id },
+      where: { email: responseBody.email },
       include: { organization: true, UserRoles: { include: { role: true } } },
     });
     if (!user) {
