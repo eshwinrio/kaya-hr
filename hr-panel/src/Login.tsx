@@ -1,27 +1,30 @@
-import { ActionFunction, Form, redirect } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
+import { ActionFunction, Form, useActionData, useNavigate } from 'react-router-dom';
 import validator from 'validator';
-import { useMaterialTheme } from './lib/material-theme';
 import logo from './assets/logo-full.svg';
-import { useState } from 'react';
+import InputPassword from './components/InputPassword';
 import { fetchAccessToken } from './lib/fetch-requests';
+import { useMaterialTheme } from './lib/material-theme';
+
+const initialFormData: Record<'username' | 'password', string> = {
+  username: '',
+  password: ''
+}
 
 export default function Login(d: any) {
   const { breakpoints } = useMaterialTheme();
-  const [formData, setFormData] = useState<Record<'username' | 'password', string>>({
-    username: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState<Record<'username' | 'password', string>>({
-    username: '',
-    password: ''
-  });
+  const actionData = useActionData() as { message: string };
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({...initialFormData});
+  const [errors, setErrors] = useState({ ...initialFormData });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -34,16 +37,17 @@ export default function Login(d: any) {
             : 'Invalid email'
         });
         break;
-      case 'password':
-        setErrors({
-          ...errors,
-          password: validator.isEmpty(event.target.value) || validator.isStrongPassword(event.target.value)
-            ? ''
-            : 'Weak password'
-        });
-        break;
     }
   }
+
+  useEffect(() => {
+    if (actionData) {
+      setErrors({ ...initialFormData });
+    } else {
+      navigate('../', { replace: true });
+    }
+  }, [actionData, navigate]);
+  
 
   return (
     <Box sx={{
@@ -74,14 +78,14 @@ export default function Login(d: any) {
               value={formData.username} onChange={onChange}
               error={!!errors.username} helperText={errors.username}
             />
-            <TextField
-              type='password'
+            <InputPassword
               name='password' label='Password'
               variant='outlined' sx={{ mt: 2 }} fullWidth
               required
               value={formData.password} onChange={onChange}
               error={!!errors.password} helperText={errors.password}
             />
+            {actionData?.message && <Alert severity='error' sx={{ mt: 2 }}>{actionData.message}</Alert>}
             <Button
               type='submit'
               variant='contained' color='primary'
@@ -96,17 +100,9 @@ export default function Login(d: any) {
   );
 }
 
-export const loginAction: ActionFunction = async ({ request, context }) => {
+export const loginAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const username = formData.get('username');
-  const password = formData.get('password');
-  if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
-    return false;
-  }
-  const response = await fetchAccessToken(username, password);
-  if (response.ok) {
-    return redirect('/');
-  } else {
-    return { error: 'Invalid credentials' };
-  }
+  const username = formData.get('username')!.toString();
+  const password = formData.get('password')!.toString();
+  return await fetchAccessToken(username, password);
 }

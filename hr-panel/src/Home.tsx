@@ -103,6 +103,7 @@ export default function Home() {
                 disablePadding dense
                 listItemProps={{ disableGutters: true, disablePadding: true, divider: true }}
                 data={data}
+                sx={{ height: 212, overflowY: 'auto' }}
               />
             </Paper>
           </Grid2>

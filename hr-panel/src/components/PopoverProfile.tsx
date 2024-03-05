@@ -1,16 +1,16 @@
-import Popover, { PopoverProps } from "@mui/material/Popover";
-import { Link, LoaderFunction, redirect, useLoaderData } from "react-router-dom";
-import { Avatar, Box, Button, ButtonGroup, Typography } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { useMaterialTheme } from "../lib/material-theme";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { Avatar, Box, Button, ButtonGroup, Typography } from "@mui/material";
+import Popover, { PopoverProps } from "@mui/material/Popover";
+import { Form, Link, LoaderFunction } from "react-router-dom";
 import { signout } from "../lib/fetch-requests";
-import { WhoAmIQuery } from "../lib/gql-codegen/graphql";
+import { useMaterialTheme } from "../lib/material-theme";
+import { useWhoAmI } from "../lib/whoami-provider";
 
 type PopoverProfileProps = Exclude<PopoverProps, "children">;
 
 export default function PopoverProfile({ sx, ...props }: PopoverProfileProps) {
-  const data = useLoaderData() as WhoAmIQuery;
+  const data = useWhoAmI();
   const theme = useMaterialTheme();
 
   return (
@@ -22,23 +22,25 @@ export default function PopoverProfile({ sx, ...props }: PopoverProfileProps) {
       },
       ...sx
     }}>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="body2" fontWeight="bold" sx={{ mb: 3 }}>{data.currentUser?.email}</Typography>
-        <Avatar
-          sx={{ width: 64, height: 64, mb: 1 }}
-          alt={data.currentUser?.firstName}
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h6">Hi, {data.currentUser?.firstName}!</Typography>
-        <ButtonGroup sx={{ mt: 3 }}>
-          <Button variant="outlined" color="primary" sx={{ width: "100%" }} startIcon={<SettingsIcon />}>
-            Manage
-          </Button>
-          <Button variant="outlined" color="error" sx={{ width: "100%" }} startIcon={<LogoutIcon />} component={Link} to="/signout">
-            Signout
-          </Button>
-        </ButtonGroup>
-      </Box>
+      <Form method="delete">
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="body2" fontWeight="bold" sx={{ mb: 3 }}>{data?.currentUser?.email}</Typography>
+          <Avatar
+            sx={{ width: 64, height: 64, mb: 1 }}
+            alt={data?.currentUser?.firstName}
+            src="/static/images/avatar/1.jpg"
+          />
+          <Typography variant="h6">Hi, {data?.currentUser?.firstName}!</Typography>
+          <ButtonGroup sx={{ mt: 3 }} >
+            <Button variant="outlined" color="primary" sx={{ width: "100%" }} startIcon={<SettingsIcon />}>
+              Manage
+            </Button>
+            <Button variant="outlined" color="error" sx={{ width: "100%" }} startIcon={<LogoutIcon />} component={Link} to="/signout">
+              Signout
+            </Button>
+          </ButtonGroup>
+        </Box>
+      </Form>
     </Popover>
   );
 };
@@ -46,8 +48,8 @@ export default function PopoverProfile({ sx, ...props }: PopoverProfileProps) {
 export const signoutLoader: LoaderFunction = async () => {
   const response = await signout();
   if (response.ok) {
-    return redirect('/login');
-  } else {
-    return { error: 'Signout failed' };
+    window.location.reload();
   }
+
+  return null;
 }
