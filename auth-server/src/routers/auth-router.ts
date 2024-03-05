@@ -1,14 +1,14 @@
+import { compare } from "bcrypt";
 import { Router } from "express";
 import httpErrors from "http-errors";
 import httpStatus from "http-status";
-import { compare } from "bcrypt";
+import { Http } from "../config/environment.js";
 import prisma from "../lib/prisma.js";
+import { generateAccessToken } from "../lib/token.js";
+import requireAccessToken from "../middlewares/require-access-token.js";
+import requireApplication from "../middlewares/require-application.js";
 import requireBody from "../middlewares/require-body.js";
 import requireHeaders from "../middlewares/require-headers.js";
-import requireAccessToken from "../middlewares/require-access-token.js";
-import { generateAccessToken } from "../lib/token.js";
-import { Http } from "../config/environment.js";
-import requireApplication from "../middlewares/require-application.js";
 import requireUser from "../middlewares/require-user.js";
 import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
 

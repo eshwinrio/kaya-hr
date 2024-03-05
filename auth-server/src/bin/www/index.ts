@@ -1,9 +1,9 @@
 import { Server as HttpServer, createServer } from "http";
 import { Server as HttpsServer } from "https";
 import app from "../../app.js";
+import { Http } from "../../config/environment.js";
 import { logSystem } from "../../lib/logger.js";
 import prisma from "../../lib/prisma.js";
-import { Http } from "../../config/environment.js";
 
 let server: HttpServer | HttpsServer | null = null;
 

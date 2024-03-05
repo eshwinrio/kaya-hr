@@ -1,6 +1,6 @@
 import { ErrorRequestHandler } from 'express';
-import { isHttpError } from 'http-errors';
 import type { HttpError } from 'http-errors';
+import { isHttpError } from 'http-errors';
 import { logHttp } from '../lib/logger.js';
 
 const errorHandler: ErrorRequestHandler = (error: HttpError, _req, res, _next) => {

@@ -1,8 +1,8 @@
+import type { Users } from '@prisma/client';
 import { RequestHandler } from 'express';
 import httpErrors from 'http-errors';
 import jsonwebtoken from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
-import type { Users } from '@prisma/client';
 import type { Locals as AccessTokenEnforcerLocals } from './require-access-token.js';
 
 export type Locals<S extends boolean> =

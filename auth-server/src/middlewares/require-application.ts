@@ -1,10 +1,9 @@
+import { Applications } from '@prisma/client';
 import { RequestHandler } from 'express';
 import httpErrors from 'http-errors';
-import qs from 'qs';
-import validator from 'validator';
 import jsonwebtoken from 'jsonwebtoken';
+import validator from 'validator';
 import prisma from '../lib/prisma.js';
-import { Applications } from '@prisma/client';
 
 export type Locals = Record<'application', Applications>;
 export type ApplicationEnforcer = RequestHandler<unknown, unknown, unknown, unknown, Locals>;

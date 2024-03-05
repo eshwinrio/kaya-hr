@@ -1,5 +1,5 @@
-import { ParamsDictionary } from 'express-serve-static-core';
 import { RequestHandler, Router } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 import httpErrors from 'http-errors';
 
 type EnforcedParams<T extends ParamsDictionary, K extends keyof T> = Partial<T> & Required<Pick<T, K>>;

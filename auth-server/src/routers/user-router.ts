@@ -1,16 +1,16 @@
+import { hash } from "bcrypt";
 import { Router } from "express";
 import httpErrors from "http-errors";
 import httpStatus from "http-status";
-import { hash } from "bcrypt";
 import validator from "validator";
-import requireBody from "../middlewares/require-body.js";
-import prisma from "../lib/prisma.js";
 import { Bcrypt } from "../config/environment.js";
-import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
-import requireApplication from "../middlewares/require-application.js";
-import requireUser from "../middlewares/require-user.js";
-import requireAccessToken from "../middlewares/require-access-token.js";
 import userSyncRequestHandler, { ReqBody as UserSyncBody } from "../handlers/user-sync-handler.js";
+import prisma from "../lib/prisma.js";
+import requireAccessToken from "../middlewares/require-access-token.js";
+import requireApplication from "../middlewares/require-application.js";
+import requireBody from "../middlewares/require-body.js";
+import requireUser from "../middlewares/require-user.js";
+import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
 
 const userRouter = Router();
 

@@ -1,10 +1,10 @@
 import { Users } from "@prisma/client";
+import { hash } from "bcrypt";
 import { RequestHandler } from "express";
 import validator from "validator";
-import prisma from "../lib/prisma.js";
-import { hash } from "bcrypt";
 import { Bcrypt } from "../config/environment.js";
 import { logSystem } from "../lib/logger.js";
+import prisma from "../lib/prisma.js";
 
 export type ResBody = Record<'accepted', Array<string>> & Record<'rejected', Array<string>>;
 export type ReqBody = Record<'data', Array<Users>>;
