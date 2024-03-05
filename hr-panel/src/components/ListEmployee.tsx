@@ -5,6 +5,7 @@ import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Avatar, { AvatarProps } from '@mui/material/Avatar';
 import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
+import { Link } from 'react-router-dom';
 
 interface ListEmployeeProps extends ListProps {
   readonly data?: LoadAllUsersQuery;
@@ -13,7 +14,7 @@ interface ListEmployeeProps extends ListProps {
   children?: never;
   readonly avatarProps?: AvatarProps;
   readonly listItemProps?: ListItemProps;
-  readonly listItemButtonProps?: ListItemButtonProps;
+  readonly listItemButtonProps?: Exclude<ListItemButtonProps, 'component'>;
   readonly listItemIconProps?: ListItemIconProps;
   readonly listItemTextProps?: ListItemTextProps;
 }
@@ -33,9 +34,9 @@ export default function ListEmployee({
     <List {...props}>
       {data?.users.map((user, index) => (
         <ListItem key={index} {...listItemProps}>
-          <ListItemButton {...listItemButtonProps}>
+          <ListItemButton component={Link} to={`/employees/view/${user?.id}`} {...listItemButtonProps}>
             <ListItemIcon {...listItemIconProps}>
-              <Avatar variant='rounded' sx={{ width: 36, height: 36 }} {...avatarProps}>{user?.firstName.charAt(0)}</Avatar>
+              <Avatar {...avatarProps}>{user?.firstName.charAt(0)}</Avatar>
             </ListItemIcon>
             <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} {...listItemTextProps} />
           </ListItemButton>
