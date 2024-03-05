@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
-import { Api } from "../config/environment.js";
 import type { Request } from 'express';
+import { Api } from "../config/environment.js";
 
 export const getHeaders = (req: Request) => {
   const headers = new Headers();

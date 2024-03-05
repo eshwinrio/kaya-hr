@@ -1,10 +1,10 @@
-import express from "express";
-import cors, { CorsOptions } from "cors";
-import cookieParser from "cookie-parser";
 import { expressMiddleware } from "@apollo/server/express4";
-import { httpLogStream } from "./lib/logger.js";
-import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
+import cookieParser from "cookie-parser";
+import cors, { CorsOptions } from "cors";
+import express from "express";
 import { Cors } from "./config/environment.js";
+import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
+import { httpLogStream } from "./lib/logger.js";
 import errorHandler from "./middlewares/error-handler.js";
 
 const app = express();
@@ -36,5 +36,5 @@ const bindExpressMiddleware = () => app.use(
 
 const bindErrorHandler = () => app.use(errorHandler);
 
-export { bindExpressMiddleware, bindErrorHandler };
+export { bindErrorHandler, bindExpressMiddleware };
 export default app;

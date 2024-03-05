@@ -1,11 +1,11 @@
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { Server as HttpServer, createServer } from "http";
 import { Server as HttpsServer } from "https";
 import app, { bindErrorHandler, bindExpressMiddleware } from "../../app.js";
-import { logSystem } from "../../lib/logger.js";
-import prisma from "../../lib/prisma.js";
 import { Http } from "../../config/environment.js";
 import apolloServer from "../../lib/apollo.js";
-import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { logSystem } from "../../lib/logger.js";
+import prisma from "../../lib/prisma.js";
 
 let server: HttpServer | HttpsServer | null = null;
 
