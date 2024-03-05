@@ -1,24 +1,24 @@
-import { Link, LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom'
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Toolbar from '@mui/material/Toolbar';
-import SearchIcon from '@mui/icons-material/Search';
+import { useMutation } from '@apollo/client';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { apolloClient } from './lib/apollo';
-import { LOAD_USERS, SYNC_USERS } from './lib/gql-queries';
-import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
-import SearchWIdget from './components/SearchWidget';
-import SearchIconWrapper from './components/SearchIconWrapper';
-import SearchWidgetInputBase from './components/SearchWidgetInputBase';
-import { useMaterialTheme } from './lib/material-theme';
+import { Link, LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
 import ListEmployee from './components/ListEmployee';
+import SearchIconWrapper from './components/SearchIconWrapper';
+import SearchWIdget from './components/SearchWidget';
+import SearchWidgetInputBase from './components/SearchWidgetInputBase';
 import SyncInProgressIcon from './components/SyncInProgressIcon';
-import { useMutation } from '@apollo/client';
+import { apolloClient } from './lib/apollo';
+import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
+import { LOAD_USERS, SYNC_USERS } from './lib/gql-queries';
+import { useMaterialTheme } from './lib/material-theme';
 
 const columns: GridColDef[] = [
   {

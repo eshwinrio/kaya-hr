@@ -1,7 +1,11 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Avatar, Box, Button, ButtonGroup, Typography } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Popover, { PopoverProps } from "@mui/material/Popover";
+import Typography from "@mui/material/Typography";
 import { Form, Link, LoaderFunction } from "react-router-dom";
 import { signout } from "../lib/fetch-requests";
 import { useMaterialTheme } from "../lib/material-theme";

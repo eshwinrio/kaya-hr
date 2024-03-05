@@ -1,11 +1,11 @@
+import Avatar, { AvatarProps } from '@mui/material/Avatar';
 import List, { ListProps } from '@mui/material/List';
 import ListItem, { ListItemProps } from '@mui/material/ListItem';
 import ListItemButton, { ListItemButtonProps } from '@mui/material/ListItemButton';
 import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
-import Avatar, { AvatarProps } from '@mui/material/Avatar';
-import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
 import { Link } from 'react-router-dom';
+import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
 
 interface ListEmployeeProps extends ListProps {
   readonly data?: LoadAllUsersQuery;

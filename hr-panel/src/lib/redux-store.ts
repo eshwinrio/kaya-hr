@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { uiPreferencesSlice } from './redux-slice-ui-preferences';
 import { authenticationSlice } from './redux-slice-authentication';
+import { uiPreferencesSlice } from './redux-slice-ui-preferences';
 
 const store = configureStore({
   reducer: {

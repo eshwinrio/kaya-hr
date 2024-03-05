@@ -1,20 +1,20 @@
-import { Link, LoaderFunction, useLoaderData } from 'react-router-dom'
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import LaunchIcon from '@mui/icons-material/Launch';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import LaunchIcon from '@mui/icons-material/Launch';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import DashCard from './components/DashCard';
 import ListEmployee from './components/ListEmployee';
-import { useWhoAmI } from './lib/whoami-provider';
 import { apolloClient } from './lib/apollo';
-import { LOAD_USERS } from './lib/gql-queries';
 import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
+import { LOAD_USERS } from './lib/gql-queries';
+import { useWhoAmI } from './lib/whoami-provider';
 
 export default function Home() {
   const whoAmI = useWhoAmI();

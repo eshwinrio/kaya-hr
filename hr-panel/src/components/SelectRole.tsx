@@ -1,10 +1,10 @@
 import { useQuery } from "@apollo/client";
+import Checkbox from "@mui/material/Checkbox";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent, SelectProps } from "@mui/material/Select";
-import { LOAD_ROLES } from "../lib/gql-queries";
 import Skeleton from "@mui/material/Skeleton";
 import { useState } from "react";
-import Checkbox from "@mui/material/Checkbox";
+import { LOAD_ROLES } from "../lib/gql-queries";
 
 type SelectRoleProps = Exclude<SelectProps, 'children' | 'defaultValue' | 'value' | 'onChange'>;
 
