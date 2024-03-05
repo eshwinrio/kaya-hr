@@ -8,8 +8,22 @@ export function useMaterialTheme() {
     palette: {
       mode,
       primary: {
-        main: '#6E11E4',
-        contrastText: '#fff'
+        main: '#6750A4',
+        light: '#65558F',
+        dark: '#D0BCFE',
+        contrastText: '#fff',
+      },
+      secondary: {
+        main: '#958DA5',
+        light: '#625B71',
+        dark: '#CCC2DC',
+        contrastText: '#fff',
+      },
+      error: {
+        main: '#E46962',
+        light: '#B3261E',
+        dark: '#F2B8B5',
+        contrastText: '#fff',
       },
     },
     breakpoints: {

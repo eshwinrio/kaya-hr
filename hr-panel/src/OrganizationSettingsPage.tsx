@@ -1,7 +1,5 @@
 import Container from "@mui/material/Container";
 import { useWhoAmI } from "./lib/whoami-provider";
-import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
@@ -14,6 +12,7 @@ import { useMaterialTheme } from "./lib/material-theme";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { apolloClient } from "./lib/apollo";
 import { UPDATE_ORGANIZATION } from "./lib/gql-queries";
+import Banner from "./components/Banner";
 
 // TODO: Replace dummy data with query data
 const names = [
@@ -36,7 +35,8 @@ export default function OrganizationSettingsPage() {
     <Container maxWidth="lg">
       <Banner sx={{
         backgroundImage: `url(${whoAmI?.currentUser?.organization?.bannerUrl})`,
-        mb: 2
+        mb: 2,
+        height: isAboveXs ? 300 : 200
       }}>
         <Grid2 container gap={1}>
           <Grid2>
@@ -110,23 +110,6 @@ export default function OrganizationSettingsPage() {
     </Container >
   );
 }
-
-const Banner = styled(Box)(({ theme }) => ({
-  backgroundRepeat: 'no-repeat',
-  backgroundAttachment: 'fixed',
-  backgroundBlendMode: 'soft-light',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  minHeight: 200,
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[3],
-  padding: theme.spacing(2),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-end',
-}));
 
 export const organizationSettingsAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();

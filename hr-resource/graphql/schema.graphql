@@ -110,6 +110,7 @@ input RoleInput {
 # Root types
 type Query {
   currentUser: User
+  user(id: Int!): User!
   users: [User]!
   roles: [Role!]!
 }

@@ -11,6 +11,8 @@ import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from './lib/apollo';
 import SettingsPage from './SettingsPage';
 import OrganizationSettingsPage, { organizationSettingsAction } from './OrganizationSettingsPage';
+import EmployeeList, { employeeListLoader } from './EmployeeList';
+import ViewEmployee, { viewEmployeeLoader } from './ViewEmployee';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,16 @@ const router = createBrowserRouter([
                 index: true,
                 Component: EmployeeAdd,
                 action: employeeAddAction,
+              },
+              {
+                path: "list",
+                Component: EmployeeList,
+                loader: employeeListLoader,
+              },
+              {
+                path: "view/:id",
+                Component: ViewEmployee,
+                loader: viewEmployeeLoader,
               }
             ]
           },

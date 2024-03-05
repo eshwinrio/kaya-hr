@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
 import { isApolloError } from "@apollo/client";
 import AppBar from "@mui/material/AppBar";
@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -38,6 +39,7 @@ const drawerWidth = 240;
 export default function DashboardLayout() {
   const materialTheme = useMaterialTheme();
   const isSmallerScreen = useMediaQuery(materialTheme.breakpoints.down('md'));
+  const contentWidth = useMemo(() => (isSmallerScreen ? '100%' : `calc(100% - ${drawerWidth}px)`), [isSmallerScreen]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { mode } = useUiPreferences();
@@ -53,7 +55,7 @@ export default function DashboardLayout() {
           position="fixed"
           color="inherit"
           elevation={0}
-          sx={{ width: isSmallerScreen ? '100%' : `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}>
+          sx={{ width: contentWidth }}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
               <IconButton
@@ -91,9 +93,22 @@ export default function DashboardLayout() {
           variant={isSmallerScreen ? 'temporary' : 'permanent'}
           anchor="left"
         >
-          <Toolbar sx={{ gap: 2 }}>
-            <img src={logo} alt="logo" height={48} />
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', overflow: 'hidden' }}>
+          <Toolbar disableGutters>
+            <Avatar
+              variant="square"
+              src={whoamiData.currentUser?.organization?.logoUrl || logo}
+              alt={whoamiData.currentUser?.organization?.name || 'Management dashboard'}
+              sx={{ width: 48, height: 48, cursor: 'pointer', mx: 1 }}
+            />
+            <Divider orientation="vertical" flexItem />
+            <Box sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              overflow: 'hidden',
+              p: 1
+              }}>
               <Typography variant="body1" noWrap>{whoamiData.currentUser?.organization?.name || 'Kaya HR'}</Typography>
               <Typography variant="caption" noWrap>Panel v0.0.1</Typography>
             </Box>
@@ -118,7 +133,7 @@ export default function DashboardLayout() {
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
-              <ListItemText primary="Employees" />
+              <ListItemText primary="Employees" secondary="Add, list employees" />
             </ListItemButton>
             <Collapse in={employeeDropdown} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
@@ -127,6 +142,12 @@ export default function DashboardLayout() {
                     <GroupAddIcon />
                   </ListItemIcon>
                   <ListItemText primary="Add member" />
+                </ListItemButton>
+                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/list">
+                  <ListItemIcon>
+                    <ChecklistIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="List members" />
                 </ListItemButton>
               </List>
             </Collapse>
@@ -137,7 +158,7 @@ export default function DashboardLayout() {
             </IconButton>
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ width: contentWidth, flexGrow: 1 }}>
           <ToolbarSpacer sx={{ marginBottom: 2 }} />
           <Outlet />
         </Box>

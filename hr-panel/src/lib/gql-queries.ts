@@ -42,3 +42,56 @@ export const UPDATE_ORGANIZATION = gql(`
     updateOrganization(id: $id, input: $input)
   }
 `);
+
+export const LOAD_USERS = gql(`
+  query LoadAllUsers {
+    users {
+        id
+        firstName
+        lastName
+        email
+        phone
+        dateJoined
+        dateOfBirth
+        streetName
+        pincode
+    }
+  }
+`);
+
+export const SYNC_USERS = gql(`
+  mutation SyncUsers($force: Boolean) {
+    syncUsers(force: $force) {
+      accepted
+      rejected
+    }
+  }
+`);
+
+export const VIEW_USER = gql(`
+  query ViewUser($id: Int!) {
+    user(id: $id) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      organization {
+        name 
+      }
+      dateOfBirth
+      streetName
+      addressL2
+      city
+      country
+      province
+      pincode
+      dateJoined
+      dateOfBirth
+      roles {
+        code
+      }
+    }
+  }
+`);

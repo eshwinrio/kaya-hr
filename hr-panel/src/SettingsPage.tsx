@@ -24,7 +24,7 @@ export default function SettingsPage() {
               <CardContent>
                 <Typography variant="caption">My organization</Typography>
                 <Typography variant="h5" fontWeight="bold">{whoAmI?.currentUser?.organization?.name}</Typography>
-                <Typography variant="body2" sx={{ mb: 2 }}>{whoAmI?.currentUser?.organization?.summary}</Typography>
+                <Typography variant="body2" textOverflow="ellipsis" sx={{ maxHeight: 100, overflow: 'hidden', mb: 2 }}>{whoAmI?.currentUser?.organization?.summary}</Typography>
                 <Typography variant="button" color="text.secondary">Open organization settings</Typography>
               </CardContent>
             </CardActionArea>
