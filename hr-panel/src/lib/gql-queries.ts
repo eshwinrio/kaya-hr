@@ -19,18 +19,6 @@ export const WHOAMI = gql(`
   }
 `);
 
-export const LOAD_ROLES = gql(`
-  query LoadAllRoles {
-    roles {
-      id
-      code
-      title
-      description
-      hourlyWage
-    }
-  }
-`);
-
 export const CREATE_USER = gql(`
   mutation CreateUser($input: CreateUserInput!) {
     createUser(input: $input)
@@ -89,9 +77,7 @@ export const VIEW_USER = gql(`
       pincode
       dateJoined
       dateOfBirth
-      roles {
-        code
-      }
+      roles
     }
   }
 `);

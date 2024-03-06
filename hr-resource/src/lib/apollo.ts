@@ -9,7 +9,7 @@ import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
 import { mResolverCreateOrganization, mResolverCreateUser, mResolverScheduleShiftFor, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
-import { qResolverCurrentUser, qResolverRoles, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
@@ -68,7 +68,6 @@ const resolvers: Resolvers<ApolloServerContext> = {
     currentUser: qResolverCurrentUser,
     users: qResolverUsers,
     user: qResolverUser,
-    roles: qResolverRoles,
   },
   Mutation: {
     createUser: mResolverCreateUser,

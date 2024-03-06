@@ -19,6 +19,7 @@ import validator from 'validator';
 import InputPassword from './components/InputPassword';
 import SelectRole from './components/SelectRole';
 import { apolloClient } from './lib/apollo';
+import { Role } from './lib/gql-codegen/graphql';
 import { CREATE_USER } from './lib/gql-queries';
 
 type FormKeys =
@@ -319,7 +320,7 @@ export const employeeAddAction: ActionFunction = async ({ request }) => {
         country: formData.get('country')!.toString(),
         password: formData.get('password')!.toString(),
         dateJoined: formData.get('dateJoined')!.toString(),
-        roleIds: formData.get('role')!.toString().split(',').map(Number),
+        roles: formData.get('role')!.toString().split(',') as Array<Role>,
       }
     }
   });

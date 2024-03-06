@@ -16,8 +16,6 @@ export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   dateOfBirth: user.dateOfBirth.toISOString(),
 });
 
-export const qResolverRoles: QueryResolvers['roles'] = async (_root, _args, { roles }) => roles.map(role => role as Role);
-
 export const qResolverUsers: QueryResolvers['users'] = async (
   _root,
   _args,

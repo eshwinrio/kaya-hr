@@ -1,24 +1,17 @@
-import { useQuery } from "@apollo/client";
 import Checkbox from "@mui/material/Checkbox";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent, SelectProps } from "@mui/material/Select";
-import Skeleton from "@mui/material/Skeleton";
 import { useState } from "react";
-import { LOAD_ROLES } from "../lib/gql-queries";
+import { Role } from "../lib/gql-codegen/graphql";
 
 type SelectRoleProps = Exclude<SelectProps, 'children' | 'defaultValue' | 'value' | 'onChange'>;
 
 export default function SelectRole({ defaultValue, value, onChange, ...props }: SelectRoleProps) {
-  const { data, loading } = useQuery(LOAD_ROLES);
-  const [roleIds, setRoleIds] = useState<Array<number>>(data?.roles.length ? [data.roles[0].id] : []);
+  const [roles, setRoles] = useState<Array<Role>>([Role.Employee]);
 
-  if (loading) return (
-    <Skeleton variant="rectangular" />
-  );
-
-  const handleChange = (event: SelectChangeEvent<typeof roleIds>) => {
+  const handleChange = (event: SelectChangeEvent<typeof roles>) => {
     const { target: { value } } = event;
-    setRoleIds(typeof value === 'string' ? value.split(',').map(Number) : value);
+    setRoles(typeof value === 'string' ? value.split(',') as Array<Role> : value);
   };
 
   return (
@@ -26,14 +19,14 @@ export default function SelectRole({ defaultValue, value, onChange, ...props }: 
       multiple
       MenuProps={{ MenuListProps: { disablePadding: true } }}
       {...props}
-      value={roleIds}
+      value={roles}
       onChange={handleChange}
-      renderValue={set => data?.roles.filter((role) => set.includes(role.id)).map((role) => role.title).join(', ')}
+      renderValue={set => roles.filter((role) => set.includes(role)).join(', ')}
     >
-      {data?.roles.map((role) => (
-        <MenuItem key={role.code} value={role.id}>
-          <Checkbox checked={roleIds.includes(role.id)} />
-          {role.title}
+      {Object.values(Role).map(role => (
+        <MenuItem key={role} value={role}>
+          <Checkbox checked={roles.includes(role)} />
+          {role}
         </MenuItem>
       ))}
     </Select>

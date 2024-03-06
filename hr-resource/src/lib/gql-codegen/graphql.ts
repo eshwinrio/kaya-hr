@@ -132,7 +132,6 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
-  roles: Array<Role>;
   scheduledShifts: Array<Maybe<Schedule>>;
   user: User;
   users: Array<Maybe<User>>;
@@ -381,7 +380,6 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
   scheduledShifts?: Resolver<Array<Maybe<ResolversTypes['Schedule']>>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
