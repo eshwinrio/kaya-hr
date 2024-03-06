@@ -10,7 +10,7 @@ import prisma from "./prisma.js";
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   _root,
   { input },
-  { user, organization, roles }
+  { organization }
 ) => {
   if (!validator.isEmail(input.email)) {
     throw new GraphQLError('Invalid email format', { extensions: { code: 'BAD_USER_INPUT' } });
@@ -46,7 +46,8 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
         streetName: input.streetName,
         addressL2: input.addressL2,
         organization: { connect: { id: organization?.id } },
-        UserRoles: { createMany: { data: input.roleIds?.map(roleId => ({ roleId })) ?? [] } },
+        UserRoleMap: { createMany: { data: input.roles?.map(role => ({ role })) ?? [] } },
+        UserPositionMap: { createMany: { data: input.positionIds?.map(positionId => ({ positionId })) ?? [] } },
       },
     })
     .then(user => user.id)
@@ -61,7 +62,7 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
   { input },
   { roles },
 ) => {
-  if (roles.findIndex(role => role.code === 'SUPER') === -1) {
+  if (!roles.includes("SUPER")) {
     throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
   }
   try {
@@ -85,9 +86,10 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
 export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'] = async (
   _root,
   { id, input },
-  { roles, organization }
+  { roles }
 ) => {
-  if (roles.findIndex(role => role.code === 'SUPER') === -1 || organization?.id !== id) {
+  // TODO: Add a check to only allow org admins to update
+  if (!roles.includes("SUPER")) {
     throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
   }
   return prisma.organization
@@ -103,7 +105,6 @@ export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'
     })
     .then(organization => organization.id)
     .catch(error => {
-      console.log(error);
       logSystem.error(error);
       throw new GraphQLError('Could not update organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
@@ -167,3 +168,22 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
 
   return { accepted: accepted.count, rejected: rejected.count };
 };
+
+export const mResolverScheduleShiftFor: MutationResolvers['scheduleShiftFor'] = async (
+  _root,
+  { userId, input },
+  _context
+) => {
+  return prisma.schedule
+    .create({ data: {
+      dateTimeStart: new Date(input.dateTimeStart),
+      dateTimeEnd: new Date(input.dateTimeEnd),
+      user: { connect: { id: userId } },
+      position: { connect: { id: input.positionId } },
+    } })
+    .then(shift => shift.id)
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+}

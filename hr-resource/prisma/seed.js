@@ -15,29 +15,13 @@ async function main() {
     update: {}
   });
 
-  // Seed default role
-  const defaultRoleUpsertPromise = prisma.role.upsert({
-    where: { code: Seed.defaultRoleCode },
-    create: {
-      code: Seed.defaultRoleCode,
-      title: Seed.defaultRoleTitle,
-      description: Seed.defaultRoleDescription,
-      hourlyWage: Seed.defaultRoleHourlyWage
-    },
-    update: {
-      title: Seed.defaultRoleTitle,
-      description: Seed.defaultRoleDescription,
-      hourlyWage: Seed.defaultRoleHourlyWage
-    }
-  });
-
   // Seed default user
-  const defaultUserUpsertPromise = prisma.user.upsert({
+  const defaultUserUpsert = await prisma.user.upsert({
     where: { email: Seed.defaultUserEmail },
     create: {
-      email: Seed.defaultUserEmail,
       firstName: Seed.defaultUserFirstName,
       lastName: Seed.defaultUserLastName,
+      email: Seed.defaultUserEmail,
       dateOfBirth: Seed.defaultUserDateOfBirth,
       streetName: Seed.defaultUserStreetName,
       city: Seed.defaultUserCity,
@@ -62,17 +46,12 @@ async function main() {
     }
   });
 
-  const [defaultRoleUpsert, defaultUserUpsert] = await Promise.all([
-    defaultRoleUpsertPromise,
-    defaultUserUpsertPromise
-  ]);
-
   // Link both user and role
-  await prisma.userRole.upsert({
-    where: { userId_roleId: { userId: defaultUserUpsert.id, roleId: defaultRoleUpsert.id } },
+  await prisma.userRoleMap.upsert({
+    where: { userId_role: { userId: defaultUserUpsert.id, role: "SUPER" } },
     create: {
       userId: defaultUserUpsert.id,
-      roleId: defaultRoleUpsert.id
+      role: "SUPER"
     },
     update: {}
   });

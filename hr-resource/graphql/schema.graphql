@@ -1,3 +1,17 @@
+enum Role {
+  SUPER
+  ADMIN
+  MANAGER
+  LEAD
+  EMPLOYEE
+}
+
+enum SyncStatus {
+  NEVER
+  OK
+  FAIL
+}
+
 type ClockTime {
   id: Int!
   startTime: String!
@@ -20,9 +34,8 @@ type Schedule {
   notes: String
 }
 
-type Role {
+type Position {
   id: Int!
-  code: String!
   title: String!
   description: String
   hourlyWage: Int
@@ -44,9 +57,12 @@ type User {
   country: String!
   dateJoined: String!
   status: String
-  type: String
+  syncStatus: SyncStatus
   organization: Organization
+  schedules: [Schedule]
+  timesheets: [Timesheet]
   roles: [Role!]!
+  positions: [Position]!
 }
 
 type Organization {
@@ -80,7 +96,8 @@ input CreateUserInput {
   country: String!
   password: String!
   dateJoined: String!
-  roleIds: [Int!]
+  roles: [Role!]
+  positionIds: [Int!]
 }
 
 input CreateOrganizationInput {
@@ -99,11 +116,22 @@ input UpdateOrganizationInput {
   logoUrl: String
 }
 
-input RoleInput {
-  code: String!
+input PositionInput {
   title: String!
   description: String
   hourlyWage: Int
+}
+
+input ScheduleInput {
+  dateTimeStart: String!
+  dateTimeEnd: String!
+  positionId: Int!
+  notes: String
+}
+
+input ListScheduleFilterInput {
+  userId: Int
+  date: String
 }
 
 
@@ -113,12 +141,19 @@ type Query {
   user(id: Int!): User!
   users: [User]!
   roles: [Role!]!
+
+  # Shift scheduling
+  scheduledShifts(filters: ListScheduleFilterInput): [Schedule]!
 }
 
 type Mutation {
-  createRole(input: RoleInput!): Int!
+  createPosition(input: PositionInput!): Int!
   createOrganization(input: CreateOrganizationInput!): Int!
   createUser(input: CreateUserInput!): Int!
   updateOrganization(id: Int!, input: UpdateOrganizationInput!): Int!
   syncUsers(force: Boolean): UserSyncResult!
+
+  # Shift scheduling
+  scheduleShiftFor(userId: Int!, input: ScheduleInput!): Int!
+  unscheduleShift(shiftId: Int!): Int!
 }

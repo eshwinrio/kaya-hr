@@ -15,7 +15,6 @@ CREATE TABLE `User` (
     `country` VARCHAR(191) NOT NULL,
     `dateJoined` DATETIME(3) NOT NULL,
     `status` VARCHAR(191) NULL,
-    `type` VARCHAR(191) NULL,
     `organizationId` INTEGER NOT NULL,
     `syncStatus` ENUM('NEVER', 'OK', 'FAIL') NOT NULL DEFAULT 'NEVER',
 
@@ -24,24 +23,32 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Role` (
+CREATE TABLE `UserRoleMap` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(191) NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
-    `hourlyWage` DECIMAL(65, 30) NOT NULL,
+    `userId` INTEGER NOT NULL,
+    `role` ENUM('SUPER', 'ADMIN', 'MANAGER', 'LEAD', 'EMPLOYEE') NOT NULL,
 
-    UNIQUE INDEX `Role_code_key`(`code`),
+    UNIQUE INDEX `UserRoleMap_userId_role_key`(`userId`, `role`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `UserRole` (
+CREATE TABLE `Position` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `hourlyWage` DECIMAL(65, 30) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserPositionMap` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
-    `roleId` INTEGER NOT NULL,
+    `positionId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `UserRole_userId_roleId_key`(`userId`, `roleId`),
+    UNIQUE INDEX `UserPositionMap_userId_positionId_key`(`userId`, `positionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -61,9 +68,9 @@ CREATE TABLE `Organization` (
 CREATE TABLE `Schedule` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NULL,
-    `dataTimeStart` DATETIME(3) NOT NULL,
+    `dateTimeStart` DATETIME(3) NOT NULL,
     `dateTimeEnd` DATETIME(3) NOT NULL,
-    `roleId` INTEGER NOT NULL,
+    `positionId` INTEGER NOT NULL,
     `notes` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
@@ -92,16 +99,19 @@ CREATE TABLE `ClockTime` (
 ALTER TABLE `User` ADD CONSTRAINT `User_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `UserRoleMap` ADD CONSTRAINT `UserRoleMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `UserPositionMap` ADD CONSTRAINT `UserPositionMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserPositionMap` ADD CONSTRAINT `UserPositionMap_positionId_fkey` FOREIGN KEY (`positionId`) REFERENCES `Position`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `Role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_positionId_fkey` FOREIGN KEY (`positionId`) REFERENCES `Position`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TimeSheet` ADD CONSTRAINT `TimeSheet_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -46,17 +46,25 @@ export type CreateUserInput = {
   password: Scalars['String']['input'];
   phone: Scalars['String']['input'];
   pincode: Scalars['String']['input'];
+  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
   province: Scalars['String']['input'];
-  roleIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  roles?: InputMaybe<Array<Role>>;
   streetName: Scalars['String']['input'];
+};
+
+export type ListScheduleFilterInput = {
+  date?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   createOrganization: Scalars['Int']['output'];
-  createRole: Scalars['Int']['output'];
+  createPosition: Scalars['Int']['output'];
   createUser: Scalars['Int']['output'];
+  scheduleShiftFor: Scalars['Int']['output'];
   syncUsers: UserSyncResult;
+  unscheduleShift: Scalars['Int']['output'];
   updateOrganization: Scalars['Int']['output'];
 };
 
@@ -66,8 +74,8 @@ export type MutationCreateOrganizationArgs = {
 };
 
 
-export type MutationCreateRoleArgs = {
-  input: RoleInput;
+export type MutationCreatePositionArgs = {
+  input: PositionInput;
 };
 
 
@@ -76,8 +84,19 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationScheduleShiftForArgs = {
+  input: ScheduleInput;
+  userId: Scalars['Int']['input'];
+};
+
+
 export type MutationSyncUsersArgs = {
   force?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type MutationUnscheduleShiftArgs = {
+  shiftId: Scalars['Int']['input'];
 };
 
 
@@ -96,12 +115,32 @@ export type Organization = {
   webUrl?: Maybe<Scalars['String']['output']>;
 };
 
+export type Position = {
+  __typename?: 'Position';
+  description?: Maybe<Scalars['String']['output']>;
+  hourlyWage?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['Int']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type PositionInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  hourlyWage?: InputMaybe<Scalars['Int']['input']>;
+  title: Scalars['String']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
   roles: Array<Role>;
+  scheduledShifts: Array<Maybe<Schedule>>;
   user: User;
   users: Array<Maybe<User>>;
+};
+
+
+export type QueryScheduledShiftsArgs = {
+  filters?: InputMaybe<ListScheduleFilterInput>;
 };
 
 
@@ -109,21 +148,13 @@ export type QueryUserArgs = {
   id: Scalars['Int']['input'];
 };
 
-export type Role = {
-  __typename?: 'Role';
-  code: Scalars['String']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  hourlyWage?: Maybe<Scalars['Int']['output']>;
-  id: Scalars['Int']['output'];
-  title: Scalars['String']['output'];
-};
-
-export type RoleInput = {
-  code: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  hourlyWage?: InputMaybe<Scalars['Int']['input']>;
-  title: Scalars['String']['input'];
-};
+export enum Role {
+  Admin = 'ADMIN',
+  Employee = 'EMPLOYEE',
+  Lead = 'LEAD',
+  Manager = 'MANAGER',
+  Super = 'SUPER'
+}
 
 export type Schedule = {
   __typename?: 'Schedule';
@@ -134,6 +165,19 @@ export type Schedule = {
   role: Role;
   userId: Scalars['Int']['output'];
 };
+
+export type ScheduleInput = {
+  dateTimeEnd: Scalars['String']['input'];
+  dateTimeStart: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  positionId: Scalars['Int']['input'];
+};
+
+export enum SyncStatus {
+  Fail = 'FAIL',
+  Never = 'NEVER',
+  Ok = 'OK'
+}
 
 export type Timesheet = {
   __typename?: 'Timesheet';
@@ -165,11 +209,14 @@ export type User = {
   organization?: Maybe<Organization>;
   phone: Scalars['String']['output'];
   pincode: Scalars['String']['output'];
+  positions: Array<Maybe<Position>>;
   province: Scalars['String']['output'];
   roles: Array<Role>;
+  schedules?: Maybe<Array<Maybe<Schedule>>>;
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
-  type?: Maybe<Scalars['String']['output']>;
+  syncStatus?: Maybe<SyncStatus>;
+  timesheets?: Maybe<Array<Maybe<Timesheet>>>;
 };
 
 export type UserSyncResult = {
@@ -256,13 +303,17 @@ export type ResolversTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  ListScheduleFilterInput: ListScheduleFilterInput;
   Mutation: ResolverTypeWrapper<{}>;
   Organization: ResolverTypeWrapper<Organization>;
+  Position: ResolverTypeWrapper<Position>;
+  PositionInput: PositionInput;
   Query: ResolverTypeWrapper<{}>;
-  Role: ResolverTypeWrapper<Role>;
-  RoleInput: RoleInput;
+  Role: Role;
   Schedule: ResolverTypeWrapper<Schedule>;
+  ScheduleInput: ScheduleInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  SyncStatus: SyncStatus;
   Timesheet: ResolverTypeWrapper<Timesheet>;
   UpdateOrganizationInput: UpdateOrganizationInput;
   User: ResolverTypeWrapper<User>;
@@ -277,12 +328,14 @@ export type ResolversParentTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   Float: Scalars['Float']['output'];
   Int: Scalars['Int']['output'];
+  ListScheduleFilterInput: ListScheduleFilterInput;
   Mutation: {};
   Organization: Organization;
+  Position: Position;
+  PositionInput: PositionInput;
   Query: {};
-  Role: Role;
-  RoleInput: RoleInput;
   Schedule: Schedule;
+  ScheduleInput: ScheduleInput;
   String: Scalars['String']['output'];
   Timesheet: Timesheet;
   UpdateOrganizationInput: UpdateOrganizationInput;
@@ -300,9 +353,11 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
-  createRole?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateRoleArgs, 'input'>>;
+  createPosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  scheduleShiftFor?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationScheduleShiftForArgs, 'input' | 'userId'>>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
+  unscheduleShift?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationUnscheduleShiftArgs, 'shiftId'>>;
   updateOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
 }>;
 
@@ -316,20 +371,20 @@ export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
-  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
-}>;
-
-export type RoleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Role'] = ResolversParentTypes['Role']> = ResolversObject<{
-  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+export type PositionResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Position'] = ResolversParentTypes['Position']> = ResolversObject<{
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hourlyWage?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  currentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  scheduledShifts?: Resolver<Array<Maybe<ResolversTypes['Schedule']>>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
+  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
 }>;
 
 export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
@@ -363,11 +418,14 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   organization?: Resolver<Maybe<ResolversTypes['Organization']>, ParentType, ContextType>;
   phone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   pincode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  positions?: Resolver<Array<Maybe<ResolversTypes['Position']>>, ParentType, ContextType>;
   province?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   roles?: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  schedules?: Resolver<Maybe<Array<Maybe<ResolversTypes['Schedule']>>>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   streetName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  syncStatus?: Resolver<Maybe<ResolversTypes['SyncStatus']>, ParentType, ContextType>;
+  timesheets?: Resolver<Maybe<Array<Maybe<ResolversTypes['Timesheet']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -381,8 +439,8 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
+  Position?: PositionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  Role?: RoleResolvers<ContextType>;
   Schedule?: ScheduleResolvers<ContextType>;
   Timesheet?: TimesheetResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

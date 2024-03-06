@@ -1,40 +1,43 @@
 import { GraphQLError } from "graphql";
-import { QueryResolvers } from "./gql-codegen/graphql.js";
+import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import prisma from "./prisma.js";
 
 export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   _root,
   _args,
-  { user, organization, roles }
+  { user, organization, positions, roles }
 ) => ({
   ...user,
-  roles: roles.map(role => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })),
+  roles: roles.map(role => role as Role),
+  positions: positions.map(position => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
   organization,
+  syncStatus: user.syncStatus as SyncStatus,
   dateJoined: user.dateJoined.toISOString(),
   dateOfBirth: user.dateOfBirth.toISOString(),
 });
 
-export const qResolverRoles: QueryResolvers['roles'] = async (_root, _args, { roles }) => await prisma.role
-  .findMany()
-  .then(roles => roles.map(role => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })));
+export const qResolverRoles: QueryResolvers['roles'] = async (_root, _args, { roles }) => roles.map(role => role as Role);
 
 export const qResolverUsers: QueryResolvers['users'] = async (
   _root,
   _args,
-  _context
+  { organization, roles }
 ) => {
   const users = await prisma.user.findMany({
     include: {
-      UserRoles: {
-        include: { role: true },
-        where: { roleId: { not: 1 } }
+      UserPositionMap: {
+        include: { position: true },
       },
+      UserRoleMap: true,
       organization: true
-    }
+    },
+    where: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
   });
 
-  return users.map(({ UserRoles, dateOfBirth, dateJoined, ...user }) => ({
-    roles: UserRoles.map(({ role }) => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })),
+  return users.map(({ UserRoleMap, UserPositionMap, dateOfBirth, dateJoined, syncStatus, ...user }) => ({
+    positions: UserPositionMap.map(({ position }) => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
+    roles: UserRoleMap.map(({ role }) => role as Role),
+    syncStatus: syncStatus as SyncStatus,
     dateOfBirth: dateOfBirth.toISOString(),
     dateJoined: dateJoined.toISOString(),
     ...user
@@ -49,12 +52,12 @@ export const qResolverUser: QueryResolvers['user'] = async (
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      UserRoles: {
-        include: { role: true },
-        where: { roleId: { not: 1 } }
+      UserPositionMap: {
+        include: { position: true },
       },
+      UserRoleMap: true,
       organization: true
-    }
+    },
   });
 
   if (!user) {
@@ -63,8 +66,10 @@ export const qResolverUser: QueryResolvers['user'] = async (
   
   return {
     ...user,
-    roles: user.UserRoles.map(({ role }) => ({ ...role, hourlyWage: role.hourlyWage.toNumber() })),
+    positions: user.UserPositionMap.map(({ position }) => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
+    roles: user.UserRoleMap.map(({ role }) => role as Role),
+    syncStatus: user.syncStatus as SyncStatus,
     dateOfBirth: user.dateOfBirth.toISOString(),
-    dateJoined: user.dateJoined.toISOString()
+    dateJoined: user.dateJoined.toISOString(),
   };
 }
