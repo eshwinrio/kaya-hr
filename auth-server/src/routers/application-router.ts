@@ -1,11 +1,11 @@
 import { Applications } from "@prisma/client";
 import { Router } from "express";
-import requireBody from "../middlewares/require-body.js";
-import prisma from "../lib/prisma.js";
-import httpStatus from "http-status";
 import httpErrors from "http-errors";
-import requireParams from "../middlewares/require-params.js";
+import httpStatus from "http-status";
+import prisma from "../lib/prisma.js";
 import requireAccessToken from "../middlewares/require-access-token.js";
+import requireBody from "../middlewares/require-body.js";
+import requireParams from "../middlewares/require-params.js";
 
 const applicationRouter = Router();
 

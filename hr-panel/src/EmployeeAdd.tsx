@@ -1,24 +1,23 @@
-import { useState } from 'react';
-import { ActionFunction, Form, redirect } from 'react-router-dom';
-import validator from 'validator';
-import dayjs from 'dayjs';
+import ReplayIcon from '@mui/icons-material/Replay';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid2 from '@mui/material/Unstable_Grid2';
 import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import ReplayIcon from '@mui/icons-material/Replay';
+import Grid2 from '@mui/material/Unstable_Grid2';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
-import SelectRole from './components/SelectRole';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { ActionFunction, Form, redirect } from 'react-router-dom';
+import validator from 'validator';
 import InputPassword from './components/InputPassword';
+import SelectRole from './components/SelectRole';
 import { apolloClient } from './lib/apollo';
 import { CREATE_USER } from './lib/gql-queries';
 

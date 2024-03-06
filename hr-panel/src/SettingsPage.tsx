@@ -1,13 +1,13 @@
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useWhoAmI } from "./lib/whoami-provider";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
 import { Link } from "react-router-dom";
+import { useWhoAmI } from "./lib/whoami-provider";
 
 export default function SettingsPage() {
   const whoAmI = useWhoAmI();

@@ -1,12 +1,12 @@
-import express from "express";
-import cors, { CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
+import cors, { CorsOptions } from "cors";
+import express from "express";
 import { Cors } from "./config/environment.js";
-import { httpLogStream } from "./lib/logger.js";
 import errorHandler from "./handlers/error-handler.js";
+import { httpLogStream } from "./lib/logger.js";
+import applicationRouter from "./routers/application-router.js";
 import authRouter from "./routers/auth-router.js";
 import userRouter from "./routers/user-router.js";
-import applicationRouter from "./routers/application-router.js";
 
 const app = express();
 

@@ -1,5 +1,5 @@
-import { keyframes, styled } from "@mui/material/styles";
 import SyncIcon from '@mui/icons-material/Sync';
+import { keyframes, styled } from "@mui/material/styles";
 
 const spin = keyframes({
   from: {

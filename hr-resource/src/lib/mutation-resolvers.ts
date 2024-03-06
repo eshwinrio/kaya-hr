@@ -1,11 +1,11 @@
 import { GraphQLError } from "graphql";
-import { MutationResolvers } from "./gql-codegen/graphql.js";
-import prisma from "./prisma.js";
-import validator from "validator";
-import { logHttp, logSystem } from "./logger.js";
-import { syncUsers } from "./fetch-requests.js";
 import createHttpError from "http-errors";
+import validator from "validator";
 import { Seed } from "../config/environment.js";
+import { syncUsers } from "./fetch-requests.js";
+import { MutationResolvers } from "./gql-codegen/graphql.js";
+import { logHttp, logSystem } from "./logger.js";
+import prisma from "./prisma.js";
 
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   _root,

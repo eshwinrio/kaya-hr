@@ -1,15 +1,15 @@
-import { readFileSync } from "fs";
-import httpErrors, { HttpError } from "http-errors";
-import { GraphQLError } from "graphql";
 import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
 import { Organization, Role, User } from "@prisma/client";
-import { Resolvers } from "./gql-codegen/graphql.js";
-import { qResolverCurrentUser, qResolverRoles, qResolverUser, qResolverUsers } from "./query-resolvers.js";
-import { mResolverCreateOrganization, mResolverCreateUser, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
+import { readFileSync } from "fs";
+import { GraphQLError } from "graphql";
+import httpErrors, { HttpError } from "http-errors";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
-import prisma from "./prisma.js";
+import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
+import { mResolverCreateOrganization, mResolverCreateUser, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
+import prisma from "./prisma.js";
+import { qResolverCurrentUser, qResolverRoles, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;

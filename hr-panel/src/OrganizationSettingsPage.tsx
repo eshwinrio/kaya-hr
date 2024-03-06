@@ -1,18 +1,18 @@
-import Container from "@mui/material/Container";
-import { useWhoAmI } from "./lib/whoami-provider";
 import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import { ActionFunction, Form } from "react-router-dom";
 import AvatarGroup from "@mui/material/AvatarGroup";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
-import { useMaterialTheme } from "./lib/material-theme";
+import Typography from "@mui/material/Typography";
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { ActionFunction, Form } from "react-router-dom";
+import Banner from "./components/Banner";
 import { apolloClient } from "./lib/apollo";
 import { UPDATE_ORGANIZATION } from "./lib/gql-queries";
-import Banner from "./components/Banner";
+import { useMaterialTheme } from "./lib/material-theme";
+import { useWhoAmI } from "./lib/whoami-provider";
 
 // TODO: Replace dummy data with query data
 const names = [

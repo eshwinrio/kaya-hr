@@ -1,20 +1,20 @@
-import { LoaderFunction, useLoaderData } from 'react-router-dom'
-import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import Container from '@mui/material/Container';
-import Input from '@mui/material/Input';
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
-import { styled } from '@mui/material/styles';
 import CallIcon from '@mui/icons-material/Call';
 import MailIcon from '@mui/icons-material/Mail';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Container from '@mui/material/Container';
+import Input from '@mui/material/Input';
+import Typography from '@mui/material/Typography';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { styled } from '@mui/material/styles';
+import { GraphQLError } from 'graphql';
+import { LoaderFunction, useLoaderData } from 'react-router-dom';
 import Banner from './components/Banner';
 import { apolloClient } from './lib/apollo';
-import { VIEW_USER } from './lib/gql-queries';
 import { ViewUserQuery } from './lib/gql-codegen/graphql';
-import { GraphQLError } from 'graphql';
+import { VIEW_USER } from './lib/gql-queries';
 import { useWhoAmI } from './lib/whoami-provider';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Button from '@mui/material/Button';
 
 const EditableTypography = styled(Input)(({ theme }) => ({
   ...theme.typography.h6,

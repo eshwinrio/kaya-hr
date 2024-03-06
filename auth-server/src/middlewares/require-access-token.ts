@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
 import httpErrors from 'http-errors';
-import validator from 'validator';
 import jsonwebtoken from 'jsonwebtoken';
-import type { Locals as RequireApplicationLocals } from './require-application.js';
+import validator from 'validator';
 import { AccessTokenPayload, verifyAccessToken } from '../lib/token.js';
+import type { Locals as RequireApplicationLocals } from './require-application.js';
 
 export type Locals = RequireApplicationLocals & Record<'accessTokenData', AccessTokenPayload>;
 export type AccessTokenEnforcer = RequestHandler<unknown, unknown, unknown, unknown, Locals>;
