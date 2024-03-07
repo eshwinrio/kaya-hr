@@ -1,5 +1,6 @@
 import { GraphQLError } from "graphql";
 import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
 export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
@@ -12,8 +13,6 @@ export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   positions: positions.map(position => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
   organization,
   syncStatus: user.syncStatus as SyncStatus,
-  dateJoined: user.dateJoined.toISOString(),
-  dateOfBirth: user.dateOfBirth.toISOString(),
 });
 
 export const qResolverUsers: QueryResolvers['users'] = async (
@@ -32,12 +31,10 @@ export const qResolverUsers: QueryResolvers['users'] = async (
     where: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
   });
 
-  return users.map(({ UserRoleMap, UserPositionMap, dateOfBirth, dateJoined, syncStatus, ...user }) => ({
+  return users.map(({ UserRoleMap, UserPositionMap, syncStatus, ...user }) => ({
     positions: UserPositionMap.map(({ position }) => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
     roles: UserRoleMap.map(({ role }) => role as Role),
     syncStatus: syncStatus as SyncStatus,
-    dateOfBirth: dateOfBirth.toISOString(),
-    dateJoined: dateJoined.toISOString(),
     ...user
   }));
 }
@@ -67,7 +64,42 @@ export const qResolverUser: QueryResolvers['user'] = async (
     positions: user.UserPositionMap.map(({ position }) => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
     roles: user.UserRoleMap.map(({ role }) => role as Role),
     syncStatus: user.syncStatus as SyncStatus,
-    dateOfBirth: user.dateOfBirth.toISOString(),
-    dateJoined: user.dateJoined.toISOString(),
   };
+}
+
+export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async (
+  _root,
+  { filters },
+  _context,
+) => {
+  const mixedScheduleDocument = await prisma.schedule
+    .findMany({
+      include: {
+        position: true,
+        user: {
+          include: {
+            UserPositionMap: { include: { position: true } },
+            UserRoleMap: true,
+          }
+        },
+      },
+      where: {
+        userId: filters?.userId,
+      },
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not query shifts', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return mixedScheduleDocument.map(({ user, position, ...shift }) => ({
+    ...shift,
+    position: { ...position, hourlyWage: position.hourlyWage.toNumber() },
+    user: user && {
+      ...user,
+      positions: user.UserPositionMap.map(({ position }) => ({ ...position, hourlyWage: position.hourlyWage.toNumber() })),
+      roles: user.UserRoleMap.map(({ role }) => role as Role),
+      syncStatus: user.syncStatus as SyncStatus,
+    }
+  }));
 }

@@ -1,3 +1,5 @@
+scalar ISODate
+
 enum Role {
   SUPER
   ADMIN
@@ -14,8 +16,8 @@ enum SyncStatus {
 
 type ClockTime {
   id: Int!
-  startTime: String!
-  endTime: String!
+  startTime: ISODate!
+  endTime: ISODate!
   timesheetId: Int!
 }
 
@@ -27,10 +29,10 @@ type Timesheet {
 
 type Schedule {
   id: Int!
-  userId: Int!
-  dateTimeStart: String!
-  dateTimeEnd: String!
-  role: Role!
+  user: User
+  dateTimeStart: ISODate!
+  dateTimeEnd: ISODate!
+  position: Position!
   notes: String
 }
 
@@ -46,7 +48,7 @@ type User {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: String!
+  dateOfBirth: ISODate!
   email: String!
   streetName: String!
   addressL2: String
@@ -55,7 +57,7 @@ type User {
   province: String!
   phone: String!
   country: String!
-  dateJoined: String!
+  dateJoined: ISODate!
   status: String
   syncStatus: SyncStatus
   organization: Organization
@@ -85,7 +87,7 @@ input CreateUserInput {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: String!
+  dateOfBirth: ISODate!
   email: String!
   phone: String!
   streetName: String!
@@ -95,7 +97,7 @@ input CreateUserInput {
   province: String!
   country: String!
   password: String!
-  dateJoined: String!
+  dateJoined: ISODate!
   roles: [Role!]
   positionIds: [Int!]
 }
@@ -123,8 +125,8 @@ input PositionInput {
 }
 
 input ScheduleInput {
-  dateTimeStart: String!
-  dateTimeEnd: String!
+  dateTimeStart: ISODate!
+  dateTimeEnd: ISODate!
   positionId: Int!
   notes: String
 }

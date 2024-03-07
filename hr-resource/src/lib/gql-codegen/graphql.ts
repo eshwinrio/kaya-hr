@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { ApolloServerContext } from '../apollo.js';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -15,13 +15,14 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  ISODate: { input: any; output: any; }
 };
 
 export type ClockTime = {
   __typename?: 'ClockTime';
-  endTime: Scalars['String']['output'];
+  endTime: Scalars['ISODate']['output'];
   id: Scalars['Int']['output'];
-  startTime: Scalars['String']['output'];
+  startTime: Scalars['ISODate']['output'];
   timesheetId: Scalars['Int']['output'];
 };
 
@@ -37,8 +38,8 @@ export type CreateUserInput = {
   addressL2?: InputMaybe<Scalars['String']['input']>;
   city: Scalars['String']['input'];
   country: Scalars['String']['input'];
-  dateJoined: Scalars['String']['input'];
-  dateOfBirth: Scalars['String']['input'];
+  dateJoined: Scalars['ISODate']['input'];
+  dateOfBirth: Scalars['ISODate']['input'];
   email: Scalars['String']['input'];
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
@@ -157,17 +158,17 @@ export enum Role {
 
 export type Schedule = {
   __typename?: 'Schedule';
-  dateTimeEnd: Scalars['String']['output'];
-  dateTimeStart: Scalars['String']['output'];
+  dateTimeEnd: Scalars['ISODate']['output'];
+  dateTimeStart: Scalars['ISODate']['output'];
   id: Scalars['Int']['output'];
   notes?: Maybe<Scalars['String']['output']>;
-  role: Role;
-  userId: Scalars['Int']['output'];
+  position: Position;
+  user?: Maybe<User>;
 };
 
 export type ScheduleInput = {
-  dateTimeEnd: Scalars['String']['input'];
-  dateTimeStart: Scalars['String']['input'];
+  dateTimeEnd: Scalars['ISODate']['input'];
+  dateTimeStart: Scalars['ISODate']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
   positionId: Scalars['Int']['input'];
 };
@@ -198,8 +199,8 @@ export type User = {
   addressL2?: Maybe<Scalars['String']['output']>;
   city: Scalars['String']['output'];
   country: Scalars['String']['output'];
-  dateJoined: Scalars['String']['output'];
-  dateOfBirth: Scalars['String']['output'];
+  dateJoined: Scalars['ISODate']['output'];
+  dateOfBirth: Scalars['ISODate']['output'];
   email: Scalars['String']['output'];
   firstName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
@@ -301,6 +302,7 @@ export type ResolversTypes = ResolversObject<{
   CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ListScheduleFilterInput: ListScheduleFilterInput;
   Mutation: ResolverTypeWrapper<{}>;
@@ -326,6 +328,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
   Float: Scalars['Float']['output'];
+  ISODate: Scalars['ISODate']['output'];
   Int: Scalars['Int']['output'];
   ListScheduleFilterInput: ListScheduleFilterInput;
   Mutation: {};
@@ -343,12 +346,16 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ClockTime'] = ResolversParentTypes['ClockTime']> = ResolversObject<{
-  endTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  endTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   timesheetId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
+
+export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ISODate'], any> {
+  name: 'ISODate';
+}
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
@@ -386,12 +393,12 @@ export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends
 }>;
 
 export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
-  dateTimeEnd?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  dateTimeStart?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dateTimeEnd?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  dateTimeStart?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  role?: Resolver<ResolversTypes['Role'], ParentType, ContextType>;
-  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  position?: Resolver<ResolversTypes['Position'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -406,8 +413,8 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   addressL2?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   country?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  dateJoined?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  dateOfBirth?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dateJoined?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  dateOfBirth?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -435,6 +442,7 @@ export type UserSyncResultResolvers<ContextType = ApolloServerContext, ParentTyp
 
 export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
+  ISODate?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Position?: PositionResolvers<ContextType>;
