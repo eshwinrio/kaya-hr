@@ -85,6 +85,8 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
       },
       where: {
         userId: filters?.userId,
+        dateTimeStart: { gte: filters?.from },
+        dateTimeEnd: { lte: filters?.to },
       },
     })
     .catch(error => {

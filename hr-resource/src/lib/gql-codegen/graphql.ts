@@ -54,7 +54,8 @@ export type CreateUserInput = {
 };
 
 export type ListScheduleFilterInput = {
-  date?: InputMaybe<Scalars['String']['input']>;
+  from?: InputMaybe<Scalars['ISODate']['input']>;
+  to?: InputMaybe<Scalars['ISODate']['input']>;
   userId?: InputMaybe<Scalars['Int']['input']>;
 };
 
