@@ -10,7 +10,7 @@ import { logHttp } from "./logger.js";
 import { mResolverCreateOrganization, mResolverCreateUser, mResolverScheduleShiftFor, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
 import { qResolverCurrentUser, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
-import { ISODate } from "./scalars.js";
+import { Decimal, ISODate } from "./scalars.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
@@ -78,6 +78,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     syncUsers: mResolverSyncUsers,
     scheduleShiftFor: mResolverScheduleShiftFor,
   },
+  Decimal: Decimal,
   ISODate: ISODate,
 }
 

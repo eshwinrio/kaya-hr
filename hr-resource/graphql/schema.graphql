@@ -1,4 +1,5 @@
 scalar ISODate
+scalar Decimal
 
 enum Role {
   SUPER
@@ -24,7 +25,7 @@ type ClockTime {
 type Timesheet {
   id: Int!
   userId: Int!
-  hourlyWage: Float!
+  hourlyWage: Decimal!
 }
 
 type Schedule {
@@ -40,7 +41,7 @@ type Position {
   id: Int!
   title: String!
   description: String
-  hourlyWage: Int
+  hourlyWage: Decimal
 }
 
 type User {
@@ -63,8 +64,8 @@ type User {
   organization: Organization
   schedules: [Schedule]
   timesheets: [Timesheet]
-  roles: [Role!]!
-  positions: [Position]!
+  roles: [Role!]
+  positions: [Position]
 }
 
 type Organization {
@@ -121,7 +122,7 @@ input UpdateOrganizationInput {
 input PositionInput {
   title: String!
   description: String
-  hourlyWage: Int
+  hourlyWage: Decimal
 }
 
 input ScheduleInput {
@@ -137,11 +138,19 @@ input ListScheduleFilterInput {
   to: ISODate
 }
 
+input ViewUserOptions {
+  organization: Boolean
+  schedules: Boolean
+  timesheets: Boolean
+  roles: Boolean
+  positons: Boolean
+}
+
 
 # Root types
 type Query {
   currentUser: User
-  user(id: Int!): User!
+  user(id: Int!, options: ViewUserOptions): User!
   users: [User]!
 
   # Shift scheduling

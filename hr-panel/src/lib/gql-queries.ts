@@ -82,6 +82,35 @@ export const VIEW_USER = gql(`
   }
 `);
 
+export const VIEW_USER_WITH_SCHEDULES = gql(`
+  query ViewUserWithSchedules ($userId: Int!) {
+    user(id: $userId, options: { positons: true, roles: true, schedules: true }) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      city
+      country
+      province
+      roles
+      schedules {
+        id
+        position {
+          id
+          title
+          description
+          hourlyWage
+        }
+        dateTimeStart
+        dateTimeEnd
+        notes
+      }
+    }
+  }
+`);
+
 export const LIST_SCHEDULES = gql(`
   query ListSchedules ($filters: ListScheduleFilterInput) {
     scheduledShifts (filters: $filters) {
