@@ -19,6 +19,8 @@ const documents = {
     "\n  query LoadAllUsers {\n    users {\n        id\n        firstName\n        lastName\n        email\n        phone\n        dateJoined\n        dateOfBirth\n        streetName\n        pincode\n    }\n  }\n": types.LoadAllUsersDocument,
     "\n  mutation SyncUsers($force: Boolean) {\n    syncUsers(force: $force) {\n      accepted\n      rejected\n    }\n  }\n": types.SyncUsersDocument,
     "\n  query ViewUser($id: Int!) {\n    user(id: $id) {\n      id\n      firstName\n      middleName\n      lastName\n      email\n      phone\n      organization {\n        name \n      }\n      dateOfBirth\n      streetName\n      addressL2\n      city\n      country\n      province\n      pincode\n      dateJoined\n      dateOfBirth\n      roles\n    }\n  }\n": types.ViewUserDocument,
+    "\n  query ListSchedules ($filters: ListScheduleFilterInput) {\n    scheduledShifts (filters: $filters) {\n      id\n      user {\n          firstName\n          email\n          phone\n          positions {\n            title\n            hourlyWage\n          }\n      }\n      dateTimeStart\n      dateTimeEnd\n      position {\n        title\n        hourlyWage\n      }\n      notes\n    }\n  }\n": types.ListSchedulesDocument,
+    "\n  mutation ScheduleShift($userId: Int!, $options: ScheduleInput!) {\n    scheduleShiftFor(userId: $userId, input: $options)\n  }\n": types.ScheduleShiftDocument,
 };
 
 /**
@@ -59,6 +61,14 @@ export function gql(source: "\n  mutation SyncUsers($force: Boolean) {\n    sync
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query ViewUser($id: Int!) {\n    user(id: $id) {\n      id\n      firstName\n      middleName\n      lastName\n      email\n      phone\n      organization {\n        name \n      }\n      dateOfBirth\n      streetName\n      addressL2\n      city\n      country\n      province\n      pincode\n      dateJoined\n      dateOfBirth\n      roles\n    }\n  }\n"): (typeof documents)["\n  query ViewUser($id: Int!) {\n    user(id: $id) {\n      id\n      firstName\n      middleName\n      lastName\n      email\n      phone\n      organization {\n        name \n      }\n      dateOfBirth\n      streetName\n      addressL2\n      city\n      country\n      province\n      pincode\n      dateJoined\n      dateOfBirth\n      roles\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query ListSchedules ($filters: ListScheduleFilterInput) {\n    scheduledShifts (filters: $filters) {\n      id\n      user {\n          firstName\n          email\n          phone\n          positions {\n            title\n            hourlyWage\n          }\n      }\n      dateTimeStart\n      dateTimeEnd\n      position {\n        title\n        hourlyWage\n      }\n      notes\n    }\n  }\n"): (typeof documents)["\n  query ListSchedules ($filters: ListScheduleFilterInput) {\n    scheduledShifts (filters: $filters) {\n      id\n      user {\n          firstName\n          email\n          phone\n          positions {\n            title\n            hourlyWage\n          }\n      }\n      dateTimeStart\n      dateTimeEnd\n      position {\n        title\n        hourlyWage\n      }\n      notes\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ScheduleShift($userId: Int!, $options: ScheduleInput!) {\n    scheduleShiftFor(userId: $userId, input: $options)\n  }\n"): (typeof documents)["\n  mutation ScheduleShift($userId: Int!, $options: ScheduleInput!) {\n    scheduleShiftFor(userId: $userId, input: $options)\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

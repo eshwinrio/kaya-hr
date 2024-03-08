@@ -81,3 +81,33 @@ export const VIEW_USER = gql(`
     }
   }
 `);
+
+export const LIST_SCHEDULES = gql(`
+  query ListSchedules ($filters: ListScheduleFilterInput) {
+    scheduledShifts (filters: $filters) {
+      id
+      user {
+          firstName
+          email
+          phone
+          positions {
+            title
+            hourlyWage
+          }
+      }
+      dateTimeStart
+      dateTimeEnd
+      position {
+        title
+        hourlyWage
+      }
+      notes
+    }
+  }
+`);
+
+export const SCHEDULE_SHIFT = gql(`
+  mutation ScheduleShift($userId: Int!, $options: ScheduleInput!) {
+    scheduleShiftFor(userId: $userId, input: $options)
+  }
+`);

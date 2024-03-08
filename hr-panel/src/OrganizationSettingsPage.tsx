@@ -7,6 +7,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import React from "react";
 import { ActionFunction, Form } from "react-router-dom";
 import Banner from "./components/Banner";
 import { apolloClient } from "./lib/apollo";
@@ -26,7 +27,7 @@ const names = [
   'Kelly Snyder',
 ];
 
-export default function OrganizationSettingsPage() {
+const OrganizationSettingsPage: React.FC = () => {
   const whoAmI = useWhoAmI();
   const materialTheme = useMaterialTheme();
   const isAboveXs = useMediaQuery(materialTheme.breakpoints.up('xs'));
@@ -62,8 +63,8 @@ export default function OrganizationSettingsPage() {
         slotProps={{
           additionalAvatar: { sx: { width: 32, height: 32 } }
         }}>
-        {names.map((value) => (
-          <Tooltip title={value}>
+        {names.map((value, index) => (
+          <Tooltip key={index} title={value}>
             <Avatar
               key={value}
               src={whoAmI?.currentUser?.organization?.logoUrl || ''}
@@ -124,3 +125,5 @@ export const organizationSettingsAction: ActionFunction = async ({ request }) =>
     variables: { id, input: { name, summary } },
   });
 }
+
+export default OrganizationSettingsPage;
