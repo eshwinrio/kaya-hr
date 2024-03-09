@@ -39,13 +39,12 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       where: { email: responseBody.email },
       include: {
         organization: true,
-        UserRoleMap: true,
+        UserRoleMap: { select: { role: true } },
         UserPositionMap: {
           include: { position: true }
         },
         UserScheduleMap: {
           include: {
-            user: true,
             schedule: true,
             position: true
           }
@@ -66,7 +65,7 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       organization: organization ?? null,
       applicationId: responseBody.application,
       accessToken: req.cookies['access_token'],
-      schedules: UserScheduleMap.map(({ user, ...schedule }) => ({
+      schedules: UserScheduleMap.map(schedule => ({
         ...schedule,
         user: { ...user, syncStatus: user.syncStatus as SyncStatus },
       })),

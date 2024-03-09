@@ -31,19 +31,10 @@ async function main() {
       country: Seed.defaultUserCountry,
       dateJoined: Seed.defaultUserDateJoined,
       organizationId: defaultOrganizationUpsert.id,
+      profileIconUrl: Seed.defaultUserProfileIconUrl,
+      profileBannerUrl: Seed.defaultUserProfileBannerUrl
     },
-    update: {
-      firstName: Seed.defaultUserFirstName,
-      lastName: Seed.defaultUserLastName,
-      dateOfBirth: Seed.defaultUserDateOfBirth,
-      streetName: Seed.defaultUserStreetName,
-      city: Seed.defaultUserCity,
-      pincode: Seed.defaultUserPincode,
-      province: Seed.defaultUserProvince,
-      phone: Seed.defaultUserPhone,
-      country: Seed.defaultUserCountry,
-      dateJoined: Seed.defaultUserDateJoined
-    }
+    update: {}
   });
 
   // Link both user and role
