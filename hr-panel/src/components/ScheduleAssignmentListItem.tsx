@@ -6,25 +6,25 @@ import Typography from "@mui/material/Typography";
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import dayjs from "dayjs";
 import { useEffect, useState } from 'react';
-import { Schedule } from "../lib/gql-codegen/graphql";
+import { ScheduleAssignment } from "../lib/gql-codegen/graphql";
 import BorderLinearProgress from './BorderLinearProgress';
 
-export interface ScheduleListItemProps extends ListItemProps {
+export interface ScheduleAssignmentListItemProps extends ListItemProps {
   children?: never;
   readonly listItemButtonProps?: ListItemButtonProps;
   readonly listItemTextProps?: ListItemTextProps;
-  readonly schedule: Schedule;
+  readonly scheduleAssignment: ScheduleAssignment;
 }
 
-export default function ScheduleListItem({
+export default function ScheduleAssignmentListItem({
   children,
   listItemButtonProps,
   listItemTextProps,
-  schedule,
+  scheduleAssignment,
   ...props
-}: ScheduleListItemProps) {
-  const dayjsStart = dayjs(schedule.dateTimeStart);
-  const dayjsEnd = dayjs(schedule.dateTimeEnd);
+}: ScheduleAssignmentListItemProps) {
+  const dayjsStart = dayjs(scheduleAssignment.schedule.dateTimeStart);
+  const dayjsEnd = dayjs(scheduleAssignment.schedule.dateTimeEnd);
   const [dayjsNow, setDayjsNow] = useState(dayjs());
   const isShiftInProgress = dayjsStart.isBefore(dayjsNow) && dayjsEnd.isAfter(dayjsNow);
   const shiftProgress = Math.round((dayjsNow.diff(dayjsStart, 'milliseconds') / dayjsEnd.diff(dayjsStart, 'milliseconds')) * 100);
@@ -41,8 +41,8 @@ export default function ScheduleListItem({
           <Grid2 xs={12} sm='auto'>
             <ListItemText
               {...listItemTextProps}
-              primary={schedule.title}
-              secondary={schedule.id}
+              primary={scheduleAssignment.user.firstName + " " + scheduleAssignment.user.lastName}
+              secondary={scheduleAssignment.position.title}
             />
           </Grid2>
           <Grid2 container direction='row' alignItems='center'>

@@ -1,26 +1,31 @@
+import AddIcon from '@mui/icons-material/Add';
 import CallIcon from '@mui/icons-material/Call';
 import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Container from '@mui/material/Container';
-import List from '@mui/material/List';
+import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { styled } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { GraphQLError } from 'graphql';
 import { LoaderFunction, useLoaderData } from 'react-router-dom';
 import Banner from './components/Banner';
-import ScheduleListItem from './components/ScheduleListItem';
+import ScheduleAssignmentList from './components/ScheduleAssignmentList';
 import { apolloClient } from './lib/apollo';
 import { ListUserSchedulesQuery } from './lib/gql-codegen/graphql';
 import { VIEW_USER_WITH_SCHEDULES } from './lib/gql-queries';
-
+import { useMaterialTheme } from './lib/material-theme';
 
 export default function ViewEmployee() {
   const userWithSchedules = useLoaderData() as ListUserSchedulesQuery;
+  const theme = useMaterialTheme();
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Container maxWidth='lg'>
@@ -56,22 +61,25 @@ export default function ViewEmployee() {
         </Grid2>
         <Grid2 xs={12} sm='auto'></Grid2>
       </Grid2>
-      
-      <Toolbar disableGutters sx={{ mt: 2 }}>
+
+      <Toolbar disableGutters sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6">Schedules</Typography>
+        <Box>
+          {isMobileScreen
+            ? <IconButton><AddIcon /></IconButton>
+            : <Button>Assign</Button>
+          }
+        </Box>
       </Toolbar>
       <Paper variant="outlined">
-        <List disablePadding>
-          {userWithSchedules.user.schedules?.map((schedule, index, schedules) => (
-            <ScheduleListItem
-              key={index}
-              scheduleAssignment={schedule}
-              disableGutters
-              disablePadding
-              divider={index < schedules.length - 1}
-            />
-          ))}
-        </List>
+        <ScheduleAssignmentList
+          scheduleAssignments={userWithSchedules.user.schedules ?? []}
+          disablePadding
+          itemProps={{
+            disableGutters: true,
+            disablePadding: true,
+          }}
+        />
       </Paper>
     </Container>
   );
