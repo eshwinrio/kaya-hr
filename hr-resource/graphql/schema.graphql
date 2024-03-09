@@ -30,11 +30,13 @@ type Timesheet {
 
 type Schedule {
   id: Int!
-  user: User
+  title: String!
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
-  position: Position!
-  notes: String
+  employees: [User!]
+  createdBy: User
+  createdAt: ISODate!
+  positions: [Position!]
 }
 
 type Position {
@@ -42,6 +44,8 @@ type Position {
   title: String!
   description: String
   hourlyWage: Decimal
+  users: [User!]
+  schedules: [User!]
 }
 
 type User {
@@ -61,20 +65,30 @@ type User {
   dateJoined: ISODate!
   status: String
   syncStatus: SyncStatus
+  profileIconUrl: String
+  bannerUrl: String
   organization: Organization
-  schedules: [Schedule]
   timesheets: [Timesheet]
+  schedules: [ScheduleAssignment!]
   roles: [Role!]
-  positions: [Position]
+  positions: [Position!]
+}
+
+type ScheduleAssignment {
+  id: Int!
+  user: User!
+  schedule: Schedule!
+  position: Position!
 }
 
 type Organization {
   id: Int!
   name: String!
   summary: String
-  webUrl: String,
-  bannerUrl: String,
+  webUrl: String
+  bannerUrl: String
   logoUrl: String
+  users: [User!]
 }
 
 type UserSyncResult {
@@ -82,23 +96,26 @@ type UserSyncResult {
   rejected: Int!
 }
 
-
 # Input types
 input CreateUserInput {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: ISODate!
   email: String!
-  phone: String!
+  dateOfBirth: ISODate!
   streetName: String!
   addressL2: String
   city: String!
   pincode: String!
   province: String!
+  phone: String!
   country: String!
-  password: String!
   dateJoined: ISODate!
+  status: String
+  organizationId: Int
+  profileIconUrl: String
+  bannerUrl: String
+  password: String!
   roles: [Role!]
   positionIds: [Int!]
 }
@@ -114,8 +131,8 @@ input CreateOrganizationInput {
 input UpdateOrganizationInput {
   name: String
   summary: String
-  webUrl: String,
-  bannerUrl: String,
+  webUrl: String
+  bannerUrl: String
   logoUrl: String
 }
 
@@ -125,15 +142,23 @@ input PositionInput {
   hourlyWage: Decimal
 }
 
+input ScheduleAssigneeInput {
+  userId: Int!
+  positionId: Int!
+}
+
 input ScheduleInput {
+  title: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
-  positionId: Int!
+  assignees: [ScheduleAssigneeInput!]
   notes: String
 }
 
 input ListScheduleFilterInput {
   userId: Int
+  createdByUserId: Int
+  title: String
   from: ISODate
   to: ISODate
 }
@@ -143,21 +168,22 @@ input ViewUserOptions {
   schedules: Boolean
   timesheets: Boolean
   roles: Boolean
-  positons: Boolean
+  positions: Boolean
 }
-
 
 # Root types
 type Query {
-  currentUser: User
+  # Users
+  currentUser(options: ViewUserOptions): User!
   user(id: Int!, options: ViewUserOptions): User!
-  users: [User]!
+  users(options: ViewUserOptions): [User]!
 
   # Shift scheduling
-  scheduledShifts(filters: ListScheduleFilterInput): [Schedule]!
+  scheduledShifts(filters: ListScheduleFilterInput): [ScheduleAssignment!]!
 }
 
 type Mutation {
+  # Users
   createPosition(input: PositionInput!): Int!
   createOrganization(input: CreateOrganizationInput!): Int!
   createUser(input: CreateUserInput!): Int!
@@ -165,6 +191,7 @@ type Mutation {
   syncUsers(force: Boolean): UserSyncResult!
 
   # Shift scheduling
-  scheduleShiftFor(userId: Int!, input: ScheduleInput!): Int!
-  unscheduleShift(shiftId: Int!): Int!
+  createSchedule(input: ScheduleInput!): Schedule!
+  updateSchedule(scheduleId: Int!, input: ScheduleInput!): Schedule!
+  deleteSchedule(scheduleId: Int!): Schedule!
 }

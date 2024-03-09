@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
@@ -6,7 +7,6 @@ import { syncUsers } from "./fetch-requests.js";
 import { MutationResolvers } from "./gql-codegen/graphql.js";
 import { logHttp, logSystem } from "./logger.js";
 import prisma from "./prisma.js";
-import { Prisma } from "@prisma/client";
 
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   _root,
@@ -46,9 +46,19 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
         province: input.province,
         streetName: input.streetName,
         addressL2: input.addressL2,
-        organization: { connect: { id: organization?.id } },
-        UserRoleMap: { createMany: { data: input.roles?.map(role => ({ role })) ?? [] } },
-        UserPositionMap: { createMany: { data: input.positionIds?.map(positionId => ({ positionId })) ?? [] } },
+        organization: {
+          connect: { id: organization?.id }
+        },
+        UserRoleMap: {
+          createMany: {
+            data: input.roles?.map(role => ({ role })) ?? []
+          }
+        },
+        UserPositionMap: {
+          createMany: {
+            data: input.positionIds?.map(positionId => ({ positionId })) ?? []
+          }
+        },
       },
     })
     .then(user => user.id)
@@ -170,27 +180,20 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
   return { accepted: accepted.count, rejected: rejected.count };
 };
 
-export const mResolverScheduleShiftFor: MutationResolvers['scheduleShiftFor'] = async (
+export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = async (
   _root,
-  { userId, input },
-  _context
+  { input },
+  { organization, user }
 ) => {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    throw new GraphQLError('User not found', { extensions: { code: 'NOT_FOUND' } });
-  }
-
-  const position = await prisma.position.findUnique({ where: { id: input.positionId } });
-  if (!position) {
-    throw new GraphQLError('Designated position not found', { extensions: { code: 'NOT_FOUND' } });
-  }
-
-  const collidingSchedules = await prisma.schedule
+  const collidingSchedules = await prisma.userScheduleMap
     .findMany({
+      include: { schedule: true },
       where: {
-        positionId: input.positionId,
-        dateTimeStart: { gte: new Date(input.dateTimeStart) },
-        dateTimeEnd: { lte: new Date(input.dateTimeEnd) },
+        schedule: {
+          organizationId: organization?.id,
+          dateTimeStart: { gte: new Date(input.dateTimeStart) },
+          dateTimeEnd: { lte: new Date(input.dateTimeEnd) },
+        },
       },
     })
     .catch(error => {
@@ -202,26 +205,22 @@ export const mResolverScheduleShiftFor: MutationResolvers['scheduleShiftFor'] = 
     throw new GraphQLError('Colliding schedules found', {
       extensions: {
         code: 'CONFLICT',
-        details: collidingSchedules.map(schedule => ({
-          id: schedule.id,
-          positionId: schedule.positionId,
-          dateTimeStart: schedule.dateTimeStart,
-          dateTimeEnd: schedule.dateTimeEnd,
-        })),
+        details: collidingSchedules.map(({ schedule }) => schedule),
       }
     });
   }
 
-  return prisma.schedule
+  const schedule = await prisma.schedule
     .create({
       data: {
-        dateTimeStart: new Date(input.dateTimeStart),
-        dateTimeEnd: new Date(input.dateTimeEnd),
-        user: { connect: { id: userId } },
-        position: { connect: { id: input.positionId } },
-      }
+        title: input.title ?? undefined,
+        dateTimeStart: input.dateTimeStart,
+        dateTimeEnd: input.dateTimeEnd,
+        organizationId: organization?.id,
+        createdByUserId: user?.id,
+        createdAt: new Date(),
+      },
     })
-    .then(shift => shift.id)
     .catch(error => {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
@@ -231,4 +230,72 @@ export const mResolverScheduleShiftFor: MutationResolvers['scheduleShiftFor'] = 
       }
       throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
+
+  await prisma.userScheduleMap
+    .createMany({
+      data: input.assignees?.map(assignee => ({
+        scheduleId: schedule.id,
+        userId: assignee.userId,
+        positionId: assignee.positionId,
+      })) ?? [],
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
+}
+
+export const mResolverUpdateSchedule: MutationResolvers['updateSchedule'] = async (
+  _root,
+  { scheduleId, input },
+  { organization, user }
+) => {
+  const schedule = await prisma.schedule
+    .update({
+      where: { id: scheduleId },
+      data: {
+        title: input.title ?? undefined,
+        dateTimeStart: input.dateTimeStart,
+        dateTimeEnd: input.dateTimeEnd,
+        organizationId: organization?.id,
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      throw new GraphQLError('Could not update shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
+}
+
+export const mResolverDeleteSchedule: MutationResolvers['deleteSchedule'] = async (
+  _root,
+  { scheduleId },
+  { organization, user }
+) => {
+  const schedule = await prisma.schedule
+    .delete({
+      where: { id: scheduleId },
+      include: {
+        UserScheduleMap: true,
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      throw new GraphQLError('Could not delete shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
 }

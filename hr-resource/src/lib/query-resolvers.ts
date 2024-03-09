@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
@@ -5,13 +6,15 @@ import prisma from "./prisma.js";
 
 export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   _root,
-  _args,
-  { user, organization, positions, roles }
+  { options },
+  { user, organization, positions, roles, schedules, timesheets }
 ) => ({
   ...user,
-  positions,
-  organization,
-  roles: roles.map(role => role as Role),
+  ...(options?.positions ? { positions } : {}),
+  ...(options?.organization ? { organization } : {}),
+  ...(options?.roles ? { roles: roles.map(role => role as Role) } : {}),
+  ...(options?.schedules ? { schedules } : {}),
+  ...(options?.timesheets ? { timesheets } : {}),
   syncStatus: user.syncStatus as SyncStatus,
 });
 
@@ -50,10 +53,16 @@ export const qResolverUser: QueryResolvers['user'] = async (
       organizationId: roles.includes("SUPER") ? undefined : organization?.id,
     },
     include: {
-      UserPositionMap: { include: { position: !!options?.positons } },
+      UserPositionMap: { include: { position: !!options?.positions } },
       UserRoleMap: !!options?.roles,
       organization: !!options?.organization,
-      Schedule: { include: { position: !!options?.positons } },
+      UserScheduleMap: {
+        include: {
+          user: !!options?.schedules,
+          schedule: !!options?.schedules,
+          position: !!options?.schedules,
+        }
+      },
       TimeSheet: !!options?.timesheets,
     },
   });
@@ -62,16 +71,24 @@ export const qResolverUser: QueryResolvers['user'] = async (
     throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
   };
 
-  const { UserRoleMap, UserPositionMap, Schedule, TimeSheet, ...user } = mixedUserDocument;
+  const { UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
 
   return {
     ...user,
-    ...(options?.positons
+    ...(options?.positions
       ? { positions: UserPositionMap.map(({ position }) => position) }
       : {}
     ),
     ...(options?.roles ? { roles: UserRoleMap.map(({ role }) => role as Role) } : {}),
-    ...(options?.schedules ? { schedules: Schedule } : {}),
+    ...(options?.schedules
+      ? {
+        schedules: UserScheduleMap.map(({ user, ...schedule }) => ({
+          ...schedule,
+          user: { ...user, syncStatus: user.syncStatus as SyncStatus },
+        }))
+      }
+      : {}
+    ),
     ...(options?.timesheets ? { timesheets: TimeSheet } : {}),
     syncStatus: mixedUserDocument.syncStatus as SyncStatus,
   };
@@ -82,36 +99,44 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
   { filters },
   { roles, organization },
 ) => {
-  const mixedScheduleDocument = await prisma.schedule
+  const mixedScheduleDocument = await prisma.userScheduleMap
     .findMany({
       include: {
-        position: true,
         user: {
           include: {
             UserPositionMap: { include: { position: true } },
             UserRoleMap: true,
           },
         },
+        schedule: true,
+        position: true,
       },
       where: {
-        userId: filters?.userId,
+        userId: filters?.userId ?? undefined,
         user: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
-        dateTimeStart: { gte: filters?.from },
-        dateTimeEnd: { lte: filters?.to },
+        schedule: {
+          organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+          dateTimeStart: { gte: filters?.from, lte: filters?.to },
+          dateTimeEnd: { gte: filters?.from, lte: filters?.to },
+        },
       },
     })
     .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
       logSystem.error(error);
       throw new GraphQLError('Could not query shifts', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
-  return mixedScheduleDocument.map(({ user, ...shift }) => ({
-    ...shift,
-    user: user && {
+  return mixedScheduleDocument.map(({ user, ...schedule }) => ({
+    ...schedule,
+    user: {
       ...user,
-      positions: user.UserPositionMap.map(({ position }) => position),
-      roles: user.UserRoleMap.map(({ role }) => role as Role),
       syncStatus: user.syncStatus as SyncStatus,
-    }
+    },
   }));
 }
