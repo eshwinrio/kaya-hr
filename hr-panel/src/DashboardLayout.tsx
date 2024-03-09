@@ -73,6 +73,7 @@ export default function DashboardLayout() {
               </IconButton>
               <Avatar
                 ref={avatarRef}
+                src={whoamiData.currentUser?.profileIconUrl ?? ''}
                 sx={{ cursor: 'pointer', width: 32, height: 32 }}
                 onClick={() => setIsProfilePopoverOpen(state => !state)}
               />

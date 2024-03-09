@@ -15,26 +15,24 @@ import { LoaderFunction, useLoaderData } from 'react-router-dom';
 import Banner from './components/Banner';
 import ScheduleListItem from './components/ScheduleListItem';
 import { apolloClient } from './lib/apollo';
-import { ViewUserWithSchedulesQuery } from './lib/gql-codegen/graphql';
+import { ListUserSchedulesQuery } from './lib/gql-codegen/graphql';
 import { VIEW_USER_WITH_SCHEDULES } from './lib/gql-queries';
-import { useWhoAmI } from './lib/whoami-provider';
 
 
 export default function ViewEmployee() {
-  const whoAmI = useWhoAmI();
-  const userWithSchedules = useLoaderData() as ViewUserWithSchedulesQuery;
+  const userWithSchedules = useLoaderData() as ListUserSchedulesQuery;
 
   return (
     <Container maxWidth='lg'>
       <Banner sx={{
-        backgroundImage: `url(${whoAmI?.currentUser?.organization?.bannerUrl})`,
+        backgroundImage: `url(${userWithSchedules.user.bannerUrl ?? ''})`,
         mb: 2
       }} />
       <Grid2 container sx={{ marginTop: -8 }}>
         <Grid2 xs={6}>
           <UserAvatar
-            src={whoAmI?.currentUser?.organization?.logoUrl ?? ''}
-            alt={whoAmI?.currentUser?.firstName}
+            src={userWithSchedules.user.profileIconUrl ?? ''}
+            alt={userWithSchedules.user.firstName}
           />
         </Grid2>
         <Grid2 container alignItems='flex-start' justifyContent='flex-end' xs={6} sx={{ pt: 8 }}>
@@ -64,10 +62,10 @@ export default function ViewEmployee() {
       </Toolbar>
       <Paper variant="outlined">
         <List disablePadding>
-          {userWithSchedules.user.schedules?.map((shift, index, schedules) => (
+          {userWithSchedules.user.schedules?.map((schedule, index, schedules) => (
             <ScheduleListItem
               key={index}
-              schedule={shift}
+              scheduleAssignment={schedule}
               disableGutters
               disablePadding
               divider={index < schedules.length - 1}

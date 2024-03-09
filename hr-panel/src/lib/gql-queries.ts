@@ -2,11 +2,24 @@ import { gql } from "./gql-codegen/gql";
 
 export const WHOAMI = gql(`
   query WhoAmI {
-    currentUser {
+    currentUser(options: {
+      organization: true
+      roles: true
+      positions: true
+    }) {
       id
-      firstName
-      lastName
       email
+      phone
+      firstName
+      middleName
+      lastName
+      streetName
+      city
+      country
+      province
+      pincode
+      dateOfBirth
+      dateJoined
       organization {
         id
         name
@@ -15,6 +28,15 @@ export const WHOAMI = gql(`
         logoUrl
         bannerUrl
       }
+      roles
+      dateJoined
+      positions {
+        id
+        title
+        description
+      }
+      profileIconUrl
+      bannerUrl
     }
   }
 `);
@@ -56,35 +78,9 @@ export const SYNC_USERS = gql(`
   }
 `);
 
-export const VIEW_USER = gql(`
-  query ViewUser($id: Int!) {
-    user(id: $id) {
-      id
-      firstName
-      middleName
-      lastName
-      email
-      phone
-      organization {
-        name 
-      }
-      dateOfBirth
-      streetName
-      addressL2
-      city
-      country
-      province
-      pincode
-      dateJoined
-      dateOfBirth
-      roles
-    }
-  }
-`);
-
 export const VIEW_USER_WITH_SCHEDULES = gql(`
-  query ViewUserWithSchedules ($userId: Int!) {
-    user(id: $userId, options: { positons: true, roles: true, schedules: true }) {
+  query ListUserSchedules ($userId: Int!) {
+    user(id: $userId, options: { positions: true, roles: true, schedules: true }) {
       id
       firstName
       middleName
@@ -95,6 +91,8 @@ export const VIEW_USER_WITH_SCHEDULES = gql(`
       country
       province
       roles
+      profileIconUrl
+      bannerUrl
       schedules {
         id
         position {
@@ -103,40 +101,113 @@ export const VIEW_USER_WITH_SCHEDULES = gql(`
           description
           hourlyWage
         }
-        dateTimeStart
-        dateTimeEnd
-        notes
+        schedule {
+          id
+          title
+          dateTimeStart
+          dateTimeEnd
+          createdBy {
+            id
+            email
+            firstName
+            lastName
+            streetName
+            city
+            country
+            province
+            pincode
+            dateOfBirth
+            dateJoined
+            phone
+          }
+          createdAt
+        }
+        user {
+          id
+          email
+          firstName
+          lastName
+          streetName
+          city
+          country
+          province
+          pincode
+          dateOfBirth
+          dateJoined
+          phone
+        }
       }
     }
   }
 `);
 
 export const LIST_SCHEDULES = gql(`
-  query ListSchedules ($filters: ListScheduleFilterInput) {
+  query ListAllSchedules ($filters: ListScheduleFilterInput) {
     scheduledShifts (filters: $filters) {
       id
-      user {
-          firstName
-          email
-          phone
-          positions {
-            title
-            hourlyWage
-          }
-      }
-      dateTimeStart
-      dateTimeEnd
-      position {
+      schedule {
+        id
         title
+        dateTimeStart
+        dateTimeEnd
+        createdBy {
+          id
+          email
+          firstName
+          lastName
+          streetName
+          city
+          country
+          province
+          pincode
+          dateOfBirth
+          dateJoined
+          phone
+          profileIconUrl
+          bannerUrl
+        }
+        createdAt
+      }
+      user {
+        id
+        email
+        firstName
+        lastName
+        streetName
+        city
+        country
+        province
+        pincode
+        dateOfBirth
+        dateJoined
+        phone
+        profileIconUrl
+        bannerUrl
+      }
+      position {
+        id
+        title
+        description
         hourlyWage
       }
-      notes
     }
   }
 `);
 
 export const SCHEDULE_SHIFT = gql(`
-  mutation ScheduleShift($userId: Int!, $options: ScheduleInput!) {
-    scheduleShiftFor(userId: $userId, input: $options)
+  mutation ScheduleShift($input: ScheduleInput!) {
+    createSchedule(input: $input) {
+      id
+      title
+      dateTimeStart
+      dateTimeEnd
+      employees {
+        id
+        email
+        positions {
+          title
+        }
+      }
+    }
   }
 `);

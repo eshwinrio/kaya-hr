@@ -31,8 +31,8 @@ export default function PopoverProfile({ sx, ...props }: PopoverProfileProps) {
           <Typography variant="body2" fontWeight="bold" sx={{ mb: 3 }}>{data?.currentUser?.email}</Typography>
           <Avatar
             sx={{ width: 64, height: 64, mb: 1 }}
-            alt={data?.currentUser?.firstName}
-            src="/static/images/avatar/1.jpg"
+            alt={data?.currentUser.firstName}
+            src={data?.currentUser?.profileIconUrl ?? ''}
           />
           <Typography variant="h6">Hi, {data?.currentUser?.firstName}!</Typography>
           <ButtonGroup sx={{ mt: 3 }} >

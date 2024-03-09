@@ -6,11 +6,11 @@ import Typography from "@mui/material/Typography";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
 import ScheduleListItem from "./components/ScheduleListItem";
 import { apolloClient } from "./lib/apollo";
-import { ListSchedulesQuery } from "./lib/gql-codegen/graphql";
+import { ListAllSchedulesQuery } from "./lib/gql-codegen/graphql";
 import { LIST_SCHEDULES } from "./lib/gql-queries";
 
 export default function ScheduleViewer() {
-  const schedules = useLoaderData() as ListSchedulesQuery;
+  const schedules = useLoaderData() as ListAllSchedulesQuery;
 
   return (
     <Container>
@@ -19,10 +19,10 @@ export default function ScheduleViewer() {
       </Toolbar>
       <Paper variant="outlined">
         <List disablePadding>
-          {schedules.scheduledShifts.map((shift, index) => (
+          {schedules.scheduledShifts.map((schedule, index) => (
             <ScheduleListItem
               key={index}
-              schedule={shift}
+              scheduleAssignment={schedule}
               disableGutters
               disablePadding
               divider={index < schedules.scheduledShifts.length - 1}
@@ -35,6 +35,6 @@ export default function ScheduleViewer() {
 }
 
 export const scheduleViewerLoader: LoaderFunction = async () => {
-    const listSchedulesQuery = await apolloClient.query({ query: LIST_SCHEDULES });
-    return listSchedulesQuery.data;
+  const listSchedulesQuery = await apolloClient.query({ query: LIST_SCHEDULES });
+  return listSchedulesQuery.data;
 };
