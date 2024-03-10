@@ -2,11 +2,24 @@ import { gql } from "./gql-codegen/gql";
 
 export const WHOAMI = gql(`
   query WhoAmI {
-    currentUser {
+    currentUser(options: {
+      organization: true
+      roles: true
+      positions: true
+    }) {
       id
-      firstName
-      lastName
       email
+      phone
+      firstName
+      middleName
+      lastName
+      streetName
+      city
+      country
+      province
+      pincode
+      dateOfBirth
+      dateJoined
       organization {
         id
         name
@@ -15,18 +28,15 @@ export const WHOAMI = gql(`
         logoUrl
         bannerUrl
       }
-    }
-  }
-`);
-
-export const LOAD_ROLES = gql(`
-  query LoadAllRoles {
-    roles {
-      id
-      code
-      title
-      description
-      hourlyWage
+      roles
+      dateJoined
+      positions {
+        id
+        title
+        description
+      }
+      profileIconUrl
+      bannerUrl
     }
   }
 `);
@@ -68,29 +78,135 @@ export const SYNC_USERS = gql(`
   }
 `);
 
-export const VIEW_USER = gql(`
-  query ViewUser($id: Int!) {
-    user(id: $id) {
+export const VIEW_USER_WITH_SCHEDULES = gql(`
+  query ListUserSchedules ($userId: Int!) {
+    user(id: $userId, options: { positions: true, roles: true, schedules: true }) {
       id
       firstName
       middleName
       lastName
       email
       phone
-      organization {
-        name 
-      }
-      dateOfBirth
-      streetName
-      addressL2
       city
       country
       province
-      pincode
-      dateJoined
-      dateOfBirth
-      roles {
-        code
+      roles
+      profileIconUrl
+      bannerUrl
+      schedules {
+        id
+        position {
+          id
+          title
+          description
+          hourlyWage
+        }
+        schedule {
+          id
+          title
+          dateTimeStart
+          dateTimeEnd
+          createdBy {
+            id
+            email
+            firstName
+            lastName
+            streetName
+            city
+            country
+            province
+            pincode
+            dateOfBirth
+            dateJoined
+            phone
+          }
+          createdAt
+        }
+        user {
+          id
+          email
+          firstName
+          lastName
+          streetName
+          city
+          country
+          province
+          pincode
+          dateOfBirth
+          dateJoined
+          phone
+        }
+      }
+    }
+  }
+`);
+
+export const LIST_SCHEDULES = gql(`
+  query ListAllSchedules ($filters: ListScheduleFilterInput) {
+    scheduledShifts (filters: $filters) {
+      id
+      schedule {
+        id
+        title
+        dateTimeStart
+        dateTimeEnd
+        createdBy {
+          id
+          email
+          firstName
+          lastName
+          streetName
+          city
+          country
+          province
+          pincode
+          dateOfBirth
+          dateJoined
+          phone
+          profileIconUrl
+          bannerUrl
+        }
+        createdAt
+      }
+      user {
+        id
+        email
+        firstName
+        lastName
+        streetName
+        city
+        country
+        province
+        pincode
+        dateOfBirth
+        dateJoined
+        phone
+        profileIconUrl
+        bannerUrl
+      }
+      position {
+        id
+        title
+        description
+        hourlyWage
+      }
+    }
+  }
+`);
+
+export const SCHEDULE_SHIFT = gql(`
+  mutation ScheduleShift($input: ScheduleInput!) {
+    createSchedule(input: $input) {
+      id
+      title
+      dateTimeStart
+      dateTimeEnd
+      employees {
+        id
+        email
+        positions {
+          title
+        }
       }
     }
   }

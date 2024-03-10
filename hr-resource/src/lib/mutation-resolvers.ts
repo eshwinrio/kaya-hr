@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
@@ -10,7 +11,7 @@ import prisma from "./prisma.js";
 export const mResolverCreateUser: MutationResolvers['createUser'] = async (
   _root,
   { input },
-  { user, organization, roles }
+  { organization }
 ) => {
   if (!validator.isEmail(input.email)) {
     throw new GraphQLError('Invalid email format', { extensions: { code: 'BAD_USER_INPUT' } });
@@ -36,8 +37,8 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
         middleName: input.middleName,
         lastName: input.lastName,
         email: input.email,
-        dateOfBirth: new Date(input.dateOfBirth),
-        dateJoined: new Date(input.dateJoined),
+        dateOfBirth: input.dateOfBirth,
+        dateJoined: input.dateJoined,
         city: input.city,
         country: input.country,
         phone: input.phone,
@@ -45,8 +46,19 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
         province: input.province,
         streetName: input.streetName,
         addressL2: input.addressL2,
-        organization: { connect: { id: organization?.id } },
-        UserRoles: { createMany: { data: input.roleIds?.map(roleId => ({ roleId })) ?? [] } },
+        organization: {
+          connect: { id: organization?.id }
+        },
+        UserRoleMap: {
+          createMany: {
+            data: input.roles?.map(role => ({ role })) ?? []
+          }
+        },
+        UserPositionMap: {
+          createMany: {
+            data: input.positionIds?.map(positionId => ({ positionId })) ?? []
+          }
+        },
       },
     })
     .then(user => user.id)
@@ -61,7 +73,7 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
   { input },
   { roles },
 ) => {
-  if (roles.findIndex(role => role.code === 'SUPER') === -1) {
+  if (!roles.includes("SUPER")) {
     throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
   }
   try {
@@ -85,9 +97,10 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
 export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'] = async (
   _root,
   { id, input },
-  { roles, organization }
+  { roles }
 ) => {
-  if (roles.findIndex(role => role.code === 'SUPER') === -1 || organization?.id !== id) {
+  // TODO: Add a check to only allow org admins to update
+  if (!roles.includes("SUPER")) {
     throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
   }
   return prisma.organization
@@ -103,7 +116,6 @@ export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'
     })
     .then(organization => organization.id)
     .catch(error => {
-      console.log(error);
       logSystem.error(error);
       throw new GraphQLError('Could not update organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
@@ -167,3 +179,123 @@ export const mResolverSyncUsers: MutationResolvers['syncUsers'] = async (
 
   return { accepted: accepted.count, rejected: rejected.count };
 };
+
+export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = async (
+  _root,
+  { input },
+  { organization, user }
+) => {
+  const collidingSchedules = await prisma.userScheduleMap
+    .findMany({
+      include: { schedule: true },
+      where: {
+        schedule: {
+          organizationId: organization?.id,
+          dateTimeStart: { gte: new Date(input.dateTimeStart) },
+          dateTimeEnd: { lte: new Date(input.dateTimeEnd) },
+        },
+      },
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not query schedules', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  if (collidingSchedules.length > 0) {
+    throw new GraphQLError('Colliding schedules found', {
+      extensions: {
+        code: 'CONFLICT',
+        details: collidingSchedules.map(({ schedule }) => schedule),
+      }
+    });
+  }
+
+  const schedule = await prisma.schedule
+    .create({
+      data: {
+        title: input.title ?? undefined,
+        dateTimeStart: input.dateTimeStart,
+        dateTimeEnd: input.dateTimeEnd,
+        organizationId: organization?.id,
+        createdByUserId: user?.id,
+        createdAt: new Date(),
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  await prisma.userScheduleMap
+    .createMany({
+      data: input.assignees?.map(assignee => ({
+        scheduleId: schedule.id,
+        userId: assignee.userId,
+        positionId: assignee.positionId,
+      })) ?? [],
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
+}
+
+export const mResolverUpdateSchedule: MutationResolvers['updateSchedule'] = async (
+  _root,
+  { scheduleId, input },
+  { organization, user }
+) => {
+  const schedule = await prisma.schedule
+    .update({
+      where: { id: scheduleId },
+      data: {
+        title: input.title ?? undefined,
+        dateTimeStart: input.dateTimeStart,
+        dateTimeEnd: input.dateTimeEnd,
+        organizationId: organization?.id,
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      throw new GraphQLError('Could not update shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
+}
+
+export const mResolverDeleteSchedule: MutationResolvers['deleteSchedule'] = async (
+  _root,
+  { scheduleId },
+  { organization, user }
+) => {
+  const schedule = await prisma.schedule
+    .delete({
+      where: { id: scheduleId },
+      include: {
+        UserScheduleMap: true,
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      throw new GraphQLError('Could not delete shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedule;
+}

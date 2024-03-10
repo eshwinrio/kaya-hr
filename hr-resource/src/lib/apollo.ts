@@ -1,22 +1,26 @@
 import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
-import { Organization, Role, User } from "@prisma/client";
+import { Organization, Position, Role, TimeSheet, User } from "@prisma/client";
 import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
-import { Resolvers } from "./gql-codegen/graphql.js";
+import { Resolvers, ScheduleAssignment, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
-import { mResolverCreateOrganization, mResolverCreateUser, mResolverSyncUsers, mResolverUpdateOrganization } from "./mutation-resolvers.js";
+import { mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
-import { qResolverCurrentUser, qResolverRoles, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { Decimal, ISODate } from "./scalars.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
+  readonly roles: Array<Role>;
+  readonly organization: Organization;
   readonly applicationId: string;
   readonly accessToken: string;
-  readonly organization: Organization | null;
-  readonly roles: Role[];
+  readonly positions?: Array<Position>;
+  readonly schedules?: Array<ScheduleAssignment>;
+  readonly timesheets?: Array<TimeSheet>;
 }
 
 export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext>['context'] = async ({ req }) => {
@@ -31,21 +35,41 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
     }
 
     const responseBody = await verificationResponse.json() as { email: string, application: string };
-    const user = await prisma.user.findUnique({
+    const mixedUserDocument = await prisma.user.findUnique({
       where: { email: responseBody.email },
-      include: { organization: true, UserRoles: { include: { role: true } } },
+      include: {
+        organization: true,
+        UserRoleMap: { select: { role: true } },
+        UserPositionMap: {
+          include: { position: true }
+        },
+        UserScheduleMap: {
+          include: {
+            schedule: true,
+            position: true
+          }
+        },
+        TimeSheet: true
+      },
     });
-    if (!user) {
+
+    if (!mixedUserDocument) {
       throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
     }
 
-    const { UserRoles, organization, ...rest } = user;
+    const { organization, UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
     return {
-      user: rest,
+      user,
+      positions: UserPositionMap.map(({ position }) => position),
+      roles: UserRoleMap.map(({ role }) => role),
+      organization: organization ?? null,
       applicationId: responseBody.application,
       accessToken: req.cookies['access_token'],
-      organization,
-      roles: UserRoles.map(userRole => userRole.role)
+      schedules: UserScheduleMap.map(schedule => ({
+        ...schedule,
+        user: { ...user, syncStatus: user.syncStatus as SyncStatus },
+      })),
+      timesheets: TimeSheet,
     };
   } catch (error) {
     if (httpErrors.isHttpError(error)) {
@@ -61,14 +85,19 @@ const resolvers: Resolvers<ApolloServerContext> = {
     currentUser: qResolverCurrentUser,
     users: qResolverUsers,
     user: qResolverUser,
-    roles: qResolverRoles,
+    scheduledShifts: qResolverScheduledShifts,
   },
   Mutation: {
     createUser: mResolverCreateUser,
     createOrganization: mResolverCreateOrganization,
     updateOrganization: mResolverUpdateOrganization,
     syncUsers: mResolverSyncUsers,
+    createSchedule: mResolverCreateSchedule,
+    updateSchedule: mResolverUpdateSchedule,
+    deleteSchedule: mResolverDeleteSchedule,
   },
+  Decimal: Decimal,
+  ISODate: ISODate,
 }
 
 const apolloServerOptions: ApolloServerOptions<ApolloServerContext> = {

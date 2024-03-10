@@ -1,31 +1,51 @@
+scalar ISODate
+scalar Decimal
+
+enum Role {
+  SUPER
+  ADMIN
+  MANAGER
+  LEAD
+  EMPLOYEE
+}
+
+enum SyncStatus {
+  NEVER
+  OK
+  FAIL
+}
+
 type ClockTime {
   id: Int!
-  startTime: String!
-  endTime: String!
+  startTime: ISODate!
+  endTime: ISODate!
   timesheetId: Int!
 }
 
 type Timesheet {
   id: Int!
   userId: Int!
-  hourlyWage: Float!
+  hourlyWage: Decimal!
 }
 
 type Schedule {
   id: Int!
-  userId: Int!
-  dateTimeStart: String!
-  dateTimeEnd: String!
-  role: Role!
-  notes: String
+  title: String!
+  dateTimeStart: ISODate!
+  dateTimeEnd: ISODate!
+  employees: [User!]
+  createdBy: User
+  createdAt: ISODate!
+  positions: [Position!]
 }
 
-type Role {
+type Position {
   id: Int!
-  code: String!
   title: String!
   description: String
-  hourlyWage: Int
+  hourlyWage: Decimal
+  users: [User!]
+  schedules: [User!]
 }
 
 type User {
@@ -33,7 +53,7 @@ type User {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: String!
+  dateOfBirth: ISODate!
   email: String!
   streetName: String!
   addressL2: String
@@ -42,20 +62,33 @@ type User {
   province: String!
   phone: String!
   country: String!
-  dateJoined: String!
+  dateJoined: ISODate!
   status: String
-  type: String
+  syncStatus: SyncStatus
+  profileIconUrl: String
+  bannerUrl: String
   organization: Organization
-  roles: [Role!]!
+  timesheets: [Timesheet]
+  schedules: [ScheduleAssignment!]
+  roles: [Role!]
+  positions: [Position!]
+}
+
+type ScheduleAssignment {
+  id: Int!
+  user: User!
+  schedule: Schedule!
+  position: Position!
 }
 
 type Organization {
   id: Int!
   name: String!
   summary: String
-  webUrl: String,
-  bannerUrl: String,
+  webUrl: String
+  bannerUrl: String
   logoUrl: String
+  users: [User!]
 }
 
 type UserSyncResult {
@@ -63,24 +96,28 @@ type UserSyncResult {
   rejected: Int!
 }
 
-
 # Input types
 input CreateUserInput {
   firstName: String!
   middleName: String
   lastName: String!
-  dateOfBirth: String!
   email: String!
-  phone: String!
+  dateOfBirth: ISODate!
   streetName: String!
   addressL2: String
   city: String!
   pincode: String!
   province: String!
+  phone: String!
   country: String!
+  dateJoined: ISODate!
+  status: String
+  organizationId: Int
+  profileIconUrl: String
+  bannerUrl: String
   password: String!
-  dateJoined: String!
-  roleIds: [Int!]
+  roles: [Role!]
+  positionIds: [Int!]
 }
 
 input CreateOrganizationInput {
@@ -94,31 +131,67 @@ input CreateOrganizationInput {
 input UpdateOrganizationInput {
   name: String
   summary: String
-  webUrl: String,
-  bannerUrl: String,
+  webUrl: String
+  bannerUrl: String
   logoUrl: String
 }
 
-input RoleInput {
-  code: String!
+input PositionInput {
   title: String!
   description: String
-  hourlyWage: Int
+  hourlyWage: Decimal
 }
 
+input ScheduleAssigneeInput {
+  userId: Int!
+  positionId: Int!
+}
+
+input ScheduleInput {
+  title: String
+  dateTimeStart: ISODate!
+  dateTimeEnd: ISODate!
+  assignees: [ScheduleAssigneeInput!]
+  notes: String
+}
+
+input ListScheduleFilterInput {
+  userId: Int
+  createdByUserId: Int
+  title: String
+  from: ISODate
+  to: ISODate
+}
+
+input ViewUserOptions {
+  organization: Boolean
+  schedules: Boolean
+  timesheets: Boolean
+  roles: Boolean
+  positions: Boolean
+}
 
 # Root types
 type Query {
-  currentUser: User
-  user(id: Int!): User!
-  users: [User]!
-  roles: [Role!]!
+  # Users
+  currentUser(options: ViewUserOptions): User!
+  user(id: Int!, options: ViewUserOptions): User!
+  users(options: ViewUserOptions): [User]!
+
+  # Shift scheduling
+  scheduledShifts(filters: ListScheduleFilterInput): [ScheduleAssignment!]!
 }
 
 type Mutation {
-  createRole(input: RoleInput!): Int!
+  # Users
+  createPosition(input: PositionInput!): Int!
   createOrganization(input: CreateOrganizationInput!): Int!
   createUser(input: CreateUserInput!): Int!
   updateOrganization(id: Int!, input: UpdateOrganizationInput!): Int!
   syncUsers(force: Boolean): UserSyncResult!
+
+  # Shift scheduling
+  createSchedule(input: ScheduleInput!): Schedule!
+  updateSchedule(scheduleId: Int!, input: ScheduleInput!): Schedule!
+  deleteSchedule(scheduleId: Int!): Schedule!
 }

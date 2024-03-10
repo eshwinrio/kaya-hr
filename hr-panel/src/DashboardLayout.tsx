@@ -73,6 +73,7 @@ export default function DashboardLayout() {
               </IconButton>
               <Avatar
                 ref={avatarRef}
+                src={whoamiData.currentUser?.profileIconUrl ?? ''}
                 sx={{ cursor: 'pointer', width: 32, height: 32 }}
                 onClick={() => setIsProfilePopoverOpen(state => !state)}
               />
@@ -151,6 +152,12 @@ export default function DashboardLayout() {
                 </ListItemButton>
               </List>
             </Collapse>
+            <ListItemButton component={Link} to="/scheduler">
+              <ListItemIcon>
+                <ChecklistIcon />
+              </ListItemIcon>
+              <ListItemText primary="Scheduler" secondary="Plan schedules" />
+            </ListItemButton>
           </List>
           <Box sx={{ p: 1 }}>
             <IconButton LinkComponent={Link} to="/settings" component={Link}>
