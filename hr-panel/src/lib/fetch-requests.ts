@@ -1,3 +1,7 @@
+// export function useFetch(fetchFn: () => Promise<Response>): Response {
+
+// }
+
 export const verifyIdentity = (requestInit?: RequestInit) => fetch(
   `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/verify`,
   {
@@ -35,3 +39,11 @@ export const signout = (requestInit?: RequestInit) => fetch(
     ...requestInit
   }
 );
+
+export const fetchWeather = async (lat: number, long: number, requestInit?: RequestInit) => {
+  const url = new URL(process.env['REACT_APP_OPENWEATHERMAP_WEATHER_API']!);
+  url.searchParams.append('lat', lat.toString());
+  url.searchParams.append('lon', long.toString());
+  url.searchParams.append('appid', process.env['REACT_APP_OPENWEATHERMAP_API_KEY']!);
+  return fetch(url, { ...requestInit });
+}

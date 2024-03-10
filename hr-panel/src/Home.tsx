@@ -15,10 +15,40 @@ import { apolloClient } from './lib/apollo';
 import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
 import { LOAD_USERS } from './lib/gql-queries';
 import { useWhoAmI } from './lib/whoami-provider';
+import { useEffect, useMemo, useState } from 'react';
+import { fetchWeather } from './lib/fetch-requests';
 
 export default function Home() {
   const whoAmI = useWhoAmI();
   const data = useLoaderData() as LoadAllUsersQuery;
+  const [geolocationCoords, setGeoLocationCoords] = useState<GeolocationCoordinates | null>(null);
+  const [weatherData, setWeatherData] = useState<any>();
+  
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setGeoLocationCoords(position.coords);
+      },
+      error => {
+        if (error.PERMISSION_DENIED) {
+          alert("Bro said NO:(")
+        }
+        if (error.POSITION_UNAVAILABLE) {
+          alert("Bro ignored me :(");
+        }
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (geolocationCoords) {
+      fetchWeather(geolocationCoords.latitude, geolocationCoords.longitude)
+        .then(response => response.json())
+        .then(json => setWeatherData(json))
+        .catch(error => console.log(error));
+    }
+  }, [geolocationCoords]);
 
   return (
     <Container>
@@ -31,16 +61,15 @@ export default function Home() {
       <Grid2 container spacing={2} alignItems="stretch">
 
         {/* Section 1 - Greeting 2 and overview */}
-        <Grid2 xs={12} sm={6} xl={4}>
+        <Grid2 container xs={12} sm={6} xl={4}>
 
-          {/* Days greeting */}
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Typography variant="h5" fontWeight={600}>
-              Good morning!
-            </Typography>
-          </Toolbar>
+          <Grid2 xs={12}>
+            <DashCard elevation={0} sx={{ backgroundColor: '#E9DACFD7', color: '#482880' }}>
+              <img src={`${process.env['REACT_APP_OPENWEATHERMAP_ICON_API']}/${weatherData ? weatherData.weather[0].icon : '04d'}.png`} alt='weather' />
+              <Typography variant="h5" fontWeight={600}>{weatherData?.weather[0]?.main}</Typography>
+            </DashCard>
+          </Grid2>
 
-          <div>
             <Grid2 container spacing={1}>
 
               {[
@@ -86,7 +115,6 @@ export default function Home() {
                 </Grid2>
               ))}
             </Grid2>
-          </div>
         </Grid2>
 
         <Grid2 container direction='column' alignItems='stretch' spacing={0} xs={12} sm={6} xl={4}>
