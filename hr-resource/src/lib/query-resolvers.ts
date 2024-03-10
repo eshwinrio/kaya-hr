@@ -20,7 +20,7 @@ export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
 
 export const qResolverUsers: QueryResolvers['users'] = async (
   _root,
-  _args,
+  { options },
   { organization, roles }
 ) => {
   const users = await prisma.user.findMany({
@@ -31,7 +31,27 @@ export const qResolverUsers: QueryResolvers['users'] = async (
       UserRoleMap: true,
       organization: true
     },
-    where: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
+    where: {
+      organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+      ...(options?.searchTerm
+        ? {
+          OR: [
+            { firstName: { contains: options.searchTerm } },
+            { middleName: { contains: options.searchTerm } },
+            { lastName: { contains: options.searchTerm } },
+            { email: { contains: options.searchTerm } },
+            { phone: { contains: options.searchTerm } },
+            { streetName: { contains: options.searchTerm } },
+            { addressL2: { contains: options.searchTerm } },
+            { city: { contains: options.searchTerm } },
+            { province: { contains: options.searchTerm } },
+            { country: { contains: options.searchTerm } },
+            { pincode: { contains: options.searchTerm } },
+          ]
+        }
+        : {}
+      ),
+    },
   });
 
   return users.map(({ UserRoleMap, UserPositionMap, syncStatus, ...user }) => ({
