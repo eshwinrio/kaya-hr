@@ -2,11 +2,7 @@ import { gql } from "./gql-codegen/gql";
 
 export const WHOAMI = gql(`
   query WhoAmI {
-    currentUser(options: {
-      organization: true
-      roles: true
-      positions: true
-    }) {
+    currentUser {
       id
       email
       phone
@@ -43,13 +39,52 @@ export const WHOAMI = gql(`
 
 export const CREATE_USER = gql(`
   mutation CreateUser($input: CreateUserInput!) {
-    createUser(input: $input)
+    createUser(input: $input) {
+      id
+      firstName
+      middleName
+      lastName
+      dateOfBirth
+      email
+      streetName
+      addressL2
+      city
+      pincode
+      province
+      phone
+      country
+      dateJoined
+      status
+      syncStatus
+      profileIconUrl
+      bannerUrl
+      organization {
+        id
+        name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
+      }
+      roles
+      positions {
+        id
+        title
+      }
+    }
   }
 `);
 
 export const UPDATE_ORGANIZATION = gql(`
   mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {
-    updateOrganization(id: $id, input: $input)
+    updateOrganization(id: $id, input: $input) {
+      id
+      name
+      summary
+      webUrl
+      logoUrl
+      bannerUrl
+    }
   }
 `);
 
@@ -80,7 +115,7 @@ export const SYNC_USERS = gql(`
 
 export const VIEW_USER_WITH_SCHEDULES = gql(`
   query ListUserSchedules ($userId: Int!) {
-    user(id: $userId, options: { positions: true, roles: true, schedules: true }) {
+    user(id: $userId) {
       id
       firstName
       middleName

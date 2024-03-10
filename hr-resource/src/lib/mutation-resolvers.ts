@@ -4,7 +4,7 @@ import createHttpError from "http-errors";
 import validator from "validator";
 import { Seed } from "../config/environment.js";
 import { syncUsers } from "./fetch-requests.js";
-import { MutationResolvers } from "./gql-codegen/graphql.js";
+import { MutationResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp, logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
@@ -30,7 +30,7 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
     throw new GraphQLError('User with same email already exists', { extensions: { code: 'CONFLICT' } });
   }
 
-  return prisma.user
+  const mixedUserDocument = await prisma.user
     .create({
       data: {
         firstName: input.firstName,
@@ -60,12 +60,24 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
           }
         },
       },
+      include: {
+        UserRoleMap: true,
+        UserPositionMap: { include: { position: true } },
+        organization: true,
+      }
     })
-    .then(user => user.id)
     .catch(error => {
       logSystem.error(error);
       throw new GraphQLError('Could not create user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
+
+    const { UserPositionMap, UserRoleMap, ...user} = mixedUserDocument;
+    return {
+      ...user,
+      positions: UserPositionMap.map(({ position }) => position),
+      roles: UserRoleMap.map(({ role }) => role as Role),
+      syncStatus: user.syncStatus as SyncStatus,
+    }
 };
 
 export const mResolverCreateOrganization: MutationResolvers['createOrganization'] = async (
@@ -77,7 +89,7 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
     throw new GraphQLError('Unauthorized', { extensions: { code: 'UNAUTHORIZED' } });
   }
   try {
-    const organization = await prisma.organization
+    return await prisma.organization
       .create({
         data: {
           name: input.name,
@@ -87,7 +99,6 @@ export const mResolverCreateOrganization: MutationResolvers['createOrganization'
           bannerUrl: input.bannerUrl,
         },
       });
-    return organization.id;
   } catch (error) {
     logSystem.error(error);
     throw new GraphQLError('Could not create organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
@@ -114,7 +125,6 @@ export const mResolverUpdateOrganization: MutationResolvers['updateOrganization'
         bannerUrl: input.bannerUrl,
       },
     })
-    .then(organization => organization.id)
     .catch(error => {
       logSystem.error(error);
       throw new GraphQLError('Could not update organization', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });

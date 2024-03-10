@@ -68,13 +68,13 @@ export type ListScheduleFilterInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createOrganization: Scalars['Int']['output'];
-  createPosition: Scalars['Int']['output'];
+  createOrganization: Organization;
+  createPosition: Position;
   createSchedule: Schedule;
-  createUser: Scalars['Int']['output'];
+  createUser: User;
   deleteSchedule: Schedule;
   syncUsers: UserSyncResult;
-  updateOrganization: Scalars['Int']['output'];
+  updateOrganization: Organization;
   updateSchedule: Schedule;
 };
 
@@ -156,11 +156,6 @@ export type Query = {
 };
 
 
-export type QueryCurrentUserArgs = {
-  options?: InputMaybe<ViewUserOptions>;
-};
-
-
 export type QueryScheduledShiftsArgs = {
   filters?: InputMaybe<ListScheduleFilterInput>;
 };
@@ -168,7 +163,6 @@ export type QueryScheduledShiftsArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['Int']['input'];
-  options?: InputMaybe<ViewUserOptions>;
 };
 
 
@@ -272,11 +266,7 @@ export type UserSyncResult = {
 };
 
 export type ViewUserOptions = {
-  organization?: InputMaybe<Scalars['Boolean']['input']>;
-  positions?: InputMaybe<Scalars['Boolean']['input']>;
-  roles?: InputMaybe<Scalars['Boolean']['input']>;
-  schedules?: InputMaybe<Scalars['Boolean']['input']>;
-  timesheets?: InputMaybe<Scalars['Boolean']['input']>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -422,13 +412,13 @@ export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 }
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
-  createPosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
+  createOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
+  createPosition?: Resolver<ResolversTypes['Position'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
   createSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationCreateScheduleArgs, 'input'>>;
-  createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   deleteSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationDeleteScheduleArgs, 'scheduleId'>>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
-  updateOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
+  updateOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
   updateSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationUpdateScheduleArgs, 'input' | 'scheduleId'>>;
 }>;
 
@@ -454,7 +444,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 }>;
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
+  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
