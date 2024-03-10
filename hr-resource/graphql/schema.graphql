@@ -180,10 +180,10 @@ type Query {
 
 type Mutation {
   # Users
-  createPosition(input: PositionInput!): Int!
-  createOrganization(input: CreateOrganizationInput!): Int!
-  createUser(input: CreateUserInput!): Int!
-  updateOrganization(id: Int!, input: UpdateOrganizationInput!): Int!
+  createPosition(input: PositionInput!): Position!
+  createOrganization(input: CreateOrganizationInput!): Organization!
+  createUser(input: CreateUserInput!): User!
+  updateOrganization(id: Int!, input: UpdateOrganizationInput!): Organization!
   syncUsers(force: Boolean): UserSyncResult!
 
   # Shift scheduling

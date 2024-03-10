@@ -68,13 +68,13 @@ export type ListScheduleFilterInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createOrganization: Scalars['Int']['output'];
-  createPosition: Scalars['Int']['output'];
+  createOrganization: Organization;
+  createPosition: Position;
   createSchedule: Schedule;
-  createUser: Scalars['Int']['output'];
+  createUser: User;
   deleteSchedule: Schedule;
   syncUsers: UserSyncResult;
-  updateOrganization: Scalars['Int']['output'];
+  updateOrganization: Organization;
   updateSchedule: Schedule;
 };
 
@@ -412,13 +412,13 @@ export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 }
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
-  createPosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
+  createOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
+  createPosition?: Resolver<ResolversTypes['Position'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
   createSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationCreateScheduleArgs, 'input'>>;
-  createUser?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   deleteSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationDeleteScheduleArgs, 'scheduleId'>>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
-  updateOrganization?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
+  updateOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
   updateSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationUpdateScheduleArgs, 'input' | 'scheduleId'>>;
 }>;
 

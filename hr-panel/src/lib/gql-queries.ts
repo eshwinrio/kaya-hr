@@ -39,13 +39,52 @@ export const WHOAMI = gql(`
 
 export const CREATE_USER = gql(`
   mutation CreateUser($input: CreateUserInput!) {
-    createUser(input: $input)
+    createUser(input: $input) {
+      id
+      firstName
+      middleName
+      lastName
+      dateOfBirth
+      email
+      streetName
+      addressL2
+      city
+      pincode
+      province
+      phone
+      country
+      dateJoined
+      status
+      syncStatus
+      profileIconUrl
+      bannerUrl
+      organization {
+        id
+        name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
+      }
+      roles
+      positions {
+        id
+        title
+      }
+    }
   }
 `);
 
 export const UPDATE_ORGANIZATION = gql(`
   mutation UpdateOrganization($id: Int!, $input: UpdateOrganizationInput!) {
-    updateOrganization(id: $id, input: $input)
+    updateOrganization(id: $id, input: $input) {
+      id
+      name
+      summary
+      webUrl
+      logoUrl
+      bannerUrl
+    }
   }
 `);
 
