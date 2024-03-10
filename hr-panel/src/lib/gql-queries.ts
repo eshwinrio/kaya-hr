@@ -2,11 +2,7 @@ import { gql } from "./gql-codegen/gql";
 
 export const WHOAMI = gql(`
   query WhoAmI {
-    currentUser(options: {
-      organization: true
-      roles: true
-      positions: true
-    }) {
+    currentUser {
       id
       email
       phone
@@ -80,7 +76,7 @@ export const SYNC_USERS = gql(`
 
 export const VIEW_USER_WITH_SCHEDULES = gql(`
   query ListUserSchedules ($userId: Int!) {
-    user(id: $userId, options: { positions: true, roles: true, schedules: true }) {
+    user(id: $userId) {
       id
       firstName
       middleName
