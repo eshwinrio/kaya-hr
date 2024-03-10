@@ -6,15 +6,15 @@ import prisma from "./prisma.js";
 
 export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   _root,
-  { options },
+  _args,
   { user, organization, positions, roles, schedules, timesheets }
 ) => ({
   ...user,
-  ...(options?.positions ? { positions } : {}),
-  ...(options?.organization ? { organization } : {}),
-  ...(options?.roles ? { roles: roles.map(role => role as Role) } : {}),
-  ...(options?.schedules ? { schedules } : {}),
-  ...(options?.timesheets ? { timesheets } : {}),
+  positions,
+  organization,
+  roles: roles.map(role => role as Role),
+  schedules,
+  timesheets,
   syncStatus: user.syncStatus as SyncStatus,
 });
 
@@ -44,7 +44,7 @@ export const qResolverUsers: QueryResolvers['users'] = async (
 
 export const qResolverUser: QueryResolvers['user'] = async (
   _root,
-  { id, options },
+  { id },
   { organization, roles },
 ) => {
   const mixedUserDocument = await prisma.user.findUnique({
@@ -53,17 +53,16 @@ export const qResolverUser: QueryResolvers['user'] = async (
       organizationId: roles.includes("SUPER") ? undefined : organization?.id,
     },
     include: {
-      UserPositionMap: { include: { position: !!options?.positions } },
-      UserRoleMap: !!options?.roles,
-      organization: !!options?.organization,
+      UserPositionMap: { include: { position: true } },
+      UserRoleMap: true,
+      organization: true,
       UserScheduleMap: {
         include: {
-          user: !!options?.schedules,
-          schedule: !!options?.schedules,
-          position: !!options?.schedules,
+          schedule: true,
+          position: true,
         }
       },
-      TimeSheet: !!options?.timesheets,
+      TimeSheet: true,
     },
   });
 
@@ -75,21 +74,13 @@ export const qResolverUser: QueryResolvers['user'] = async (
 
   return {
     ...user,
-    ...(options?.positions
-      ? { positions: UserPositionMap.map(({ position }) => position) }
-      : {}
-    ),
-    ...(options?.roles ? { roles: UserRoleMap.map(({ role }) => role as Role) } : {}),
-    ...(options?.schedules
-      ? {
-        schedules: UserScheduleMap.map(({ user, ...schedule }) => ({
-          ...schedule,
-          user: { ...user, syncStatus: user.syncStatus as SyncStatus },
-        }))
-      }
-      : {}
-    ),
-    ...(options?.timesheets ? { timesheets: TimeSheet } : {}),
+    positions: UserPositionMap.map(({ position }) => position),
+    roles: UserRoleMap.map(({ role }) => role as Role),
+    schedules: UserScheduleMap.map(schedule => ({
+      ...schedule,
+      user: { ...user, syncStatus: user.syncStatus as SyncStatus },
+    })),
+    timesheets: TimeSheet,
     syncStatus: mixedUserDocument.syncStatus as SyncStatus,
   };
 }

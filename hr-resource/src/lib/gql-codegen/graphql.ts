@@ -156,11 +156,6 @@ export type Query = {
 };
 
 
-export type QueryCurrentUserArgs = {
-  options?: InputMaybe<ViewUserOptions>;
-};
-
-
 export type QueryScheduledShiftsArgs = {
   filters?: InputMaybe<ListScheduleFilterInput>;
 };
@@ -168,7 +163,6 @@ export type QueryScheduledShiftsArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['Int']['input'];
-  options?: InputMaybe<ViewUserOptions>;
 };
 
 
@@ -272,11 +266,7 @@ export type UserSyncResult = {
 };
 
 export type ViewUserOptions = {
-  organization?: InputMaybe<Scalars['Boolean']['input']>;
-  positions?: InputMaybe<Scalars['Boolean']['input']>;
-  roles?: InputMaybe<Scalars['Boolean']['input']>;
-  schedules?: InputMaybe<Scalars['Boolean']['input']>;
-  timesheets?: InputMaybe<Scalars['Boolean']['input']>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -454,7 +444,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 }>;
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
+  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
