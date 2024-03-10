@@ -4,6 +4,7 @@ import app from "../../app.js";
 import { Http } from "../../config/environment.js";
 import { logSystem } from "../../lib/logger.js";
 import prisma from "../../lib/prisma.js";
+import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 
 let server: HttpServer | HttpsServer | null = null;
 
@@ -27,6 +28,10 @@ async function init() {
       }
     });
   } catch (e) {
+    if (e instanceof PrismaClientInitializationError) {
+      logSystem.error(e.name, e);
+      process.exit(1);
+    }
     logSystem.error(e);
     process.exit(1);
   } finally {
