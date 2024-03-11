@@ -1,7 +1,3 @@
-// export function useFetch(fetchFn: () => Promise<Response>): Response {
-
-// }
-
 export const verifyIdentity = (requestInit?: RequestInit) => fetch(
   `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/verify`,
   {
