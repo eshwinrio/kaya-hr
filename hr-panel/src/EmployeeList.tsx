@@ -121,7 +121,7 @@ export default function EmployeeList() {
         {/* Add employee redirect */}
         <Button
           component={Link}
-          to="../add"
+          to="../editor/new"
           startIcon={<PersonAddAltIcon />}>
           Add
         </Button>

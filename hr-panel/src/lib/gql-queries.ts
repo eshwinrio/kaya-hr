@@ -184,6 +184,68 @@ export const VIEW_USER_WITH_SCHEDULES = gql(`
   }
 `);
 
+export const VIEW_USER = gql(`
+  query ViewUser ($userId: Int!) {
+    user(id: $userId) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      streetName
+      addressL2
+      city
+      country
+      province
+      pincode
+      roles
+      profileIconUrl
+      bannerUrl
+      dateOfBirth
+      dateJoined
+    }
+  }
+`);
+
+export const UPDATE_USER = gql(`
+  mutation UpdateUser($userId: Int!, $input: UpdateUserInput!) {
+    updateUser(userId: $userId, input: $input) {
+      id
+      firstName
+      middleName
+      lastName
+      dateOfBirth
+      email
+      streetName
+      addressL2
+      city
+      pincode
+      province
+      phone
+      country
+      dateJoined
+      status
+      syncStatus
+      profileIconUrl
+      bannerUrl
+      organization {
+        id
+        name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
+      }
+      roles
+      positions {
+        id
+        title
+      }
+    }
+  }
+`);
+
 export const LIST_SCHEDULES = gql(`
   query ListAllSchedules ($filters: ListScheduleFilterInput) {
     scheduledShifts (filters: $filters) {

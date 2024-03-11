@@ -138,7 +138,7 @@ export default function DashboardLayout() {
             </ListItemButton>
             <Collapse in={employeeDropdown} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/add">
+                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/editor/new">
                   <ListItemIcon>
                     <GroupAddIcon />
                   </ListItemIcon>
