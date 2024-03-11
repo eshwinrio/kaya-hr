@@ -1,8 +1,12 @@
 {
 	"folders": [
 		{
+			"name": "Admin Panel",
+			"path": "admin-panel"
+		},
+		{
 			"name": "Auth Server",
-			"path": "auth-server",
+			"path": "auth-server"
 		},
 		{
 			"name": "HR Panel",
