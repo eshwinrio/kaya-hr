@@ -9,10 +9,11 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { Link, LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, LoaderFunction, useFetcher, useNavigate } from 'react-router-dom';
 import ListEmployee from './components/ListEmployee';
 import SearchIconWrapper from './components/SearchIconWrapper';
-import SearchWIdget from './components/SearchWidget';
+import SearchWidget from './components/SearchWidget';
 import SearchWidgetInputBase from './components/SearchWidgetInputBase';
 import SyncInProgressIcon from './components/SyncInProgressIcon';
 import { apolloClient } from './lib/apollo';
@@ -77,32 +78,43 @@ const columns: GridColDef[] = [
 ];
 
 export default function EmployeeList() {
-  const data = useLoaderData() as LoadAllUsersQuery;
   const navigate = useNavigate();
-  const [ syncMutate, { loading } ] = useMutation(SYNC_USERS);
+  const [syncMutate, { loading }] = useMutation(SYNC_USERS);
   const materialTheme = useMaterialTheme();
   const isXsScreen = useMediaQuery(materialTheme.breakpoints.up('xs'));
   const isLgScreen = useMediaQuery(materialTheme.breakpoints.up('lg'));
+  const fetcher = useFetcher<LoadAllUsersQuery>();
+
+  useEffect(() => {
+    if (fetcher.state === 'idle' && !fetcher.data) {
+      fetcher.load('.');
+    }
+  }, [fetcher]);
+
+  const onSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    fetcher.submit({ searchTerm }, { method: 'get' });
+  }
 
   return (
     <Container maxWidth='xl'>
       <Toolbar disableGutters sx={{ justifyContent: 'space-between', gap: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>
         <Typography variant='h6' sx={{ fontWeight: 'bold' }} noWrap>All members</Typography>
-        <SearchWIdget>
+        <SearchWidget>
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
           <SearchWidgetInputBase
             placeholder="Search…"
             inputProps={{ 'aria-label': 'search' }}
+            onChange={onSearchTermChange}
           />
-        </SearchWIdget>
+        </SearchWidget>
       </Toolbar>
       <Toolbar disableGutters sx={{ justifyContent: 'flex-end', gap: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-         {/* Redirect to reload current page */}
-         <Button
-          component={Link}
-          to="."
+        {/* Redirect to reload current page */}
+        <Button
+          onClick={navigate.bind(null, 0)}
           startIcon={<RefreshIcon />}>
           Reload
         </Button>
@@ -122,7 +134,7 @@ export default function EmployeeList() {
       </Toolbar>
       {isXsScreen ? (
         <DataGrid
-          rows={data.users}
+          rows={fetcher.data?.users || []}
           columns={columns}
           initialState={{
             pagination: {
@@ -144,13 +156,19 @@ export default function EmployeeList() {
         <ListEmployee
           listItemProps={{ disablePadding: true }}
           listItemButtonProps={{ disableGutters: true }}
-          data={data}
+          data={fetcher.data}
         />
       )}
     </Container>
   );
 }
 
-export const employeeListLoader: LoaderFunction = async () => {
-  return (await apolloClient.query({ query: LOAD_USERS })).data;
+export const employeeListLoader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const searchTerm = url.searchParams.get('searchTerm');
+  const loadUsersQuery = await apolloClient.query({
+    query: LOAD_USERS,
+    variables: { options: { searchTerm } }
+  });
+  return loadUsersQuery.data;
 }

@@ -89,17 +89,25 @@ export const UPDATE_ORGANIZATION = gql(`
 `);
 
 export const LOAD_USERS = gql(`
-  query LoadAllUsers {
-    users {
-        id
-        firstName
-        lastName
-        email
-        phone
-        dateJoined
-        dateOfBirth
-        streetName
-        pincode
+  query LoadAllUsers ($options: ViewUserOptions) {
+    users (options: $options) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      city
+      country
+      province
+      roles
+      profileIconUrl
+      bannerUrl
+      dateOfBirth
+      dateJoined
+      streetName
+      pincode
+      syncStatus
     }
   }
 `);
