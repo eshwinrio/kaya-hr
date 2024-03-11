@@ -120,6 +120,26 @@ input CreateUserInput {
   positionIds: [Int!]
 }
 
+input UpdateUserInput {
+  firstName: String
+  middleName: String
+  lastName: String
+  dateOfBirth: ISODate
+  streetName: String
+  addressL2: String
+  city: String
+  pincode: String
+  province: String
+  phone: String
+  country: String
+  dateJoined: ISODate
+  status: String
+  profileIconUrl: String
+  bannerUrl: String
+  roles: [Role!]
+  positionIds: [Int!]
+}
+
 input CreateOrganizationInput {
   name: String!
   summary: String
@@ -183,6 +203,7 @@ type Mutation {
   createPosition(input: PositionInput!): Position!
   createOrganization(input: CreateOrganizationInput!): Organization!
   createUser(input: CreateUserInput!): User!
+  updateUser(userId: Int!, input: UpdateUserInput!): User!
   updateOrganization(id: Int!, input: UpdateOrganizationInput!): Organization!
   syncUsers(force: Boolean): UserSyncResult!
 

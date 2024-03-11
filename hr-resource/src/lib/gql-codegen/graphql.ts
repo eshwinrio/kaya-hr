@@ -76,6 +76,7 @@ export type Mutation = {
   syncUsers: UserSyncResult;
   updateOrganization: Organization;
   updateSchedule: Schedule;
+  updateUser: User;
 };
 
 
@@ -118,6 +119,12 @@ export type MutationUpdateOrganizationArgs = {
 export type MutationUpdateScheduleArgs = {
   input: ScheduleInput;
   scheduleId: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  input: UpdateUserInput;
+  userId: Scalars['Int']['input'];
 };
 
 export type Organization = {
@@ -230,6 +237,26 @@ export type UpdateOrganizationInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   summary?: InputMaybe<Scalars['String']['input']>;
   webUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateUserInput = {
+  addressL2?: InputMaybe<Scalars['String']['input']>;
+  bannerUrl?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  dateJoined?: InputMaybe<Scalars['ISODate']['input']>;
+  dateOfBirth?: InputMaybe<Scalars['ISODate']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  middleName?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  pincode?: InputMaybe<Scalars['String']['input']>;
+  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  profileIconUrl?: InputMaybe<Scalars['String']['input']>;
+  province?: InputMaybe<Scalars['String']['input']>;
+  roles?: InputMaybe<Array<Role>>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  streetName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {
@@ -363,6 +390,7 @@ export type ResolversTypes = ResolversObject<{
   SyncStatus: SyncStatus;
   Timesheet: ResolverTypeWrapper<Timesheet>;
   UpdateOrganizationInput: UpdateOrganizationInput;
+  UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
   UserSyncResult: ResolverTypeWrapper<UserSyncResult>;
   ViewUserOptions: ViewUserOptions;
@@ -390,6 +418,7 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
   Timesheet: Timesheet;
   UpdateOrganizationInput: UpdateOrganizationInput;
+  UpdateUserInput: UpdateUserInput;
   User: User;
   UserSyncResult: UserSyncResult;
   ViewUserOptions: ViewUserOptions;
@@ -420,6 +449,7 @@ export type MutationResolvers<ContextType = ApolloServerContext, ParentType exte
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
   updateOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
   updateSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationUpdateScheduleArgs, 'input' | 'scheduleId'>>;
+  updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'input' | 'userId'>>;
 }>;
 
 export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Organization'] = ResolversParentTypes['Organization']> = ResolversObject<{

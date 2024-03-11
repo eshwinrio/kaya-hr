@@ -1,5 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import CallIcon from '@mui/icons-material/Call';
+import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -14,7 +15,7 @@ import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { GraphQLError } from 'graphql';
-import { LoaderFunction, useLoaderData } from 'react-router-dom';
+import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import Banner from './components/Banner';
 import ScheduleAssignmentList from './components/ScheduleAssignmentList';
 import { apolloClient } from './lib/apollo';
@@ -50,7 +51,7 @@ export default function ViewEmployee() {
             </Button>
           </ButtonGroup>
         </Grid2>
-        <Grid2 xs={12} sm={6} md={4} lg={3} sx={{ pl: 1, pt: 2 }}>
+        <Grid2 xs={12} sm sx={{ pl: 1, pt: 2 }}>
           <Typography variant="h5" fontWeight='bold'>
             {[userWithSchedules.user.firstName, userWithSchedules.user.middleName, userWithSchedules.user.lastName].filter(Boolean).join(' ')}
           </Typography>
@@ -59,7 +60,15 @@ export default function ViewEmployee() {
             {userWithSchedules.user.city},&nbsp;{userWithSchedules.user.country},&nbsp;{userWithSchedules.user.province}
           </Typography>
         </Grid2>
-        <Grid2 xs={12} sm='auto'></Grid2>
+        <Grid2 xs={12} sm='auto'>
+          <Button
+            component={Link}
+            to={`../editor/${userWithSchedules.user.id}`}
+            startIcon={<EditIcon />}
+          >
+            Edit
+          </Button>
+        </Grid2>
       </Grid2>
 
       <Toolbar disableGutters sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>

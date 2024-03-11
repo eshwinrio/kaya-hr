@@ -11,14 +11,15 @@ import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import { GraphQLError } from 'graphql';
 import { useState } from 'react';
-import { ActionFunction, Form, redirect } from 'react-router-dom';
+import { ActionFunction, Form, LoaderFunction, useLoaderData } from 'react-router-dom';
 import validator from 'validator';
 import InputPassword from './components/InputPassword';
 import SelectRole from './components/SelectRole';
 import { apolloClient } from './lib/apollo';
-import { Role } from './lib/gql-codegen/graphql';
-import { CREATE_USER } from './lib/gql-queries';
+import { CreateUserMutation, Role, UpdateUserMutation, User, ViewUserQuery } from './lib/gql-codegen/graphql';
+import { CREATE_USER, UPDATE_USER, VIEW_USER } from './lib/gql-queries';
 
 type FormKeys =
   | 'firstName'
@@ -44,9 +45,9 @@ const initialFormData: EmployeeAddFormData = {
   dateJoined: ''
 };
 
-export default function EmployeeAdd() {
-
-  const [formData, setFormData] = useState<EmployeeAddFormData>({ ...initialFormData });
+export default function EmployeeEditor() {
+  const existingData = useLoaderData() as ViewUserQuery;
+  const [formData, setFormData] = useState<User | EmployeeAddFormData>(existingData ? existingData.user : { ...initialFormData });
   const [errors, setErrors] = useState<EmployeeAddFormData>({ ...initialFormData });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +120,7 @@ export default function EmployeeAdd() {
               name='firstName' label='First Name'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.firstName}
               onChange={onChange}
               error={!!errors.firstName} helperText={errors.firstName}
             />
@@ -129,6 +131,7 @@ export default function EmployeeAdd() {
               name='middleName' label='Middle Name'
               variant='outlined' fullWidth
               autoFocus
+              defaultValue={formData.middleName}
               onChange={onChange}
               error={!!errors.middleName} helperText={errors.middleName}
             />
@@ -139,6 +142,7 @@ export default function EmployeeAdd() {
               name='lastName' label='Last Name'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.lastName}
               onChange={onChange}
               error={!!errors.lastName} helperText={errors.lastName}
             />
@@ -162,6 +166,7 @@ export default function EmployeeAdd() {
               name='email' label='Email Address'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.email}
               onChange={onChange}
               error={!!errors.email} helperText={errors.email}
             />
@@ -172,6 +177,7 @@ export default function EmployeeAdd() {
               name='phone' label='Phone Number'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.phone}
               onChange={onChange}
               error={!!errors.phone} helperText={errors.phone}
             />
@@ -182,6 +188,7 @@ export default function EmployeeAdd() {
               name='streetName' label='Street Name'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.streetName}
               onChange={onChange}
               error={!!errors.streetName} helperText={errors.streetName}
             />
@@ -192,6 +199,7 @@ export default function EmployeeAdd() {
               name='addressL2' label='Address Line 2'
               variant='outlined' fullWidth
               autoFocus
+              defaultValue={formData.addressL2}
               value={formData.addressL2} onChange={onChange}
               error={!!errors.addressL2} helperText={errors.addressL2}
             />
@@ -202,6 +210,7 @@ export default function EmployeeAdd() {
               name='city' label='City'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.city}
               onChange={onChange}
               error={!!errors.city} helperText={errors.city}
             />
@@ -212,6 +221,7 @@ export default function EmployeeAdd() {
               name='province' label='Province'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.province}
               onChange={onChange}
               error={!!errors.province} helperText={errors.province}
             />
@@ -222,6 +232,7 @@ export default function EmployeeAdd() {
               name='pincode' label='Pin Code'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.pincode}
               onChange={onChange}
               error={!!errors.pincode} helperText={errors.pincode}
             />
@@ -232,6 +243,7 @@ export default function EmployeeAdd() {
               name='country' label='Country'
               variant='outlined' fullWidth
               autoFocus required
+              defaultValue={formData.country}
               onChange={onChange}
               error={!!errors.country} helperText={errors.country}
             />
@@ -296,32 +308,79 @@ export default function EmployeeAdd() {
   );
 }
 
-export const employeeAddAction: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const response = await apolloClient.mutate({
-    mutation: CREATE_USER,
-    variables: {
-      input: {
-        firstName: formData.get('firstName')!.toString(),
-        middleName: formData.get('middleName')?.toString(),
-        lastName: formData.get('lastName')!.toString(),
-        dateOfBirth: formData.get('dateOfBirth')!.toString(),
-        email: formData.get('email')!.toString(),
-        phone: formData.get('phone')!.toString(),
-        streetName: formData.get('streetName')!.toString(),
-        addressL2: formData.get('addressL2')!.toString(),
-        city: formData.get('city')!.toString(),
-        province: formData.get('province')!.toString(),
-        pincode: formData.get('pincode')!.toString(),
-        country: formData.get('country')!.toString(),
-        password: formData.get('password')!.toString(),
-        dateJoined: formData.get('dateJoined')!.toString(),
-        roles: formData.get('role')!.toString().split(',') as Array<Role>,
-      }
+export const employeeEditorLoader: LoaderFunction = async ({ params }) => {
+  const id = params['id'];
+  if (id && id !== 'new') {
+    const userId = parseInt(id, 10);
+    if (!userId) {
+      throw new GraphQLError("Invalid user ID");
     }
-  });
-  if (response.data) {
-    return redirect('../list', { status: 201 });
+    const existingUserData = await apolloClient.query({ query: VIEW_USER, variables: { userId } });
+    return existingUserData.data;
   }
   return null;
+}
+
+export const employeeEditorAction: ActionFunction = async ({ params, request }) => {
+  const formData = await request.formData();
+  let response: UpdateUserMutation | CreateUserMutation | null = null;
+  const id = params['id'];
+  if (id && id !== 'new') {
+    const userId = parseInt(id, 10);
+    if (!userId) {
+      throw new GraphQLError("Invalid user ID");
+    }
+    const updateUserMutation = await apolloClient.mutate({
+      mutation: UPDATE_USER,
+      variables: {
+        userId,
+        input: {
+          firstName: formData.get('firstName')!.toString(),
+          middleName: formData.get('middleName')?.toString(),
+          lastName: formData.get('lastName')!.toString(),
+          dateOfBirth: formData.get('dateOfBirth')!.toString(),
+          phone: formData.get('phone')!.toString(),
+          streetName: formData.get('streetName')!.toString(),
+          addressL2: formData.get('addressL2')!.toString(),
+          city: formData.get('city')!.toString(),
+          province: formData.get('province')!.toString(),
+          pincode: formData.get('pincode')!.toString(),
+          country: formData.get('country')!.toString(),
+          dateJoined: formData.get('dateJoined')!.toString(),
+          roles: formData.get('role')!.toString().split(',') as Array<Role>,
+        }
+      }
+    });
+    if (updateUserMutation.data) {
+      response = updateUserMutation.data;
+    }
+  } else {
+    const createUserMutation = await apolloClient.mutate({
+      mutation: CREATE_USER,
+      variables: {
+        input: {
+          firstName: formData.get('firstName')!.toString(),
+          middleName: formData.get('middleName')?.toString(),
+          lastName: formData.get('lastName')!.toString(),
+          dateOfBirth: formData.get('dateOfBirth')!.toString(),
+          email: formData.get('email')!.toString(),
+          phone: formData.get('phone')!.toString(),
+          streetName: formData.get('streetName')!.toString(),
+          addressL2: formData.get('addressL2')!.toString(),
+          city: formData.get('city')!.toString(),
+          province: formData.get('province')!.toString(),
+          pincode: formData.get('pincode')!.toString(),
+          country: formData.get('country')!.toString(),
+          password: formData.get('password')!.toString(),
+          dateJoined: formData.get('dateJoined')!.toString(),
+          roles: formData.get('role')!.toString().split(',') as Array<Role>,
+        }
+      }
+    });
+    if (createUserMutation.data) {
+      response = createUserMutation.data;
+    }
+  }
+
+  return response;
 }

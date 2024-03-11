@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
 import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
-import EmployeeAdd, { employeeAddAction } from './EmployeeAdd';
+import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './EmployeeEditor';
 import EmployeeList, { employeeListLoader } from './EmployeeList';
 import Home, { homeLoader } from './Home';
 import Layout from './Layout';
@@ -37,15 +37,16 @@ const router = createBrowserRouter([
             path: "employees",
             children: [
               {
-                path: "add",
-                index: true,
-                Component: EmployeeAdd,
-                action: employeeAddAction,
-              },
-              {
                 path: "list",
+                index: true,
                 Component: EmployeeList,
                 loader: employeeListLoader,
+              },
+              {
+                path: "editor/:id",
+                Component: EmployeeEditor,
+                action: employeeEditorAction,
+                loader: employeeEditorLoader,
               },
               {
                 path: "view/:id",

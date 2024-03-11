@@ -89,17 +89,25 @@ export const UPDATE_ORGANIZATION = gql(`
 `);
 
 export const LOAD_USERS = gql(`
-  query LoadAllUsers {
-    users {
-        id
-        firstName
-        lastName
-        email
-        phone
-        dateJoined
-        dateOfBirth
-        streetName
-        pincode
+  query LoadAllUsers ($options: ViewUserOptions) {
+    users (options: $options) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      city
+      country
+      province
+      roles
+      profileIconUrl
+      bannerUrl
+      dateOfBirth
+      dateJoined
+      streetName
+      pincode
+      syncStatus
     }
   }
 `);
@@ -171,6 +179,68 @@ export const VIEW_USER_WITH_SCHEDULES = gql(`
           dateJoined
           phone
         }
+      }
+    }
+  }
+`);
+
+export const VIEW_USER = gql(`
+  query ViewUser ($userId: Int!) {
+    user(id: $userId) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      streetName
+      addressL2
+      city
+      country
+      province
+      pincode
+      roles
+      profileIconUrl
+      bannerUrl
+      dateOfBirth
+      dateJoined
+    }
+  }
+`);
+
+export const UPDATE_USER = gql(`
+  mutation UpdateUser($userId: Int!, $input: UpdateUserInput!) {
+    updateUser(userId: $userId, input: $input) {
+      id
+      firstName
+      middleName
+      lastName
+      dateOfBirth
+      email
+      streetName
+      addressL2
+      city
+      pincode
+      province
+      phone
+      country
+      dateJoined
+      status
+      syncStatus
+      profileIconUrl
+      bannerUrl
+      organization {
+        id
+        name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
+      }
+      roles
+      positions {
+        id
+        title
       }
     }
   }
