@@ -7,7 +7,7 @@ import httpErrors, { HttpError } from "http-errors";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import { Resolvers, ScheduleAssignment, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
-import { mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule } from "./mutation-resolvers.js";
+import { mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
 import { qResolverCurrentUser, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
@@ -89,6 +89,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
   },
   Mutation: {
     createUser: mResolverCreateUser,
+    updateUser: mResolverUpdateUser,
     createOrganization: mResolverCreateOrganization,
     updateOrganization: mResolverUpdateOrganization,
     syncUsers: mResolverSyncUsers,

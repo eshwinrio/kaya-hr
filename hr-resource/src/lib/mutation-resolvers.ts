@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Role as PrismaRole } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
@@ -71,13 +71,110 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
       throw new GraphQLError('Could not create user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
-    const { UserPositionMap, UserRoleMap, ...user} = mixedUserDocument;
-    return {
-      ...user,
-      positions: UserPositionMap.map(({ position }) => position),
-      roles: UserRoleMap.map(({ role }) => role as Role),
-      syncStatus: user.syncStatus as SyncStatus,
-    }
+  const { UserPositionMap, UserRoleMap, ...user } = mixedUserDocument;
+  return {
+    ...user,
+    positions: UserPositionMap.map(({ position }) => position),
+    roles: UserRoleMap.map(({ role }) => role as Role),
+    syncStatus: user.syncStatus as SyncStatus,
+  }
+};
+
+export const mResolverUpdateUser: MutationResolvers['updateUser'] = async (
+  _root,
+  { userId, input },
+  { organization }
+) => {
+  // Ensure that user exists
+  if (!(await prisma.user.findUnique({ where: { id: userId } }))) {
+    throw new GraphQLError('User doesn\'t exist', { extensions: { code: 'NOT_FOUND' } });
+  }
+
+  const mixedUserDocument = await prisma.user
+    .update({
+      data: {
+        firstName: input.firstName ?? undefined,
+        middleName: input.middleName,
+        lastName: input.lastName ?? undefined,
+        dateOfBirth: input.dateOfBirth,
+        dateJoined: input.dateJoined,
+        city: input.city ?? undefined,
+        country: input.country ?? undefined,
+        phone: input.phone ?? undefined,
+        pincode: input.pincode ?? undefined,
+        province: input.province ?? undefined,
+        streetName: input.streetName ?? undefined,
+        addressL2: input.addressL2 ?? undefined,
+        ...(input.roles
+          ? {
+            UserRoleMap: {
+              deleteMany: {
+                AND: {
+                  userId,
+                  role: { notIn: input.roles ?? undefined }
+                }
+              },
+              upsert: input.roles.map(role => ({
+                create: {
+                  role: role as PrismaRole
+                },
+                update: {},
+                where: {
+                  userId_role: {
+                    userId, role: role as PrismaRole
+                  }
+                }
+              }))
+            }
+          }
+          : {}
+        ),
+        ...(input.positionIds?.length
+          ? {
+            UserPositionMap: {
+              deleteMany: {
+                AND: {
+                  userId,
+                  positionId: { notIn: input.positionIds ?? undefined }
+                }
+              },
+              upsert: input.positionIds.map(positionId => ({
+                create: {
+                  position: {
+                    connect: { id: positionId },
+                  },
+                },
+                update: {},
+                where: {
+                  userId_positionId: {
+                    userId, positionId
+                  }
+                }
+              }))
+            }
+          }
+          : {}
+        )
+      },
+      where: { id: userId },
+      include: {
+        UserRoleMap: true,
+        UserPositionMap: { include: { position: true } },
+        organization: true,
+      }
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not create user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  const { UserPositionMap, UserRoleMap, ...user } = mixedUserDocument;
+  return {
+    ...user,
+    positions: UserPositionMap.map(({ position }) => position),
+    roles: UserRoleMap.map(({ role }) => role as Role),
+    syncStatus: user.syncStatus as SyncStatus,
+  }
 };
 
 export const mResolverCreateOrganization: MutationResolvers['createOrganization'] = async (
