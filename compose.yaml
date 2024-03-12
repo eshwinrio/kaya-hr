@@ -1,0 +1,63 @@
+services:
+  database-auth:
+    image: mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    environment:
+      - MYSQL_DATABASE=kayahr-auth
+    env_file:
+      - .env
+    volumes:
+      - kaya-auth-production-mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - private
+
+  auth:
+    build:
+      args:
+        - NODE_ENV=production
+      context: auth-server
+      dockerfile: Dockerfile
+      target: production
+    command: npm run start:prod
+    environment:
+      NODE_ENV: production
+    env_file:
+      - auth-server/.env.production.local
+    hostname: auth
+    ports:
+      - 8000:8000
+    volumes:
+      - ./auth-server:/app
+    depends_on:
+      - database-auth
+    networks:
+      - private
+      - public
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - auth
+    networks:
+      - public
+
+volumes:
+  kaya-auth-production-mysql:
+    driver: local
+
+networks:
+  private:
+  public:

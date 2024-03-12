@@ -8,7 +8,12 @@
     "build": "tsc",
     "clean:build": "rimraf dist",
     "clean:logs": "rimraf logs/*.log",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:reset": "prisma migrate reset",
+    "prisma:seed": "prisma db seed",
     "start:dev": "npm run build && npm run start",
+    "start:prod": "npm run prisma:migrate && npm run prisma:seed && node .",
     "start": "node -r dotenv/config .",
     "test": "NODE_ENV=test mocha ./dist/tests/**/*.js --exit --require dotenv/config"
   },
