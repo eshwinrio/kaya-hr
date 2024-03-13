@@ -11,17 +11,13 @@ const app = express();
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
-    if (!origin) {
-      return callback(null, true);
-    }
-    return Cors.origins.includes(origin)
-      ? callback(null, true)
-      : callback(new Error("Not allowed by CORS"));
+    callback(null, true);
   },
   methods: Cors.methods,
   credentials: Cors.allowCredentials,
   maxAge: Cors.maxAge,
-};
+}
+
 
 app.use(cors(corsOptions));
 app.use(express.json());

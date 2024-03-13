@@ -4,7 +4,6 @@ export namespace Api {
 }
 
 export namespace Cors {
-  export const origins = process.env['CORS_ORIGINS']!.split(',').map((o) => o.trim());
   export const methods = process.env['CORS_METHODS']!.split(',').map((m) => m.trim());
   export const allowCredentials = process.env['CORS_ALLOW_CREDENTIALS'] === 'true';
   export const maxAge = parseInt(process.env['CORS_MAX_AGE']!);

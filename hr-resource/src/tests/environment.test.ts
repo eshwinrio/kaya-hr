@@ -21,17 +21,6 @@ describe('API configurations', () => {
 });
 
 describe('CORS configurations', () => {
-  it('CORS_ORIGINS', (done) => {
-    const origins = process.env['CORS_ORIGINS'];
-    expect(origins).not.to.be.undefined;
-    const originsArray = origins!.split(',').map((origin) => origin.trim());
-    expect(originsArray).to.have.lengthOf.above(0);
-    originsArray.forEach((origin) => {
-      expect(validator.isURL(origin, { require_tld: false })).to.be.true;
-    });
-    done();
-  });
-
   it('CORS_METHODS', (done) => {
     const methods = process.env['CORS_METHODS'];
     expect(methods).not.to.be.undefined;
