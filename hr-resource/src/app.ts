@@ -2,7 +2,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 import cookieParser from "cookie-parser";
 import cors, { CorsOptions } from "cors";
 import express from "express";
-import { Cors } from "./config/environment.js";
+import { Api, Cors, Express } from "./config/environment.js";
 import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
 import { httpLogStream } from "./lib/logger.js";
 import errorHandler from "./middlewares/error-handler.js";
@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(httpLogStream);
 
 const bindExpressMiddleware = () => app.use(
-  "/",
+  `${Express.routePrefix}/v${Express.routeVersion + Api.routeGraphQL}`,
   expressMiddleware<ApolloServerContext>(apolloServer, {
   context: apolloServerContextFn!,
 }));
