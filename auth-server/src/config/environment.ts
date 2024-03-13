@@ -1,3 +1,9 @@
+export namespace Api {
+  export const routeApplications = process.env['API_ROUTE_APPLICATIONS']!;
+  export const routeAuth = process.env['API_ROUTE_AUTH']!;
+  export const routeUsers = process.env['API_ROUTE_USERS']!;
+}
+
 export namespace Bcrypt {
   export const saltRounds = parseInt(process.env['BCRYPT_SALT_ROUNDS']!);
 }
@@ -7,6 +13,11 @@ export namespace Cors {
   export const methods = process.env['CORS_METHODS']!.split(',').map((m) => m.trim());
   export const allowCredentials = process.env['CORS_ALLOW_CREDENTIALS'] === 'true';
   export const maxAge = parseInt(process.env['CORS_MAX_AGE']!);
+}
+
+export namespace Express {
+  export const routePrefix = process.env['EXPRESS_ROUTE_PREFIX']!;
+  export const routeVersion = process.env['EXPRESS_ROUTE_VERSION']!;
 }
 
 export namespace Http {

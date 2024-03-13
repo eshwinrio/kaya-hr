@@ -23,7 +23,7 @@ interface CreateUserBody {
 }
 type UserCreateRequiredBodyKeys = "firstName" | "lastName" | "email" | "password";
 userRouter.post( 
-  '/users/register',
+  '/register',
   requireApplication(),
   requireAccessToken(),
   requireUser(),
@@ -66,7 +66,7 @@ userRouter.post(
 );
 
 userRouter.post(
-  '/users/sync',
+  '/sync',
   requireApplication(),
   requireAccessToken(),
   requireUser(),
