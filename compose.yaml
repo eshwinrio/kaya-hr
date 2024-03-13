@@ -7,14 +7,33 @@ services:
       - MYSQL_DATABASE=kayahr-auth
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
     volumes:
       - kaya-auth-production-mysql:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 3300:3306
     networks:
       - private
 
-  auth:
+  database-resource:
+    image: mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    environment:
+      - MYSQL_DATABASE=kayahr-resource
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    volumes:
+      - kaya-resource-production-mysql:/var/lib/mysql
+    ports:
+      - 3301:3306
+    networks:
+      - private
+
+  auth-server:
     build:
       args:
         - NODE_ENV=production
@@ -22,11 +41,12 @@ services:
       dockerfile: Dockerfile
       target: production
     command: npm run start:prod
+    restart: on-failure:5
     environment:
       NODE_ENV: production
     env_file:
       - auth-server/.env.production.local
-    hostname: auth
+    hostname: auth-server
     ports:
       - 8000:8000
     volumes:
@@ -35,13 +55,37 @@ services:
       - database-auth
     networks:
       - private
-      - public
+
+  hr-resource:
+    build:
+      args:
+        - NODE_ENV=production
+      context: hr-resource
+      dockerfile: Dockerfile
+      target: production
+    command: npm run start:prod
+    restart: on-failure:5
+    environment:
+      NODE_ENV: production
+    env_file:
+      - hr-resource/.env.production.local
+    hostname: hr-resource
+    ports:
+      - 8001:8001
+    volumes:
+      - ./hr-resource:/app
+    depends_on:
+      - database-resource
+    networks:
+      - private
 
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - private
 
   nginx:
     build:
@@ -50,12 +94,16 @@ services:
     ports:
       - 80:80
     depends_on:
-      - auth
+      - auth-server
+      - hr-resource
     networks:
       - public
+      - private
 
 volumes:
   kaya-auth-production-mysql:
+    driver: local
+  kaya-resource-production-mysql:
     driver: local
 
 networks:
