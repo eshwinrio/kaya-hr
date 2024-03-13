@@ -20,7 +20,7 @@ const authRouter = Router();
 type TokenGenReqBody = Record<"username" | "password", string>;
 
 authRouter.post(
-  "/auth/token",
+  "/token",
   requireHeaders("X-Application"),
   requireApplication(),
   requireBody<TokenGenReqBody, "username" | "password">("username", "password"),
@@ -54,7 +54,7 @@ authRouter.post(
 );
 
 authRouter.delete(
-  "/auth/token",
+  "/token",
   requireAccessToken(),
   async (_req, res, next) => {
     try {
@@ -67,7 +67,7 @@ authRouter.delete(
 );
 
 authRouter.get(
-  "/auth/verify",
+  "/verify",
   requireHeaders("X-Application"),
   requireApplication(),
   requireAccessToken(),

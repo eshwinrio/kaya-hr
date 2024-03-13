@@ -1,7 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors, { CorsOptions } from "cors";
 import express from "express";
-import { Cors } from "./config/environment.js";
+import { Api, Cors, Express } from "./config/environment.js";
 import errorHandler from "./handlers/error-handler.js";
 import { httpLogStream } from "./lib/logger.js";
 import applicationRouter from "./routers/application-router.js";
@@ -28,9 +28,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(httpLogStream);
-app.use(applicationRouter);
-app.use(authRouter);
-app.use(userRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeApplications}`, applicationRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeAuth}`, authRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeUsers}`, userRouter);
 app.use(errorHandler);
 
 export default app;
