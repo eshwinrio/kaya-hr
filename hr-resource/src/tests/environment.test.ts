@@ -10,6 +10,14 @@ describe('API configurations', () => {
     expect(validator.isURL(authDomain!, { require_tld: false })).to.be.true;
     done();
   });
+
+  it('API_ROUTE_GRAPHQL', (done) => {
+    const value = process.env['API_ROUTE_GRAPHQL'];
+    expect(value).not.to.be.undefined;
+    const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
+    expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
+    done();
+  });
 });
 
 describe('CORS configurations', () => {
@@ -56,6 +64,24 @@ describe('Database configurations', () => {
   it('DATABASE_URL', (done) => {
     const value = process.env['DATABASE_URL'];
     expect(value).not.to.be.undefined;
+    done();
+  });
+});
+
+describe('Express configurations', () => {
+  it('EXPRESS_ROUTE_PREFIX', (done) => {
+    const routePrefix = process.env['EXPRESS_ROUTE_PREFIX'];
+    expect(routePrefix).not.to.be.undefined;
+    const pathnameRegex = /^(\/[a-z0-9-._~%!$&'()*+,;=:@]+)*\/?$/i;
+    expect(pathnameRegex.test(routePrefix!), `Invalid route prefix: ${routePrefix}`).to.be.true;
+    done();
+  });
+
+  it('EXPRESS_ROUTE_VERSION', (done) => {
+    const routeVersion = process.env['EXPRESS_ROUTE_VERSION'];
+    expect(routeVersion).not.to.be.undefined;
+    const versionRegex = /^\d+\.\d+$/;
+    expect(versionRegex.test(routeVersion!), `Invalid route version: ${routeVersion}`).to.be.true;
     done();
   });
 });
