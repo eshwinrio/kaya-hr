@@ -27,7 +27,6 @@ import Layout from './shared/Layout';
 const router = createBrowserRouter([
   {
     id: 'root',
-    path: '/',
     Component: Layout,
     children: [
       {

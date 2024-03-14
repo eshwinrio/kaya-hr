@@ -1,5 +1,14 @@
+// Get the current hostname of the page
+const currentDomain = window.location.origin;
+
+// Get the API domain from the environment variable or default to the current domain
+const apiDomain = process.env.REACT_APP_AUTH_API_DOMAIN || currentDomain;
+
+// Auth URI (prefixed)
+const authUri = `${apiDomain}${process.env.REACT_APP_RESOURCE_API_PREFIX}`;
+
 export const verifyIdentity = (requestInit?: RequestInit) => fetch(
-  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/verify`,
+  `${authUri}/auth/verify`,
   {
     method: 'GET',
     headers: {
@@ -11,7 +20,7 @@ export const verifyIdentity = (requestInit?: RequestInit) => fetch(
 );
 
 export const fetchAccessToken = (username: string, password: string, requestInit?: RequestInit) => fetch(
-  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/token`,
+  `${authUri}/auth/token`,
   {
     method: 'POST',
     headers: {
@@ -25,7 +34,7 @@ export const fetchAccessToken = (username: string, password: string, requestInit
 );
 
 export const signout = (requestInit?: RequestInit) => fetch(
-  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/token`,
+  `${authUri}/auth/token`,
   {
     method: 'DELETE',
     headers: {
