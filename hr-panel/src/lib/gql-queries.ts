@@ -89,7 +89,7 @@ export const UPDATE_ORGANIZATION = gql(`
 `);
 
 export const LOAD_USERS = gql(`
-  query LoadAllUsers ($options: ViewUserOptions) {
+  query LoadAllUsers ($options: ListUsersFilter) {
     users (options: $options) {
       id
       firstName
@@ -247,7 +247,7 @@ export const UPDATE_USER = gql(`
 `);
 
 export const LIST_SCHEDULES = gql(`
-  query ListAllSchedules ($filters: ListScheduleFilterInput) {
+  query ListAllSchedules ($filters: ListScheduleFilter) {
     scheduledShifts (filters: $filters) {
       id
       schedule {

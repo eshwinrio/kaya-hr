@@ -58,12 +58,16 @@ export type CreateUserInput = {
   streetName: Scalars['String']['input'];
 };
 
-export type ListScheduleFilterInput = {
+export type ListScheduleFilter = {
   createdByUserId?: InputMaybe<Scalars['Int']['input']>;
   from?: InputMaybe<Scalars['ISODate']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
   to?: InputMaybe<Scalars['ISODate']['input']>;
   userId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ListUsersFilter = {
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Mutation = {
@@ -163,18 +167,24 @@ export type Query = {
 };
 
 
+export type QueryCurrentUserArgs = {
+  options?: InputMaybe<ViewUserOptions>;
+};
+
+
 export type QueryScheduledShiftsArgs = {
-  filters?: InputMaybe<ListScheduleFilterInput>;
+  filters?: InputMaybe<ListScheduleFilter>;
 };
 
 
 export type QueryUserArgs = {
   id: Scalars['Int']['input'];
+  options?: InputMaybe<ViewUserOptions>;
 };
 
 
 export type QueryUsersArgs = {
-  options?: InputMaybe<ViewUserOptions>;
+  options?: InputMaybe<ListUsersFilter>;
 };
 
 export enum Role {
@@ -293,7 +303,7 @@ export type UserSyncResult = {
 };
 
 export type ViewUserOptions = {
-  searchTerm?: InputMaybe<Scalars['String']['input']>;
+  scheduleFilters?: InputMaybe<ListScheduleFilter>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -375,7 +385,8 @@ export type ResolversTypes = ResolversObject<{
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  ListScheduleFilterInput: ListScheduleFilterInput;
+  ListScheduleFilter: ListScheduleFilter;
+  ListUsersFilter: ListUsersFilter;
   Mutation: ResolverTypeWrapper<{}>;
   Organization: ResolverTypeWrapper<Organization>;
   Position: ResolverTypeWrapper<Position>;
@@ -405,7 +416,8 @@ export type ResolversParentTypes = ResolversObject<{
   Decimal: Scalars['Decimal']['output'];
   ISODate: Scalars['ISODate']['output'];
   Int: Scalars['Int']['output'];
-  ListScheduleFilterInput: ListScheduleFilterInput;
+  ListScheduleFilter: ListScheduleFilter;
+  ListUsersFilter: ListUsersFilter;
   Mutation: {};
   Organization: Organization;
   Position: Position;
@@ -474,7 +486,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 }>;
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
