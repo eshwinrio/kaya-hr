@@ -1,0 +1,25 @@
+{
+  "short_name": "Kaya HR",
+  "name": "Kaya HR - Service Administration Panel",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo-icon-rounded@192w.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo-icon-rounded@512w.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

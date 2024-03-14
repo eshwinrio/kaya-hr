@@ -15,6 +15,10 @@
 		{
 			"name": "HR Resource Server",
 			"path": "hr-resource"
+		},
+		{
+			"name": "Employee Client",
+			"path": "employee-client-web"
 		}
 	],
 	"settings": {
