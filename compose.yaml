@@ -79,6 +79,26 @@ services:
     networks:
       - private
 
+  hr-panel:
+    build:
+      args:
+        - NODE_ENV=production
+      context: hr-panel
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - hr-panel/.env.production.local
+    hostname: hr-panel
+    ports:
+      - 3000:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
   adminer:
     image: adminer
     restart: always
@@ -96,6 +116,7 @@ services:
     depends_on:
       - auth-server
       - hr-resource
+      - hr-panel
     networks:
       - public
       - private

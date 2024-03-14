@@ -20,7 +20,6 @@ import ViewEmployee, { viewEmployeeLoader } from './ViewEmployee';
 const router = createBrowserRouter([
   {
     id: 'root',
-    path: '/',
     Component: Layout,
     children: [
       {
@@ -90,9 +89,9 @@ const router = createBrowserRouter([
         Component: () => <div>404</div>
       }
     ],
-
-  }
-]);
+  }],
+  { basename: '/hr-panel' }
+);
 
 function App() {
   return (
