@@ -247,7 +247,7 @@ export const UPDATE_USER = gql(`
 `);
 
 export const LIST_SCHEDULES = gql(`
-  query ListAllSchedules ($filters: ListScheduleFilterInput) {
+  query ListAllSchedules ($filters: ListScheduleFilter) {
     scheduledShifts (filters: $filters) {
       id
       schedule {

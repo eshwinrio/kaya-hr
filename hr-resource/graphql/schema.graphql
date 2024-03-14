@@ -175,7 +175,7 @@ input ScheduleInput {
   notes: String
 }
 
-input ListScheduleFilterInput {
+input ListScheduleFilter {
   userId: Int
   createdByUserId: Int
   title: String
@@ -184,18 +184,22 @@ input ListScheduleFilterInput {
 }
 
 input ViewUserOptions {
+  scheduleFilters: ListScheduleFilter
+}
+
+input ListUsersFilter {
   searchTerm: String
 }
 
 # Root types
 type Query {
   # Users
-  currentUser: User!
-  user(id: Int!): User!
-  users(options: ViewUserOptions): [User]!
+  currentUser(options: ViewUserOptions): User!
+  user(id: Int!, options: ViewUserOptions): User!
+  users(options: ListUsersFilter): [User]!
 
   # Shift scheduling
-  scheduledShifts(filters: ListScheduleFilterInput): [ScheduleAssignment!]!
+  scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 }
 
 type Mutation {

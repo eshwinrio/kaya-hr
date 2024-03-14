@@ -4,19 +4,68 @@ import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
+
+export const qResolverUser: QueryResolvers['user'] = async (
+  _root,
+  { id, options },
+  { organization, roles },
+) => {
+  const mixedUserDocument = await prisma.user.findUnique({
+    where: {
+      id,
+      organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+    },
+    include: {
+      UserPositionMap: { include: { position: true } },
+      UserRoleMap: true,
+      organization: true,
+      UserScheduleMap: {
+        include: {
+          schedule: true,
+          position: true,
+        },
+        where: {
+          schedule: {
+            organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+            dateTimeStart: { gte: options?.scheduleFilters?.from, lte: options?.scheduleFilters?.to },
+            dateTimeEnd: { gte: options?.scheduleFilters?.from, lte: options?.scheduleFilters?.to },
+          },
+        }
+      },
+      TimeSheet: true,
+    },
+  });
+
+  if (!mixedUserDocument) {
+    throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
+  };
+
+  const { UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
+
+  return {
+    ...user,
+    positions: UserPositionMap.map(({ position }) => position),
+    roles: UserRoleMap.map(({ role }) => role as Role),
+    schedules: UserScheduleMap.map(schedule => ({
+      ...schedule,
+      user: { ...user, syncStatus: user.syncStatus as SyncStatus },
+    })),
+    timesheets: TimeSheet,
+    syncStatus: mixedUserDocument.syncStatus as SyncStatus,
+  };
+}
+
 export const qResolverCurrentUser: QueryResolvers['currentUser'] = async (
   _root,
-  _args,
-  { user, organization, positions, roles, schedules, timesheets }
-) => ({
-  ...user,
-  positions,
-  organization,
-  roles: roles.map(role => role as Role),
-  schedules,
-  timesheets,
-  syncStatus: user.syncStatus as SyncStatus,
-});
+  { options },
+  context,
+  info
+) => qResolverUser(
+  _root,
+  { id: context.user?.id, options },
+  context,
+  info
+);
 
 export const qResolverUsers: QueryResolvers['users'] = async (
   _root,
@@ -60,49 +109,6 @@ export const qResolverUsers: QueryResolvers['users'] = async (
     syncStatus: syncStatus as SyncStatus,
     ...user
   }));
-}
-
-export const qResolverUser: QueryResolvers['user'] = async (
-  _root,
-  { id },
-  { organization, roles },
-) => {
-  const mixedUserDocument = await prisma.user.findUnique({
-    where: {
-      id,
-      organizationId: roles.includes("SUPER") ? undefined : organization?.id,
-    },
-    include: {
-      UserPositionMap: { include: { position: true } },
-      UserRoleMap: true,
-      organization: true,
-      UserScheduleMap: {
-        include: {
-          schedule: true,
-          position: true,
-        }
-      },
-      TimeSheet: true,
-    },
-  });
-
-  if (!mixedUserDocument) {
-    throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
-  };
-
-  const { UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
-
-  return {
-    ...user,
-    positions: UserPositionMap.map(({ position }) => position),
-    roles: UserRoleMap.map(({ role }) => role as Role),
-    schedules: UserScheduleMap.map(schedule => ({
-      ...schedule,
-      user: { ...user, syncStatus: user.syncStatus as SyncStatus },
-    })),
-    timesheets: TimeSheet,
-    syncStatus: mixedUserDocument.syncStatus as SyncStatus,
-  };
 }
 
 export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async (

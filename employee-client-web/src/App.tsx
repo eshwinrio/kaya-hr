@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
 import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
-import HomePage from './pages/HomePage';
+import HomePage, { homePageLoader } from './pages/HomePage';
 import RootLayout from './shared/RootLayout';
 import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
@@ -26,6 +26,7 @@ const router = createBrowserRouter([
           {
             index: true,
             Component: HomePage,
+            loader: homePageLoader,
           },
           {
             path: "settings",

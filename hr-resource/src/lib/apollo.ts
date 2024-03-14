@@ -18,9 +18,6 @@ export interface ApolloServerContext extends BaseContext {
   readonly organization: Organization;
   readonly applicationId: string;
   readonly accessToken: string;
-  readonly positions?: Array<Position>;
-  readonly schedules?: Array<ScheduleAssignment>;
-  readonly timesheets?: Array<TimeSheet>;
 }
 
 export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext>['context'] = async ({ req }) => {
@@ -40,16 +37,6 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       include: {
         organization: true,
         UserRoleMap: { select: { role: true } },
-        UserPositionMap: {
-          include: { position: true }
-        },
-        UserScheduleMap: {
-          include: {
-            schedule: true,
-            position: true
-          }
-        },
-        TimeSheet: true
       },
     });
 
@@ -57,19 +44,13 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
       throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
     }
 
-    const { organization, UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
+    const { organization, UserRoleMap, ...user } = mixedUserDocument;
     return {
       user,
-      positions: UserPositionMap.map(({ position }) => position),
       roles: UserRoleMap.map(({ role }) => role),
-      organization: organization ?? null,
+      organization,
       applicationId: responseBody.application,
       accessToken: req.cookies['access_token'],
-      schedules: UserScheduleMap.map(schedule => ({
-        ...schedule,
-        user: { ...user, syncStatus: user.syncStatus as SyncStatus },
-      })),
-      timesheets: TimeSheet,
     };
   } catch (error) {
     if (httpErrors.isHttpError(error)) {
