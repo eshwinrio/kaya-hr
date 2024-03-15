@@ -11,7 +11,7 @@ const applicationRouter = Router();
 
 type CreateApplicationBody = Omit<Applications, 'id' | 'secret'>;
 applicationRouter.post(
-  "/applications",
+  "/",
   requireAccessToken(),
   requireBody<CreateApplicationBody, "name">("name"),
   async (req, res, next) => {
@@ -28,7 +28,7 @@ applicationRouter.post(
 );
 
 applicationRouter.get(
-  "/applications",
+  "/",
   requireAccessToken(),
   async (_req, res, next) => {
     try {
@@ -41,7 +41,7 @@ applicationRouter.get(
 );
 
 applicationRouter.get(
-  "/applications/:id",
+  "/:id",
   requireAccessToken(),
   requireParams("id"),
   async (req, res, next) => {
@@ -75,7 +75,7 @@ applicationRouter.get(
 );
 
 applicationRouter.put(
-  "/applications/:id",
+  "/:id",
   requireAccessToken(),
   requireParams("id"),
   requireBody<CreateApplicationBody, "name">("name"),
@@ -112,7 +112,7 @@ applicationRouter.put(
 );
 
 applicationRouter.delete(
-  "/applications/:id",
+  "/:id",
   requireAccessToken(),
   requireParams("id"),
   async (req, res, next) => {
