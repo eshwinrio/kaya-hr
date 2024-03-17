@@ -18,8 +18,7 @@ enum SyncStatus {
 type ClockTime {
   id: Int!
   startTime: ISODate!
-  endTime: ISODate!
-  timesheetId: Int!
+  endTime: ISODate
 }
 
 type Timesheet {
@@ -94,6 +93,11 @@ type Organization {
 type UserSyncResult {
   accepted: Int!
   rejected: Int!
+}
+
+type ListPunches {
+  activePunch: ClockTime
+  history: [ClockTime!]
 }
 
 # Input types
@@ -191,6 +195,13 @@ input ListUsersFilter {
   searchTerm: String
 }
 
+input ListPunchesFilter {
+  userId: Int
+  organizationId: Int
+  pageSize: Int
+  pageNumber: Int
+}
+
 # Root types
 type Query {
   # Users
@@ -200,6 +211,9 @@ type Query {
 
   # Shift scheduling
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
+
+  # Timesheet
+  listPunches(filter: ListPunchesFilter): ListPunches!
 }
 
 type Mutation {
@@ -215,4 +229,7 @@ type Mutation {
   createSchedule(input: ScheduleInput!): Schedule!
   updateSchedule(scheduleId: Int!, input: ScheduleInput!): Schedule!
   deleteSchedule(scheduleId: Int!): Schedule!
+
+  # Timesheet actions
+  registerPunch: ClockTime!
 }

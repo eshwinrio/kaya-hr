@@ -20,10 +20,9 @@ export type Scalars = {
 
 export type ClockTime = {
   __typename?: 'ClockTime';
-  endTime: Scalars['ISODate']['output'];
+  endTime?: Maybe<Scalars['ISODate']['output']>;
   id: Scalars['Int']['output'];
   startTime: Scalars['ISODate']['output'];
-  timesheetId: Scalars['Int']['output'];
 };
 
 export type CreateOrganizationInput = {
@@ -57,6 +56,19 @@ export type CreateUserInput = {
   streetName: Scalars['String']['input'];
 };
 
+export type ListPunches = {
+  __typename?: 'ListPunches';
+  activePunch?: Maybe<ClockTime>;
+  history?: Maybe<Array<ClockTime>>;
+};
+
+export type ListPunchesFilter = {
+  organizationId?: InputMaybe<Scalars['Int']['input']>;
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  userId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type ListScheduleFilter = {
   createdByUserId?: InputMaybe<Scalars['Int']['input']>;
   from?: InputMaybe<Scalars['ISODate']['input']>;
@@ -76,6 +88,7 @@ export type Mutation = {
   createSchedule: Schedule;
   createUser: User;
   deleteSchedule: Schedule;
+  registerPunch: ClockTime;
   syncUsers: UserSyncResult;
   updateOrganization: Organization;
   updateSchedule: Schedule;
@@ -160,6 +173,7 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
+  listPunches: ListPunches;
   scheduledShifts: Array<ScheduleAssignment>;
   user: User;
   users: Array<Maybe<User>>;
@@ -168,6 +182,11 @@ export type Query = {
 
 export type QueryCurrentUserArgs = {
   options?: InputMaybe<ViewUserOptions>;
+};
+
+
+export type QueryListPunchesArgs = {
+  filter?: InputMaybe<ListPunchesFilter>;
 };
 
 

@@ -65,11 +65,11 @@ model User {
   bannerUrl       String?
   syncStatus      SyncStatus        @default(NEVER)
   organization    Organization      @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-  TimeSheet       TimeSheet[]
   Schedule        Schedule[]
   UserRoleMap     UserRoleMap[]
   UserPositionMap UserPositionMap[]
   UserScheduleMap UserScheduleMap[]
+  ClockTime       ClockTime[]
 }
 
 model Schedule {
@@ -85,20 +85,13 @@ model Schedule {
   UserScheduleMap UserScheduleMap[]
 }
 
-model TimeSheet {
-  id         Int         @id @default(autoincrement())
-  userId     Int
-  hourlyWage Decimal
-  user       User        @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  ClockTimes ClockTime[]
-}
-
 model ClockTime {
-  id          Int       @id @default(autoincrement())
-  startTime   DateTime
-  endTime     DateTime?
-  timeSheetId Int
-  timesheet   TimeSheet @relation(fields: [timeSheetId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  startTime  DateTime
+  endTime    DateTime?
+  hourlyWage Decimal
+  user       User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 // Mapping models
