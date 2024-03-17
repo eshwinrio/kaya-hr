@@ -11,6 +11,8 @@ import requireBody from "../middlewares/require-body.js";
 import requireHeaders from "../middlewares/require-headers.js";
 import requireUser from "../middlewares/require-user.js";
 import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
+import forgotPasswordRequestHandler from "../handlers/forgot-password-handler.js";
+import requireQuery from "../middlewares/require-query.js";
 
 const authRouter = Router();
 
@@ -81,5 +83,11 @@ authRouter.get(
     }
   }
 );
+
+authRouter.get(
+  "/auth/reset-password",
+  requireQuery("email"),
+  forgotPasswordRequestHandler
+)
 
 export default authRouter;

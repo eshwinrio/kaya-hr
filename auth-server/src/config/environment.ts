@@ -1,3 +1,13 @@
+export namespace Api {
+  export namespace Auth {
+    export const forgotPasswordEnabled = process.env['API_AUTH_FORGOT_PASSWORD_ENABLED'] === 'true';
+    export const forgotPasswordUrl = process.env['API_AUTH_FORGOT_PASSWORD_URL']!;
+    export const forgotPasswordMailSubject = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_SUBJECT'] ?? 'Password Reset';
+    export const forgotPasswordMailText = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_TEXT']!;
+    export const forgotPasswordMailHtml = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_HTML']!;
+  }
+}
+
 export namespace Bcrypt {
   export const saltRounds = parseInt(process.env['BCRYPT_SALT_ROUNDS']!);
 }
@@ -32,6 +42,18 @@ export namespace Logger {
   export const enableStackTrace =
     process.env['LOGGER_ENABLE_STACK_TRACE'] === 'true';
 }
+
+
+export namespace Nodemailer {
+  export const transportAuthPass = process.env['NODEMAILER_TRANSPORT_AUTH_PASS']!;
+  export const transportAuthUser = process.env['NODEMAILER_TRANSPORT_AUTH_USER']!;
+  export const transportHost = process.env['NODEMAILER_TRANSPORT_HOST'];
+  export const transportPort = process.env['NODEMAILER_TRANSPORT_PORT'];
+  export const transportSecureConnection = process.env['NODEMAILER_TRANSPORT_SECURE_CONNECTION'] === 'true';
+  export const transportService = process.env['NODEMAILER_TRANSPORT_SERVICE']!;
+  export const transportTlsCiphers = process.env['NODEMAILER_TRANSPORT_TLS_CIPHERS']!;
+}
+
 
 export namespace Seed {
   export const defaultApplicationId = parseInt(process.env['SEED_DEFAULT_APPLICATION_ID']!, 10);
