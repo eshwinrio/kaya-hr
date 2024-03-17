@@ -406,3 +406,54 @@ export const mResolverDeleteSchedule: MutationResolvers['deleteSchedule'] = asyn
 
   return schedule;
 }
+
+export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async (
+  _root,
+  _args,
+  { user }
+) => {
+  const currentTime = new Date();
+  const activeSchedule = await prisma.userScheduleMap.findFirst({
+    where: {
+      userId: user?.id,
+      schedule: {
+        AND: {
+          dateTimeStart: { lte: currentTime },
+          dateTimeEnd: { gte: currentTime },
+        }
+      }
+    },
+    include: {
+      position: true,
+    },
+  });
+
+  // If no open punch, create one
+  const existingClockTime = await prisma.clockTime.findFirst({
+    where: {
+      AND: [
+        { userId: user?.id },
+        {endTime: null},
+      ],
+    },
+  });
+  
+  if (existingClockTime) {
+    return await prisma.clockTime.update({
+      where: {
+        id: existingClockTime.id,
+      },
+      data: {
+        endTime: currentTime,
+      },
+    });
+  } else {
+    return await prisma.clockTime.create({
+      data: {
+        userId: user?.id,
+        startTime: currentTime,
+        hourlyWage: activeSchedule?.position.hourlyWage ?? 0,
+      },
+    });
+  }
+}

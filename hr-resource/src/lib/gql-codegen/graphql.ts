@@ -21,10 +21,9 @@ export type Scalars = {
 
 export type ClockTime = {
   __typename?: 'ClockTime';
-  endTime: Scalars['ISODate']['output'];
+  endTime?: Maybe<Scalars['ISODate']['output']>;
   id: Scalars['Int']['output'];
   startTime: Scalars['ISODate']['output'];
-  timesheetId: Scalars['Int']['output'];
 };
 
 export type CreateOrganizationInput = {
@@ -58,6 +57,19 @@ export type CreateUserInput = {
   streetName: Scalars['String']['input'];
 };
 
+export type ListPunches = {
+  __typename?: 'ListPunches';
+  activePunch?: Maybe<ClockTime>;
+  history?: Maybe<Array<ClockTime>>;
+};
+
+export type ListPunchesFilter = {
+  organizationId?: InputMaybe<Scalars['Int']['input']>;
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  userId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type ListScheduleFilter = {
   createdByUserId?: InputMaybe<Scalars['Int']['input']>;
   from?: InputMaybe<Scalars['ISODate']['input']>;
@@ -77,6 +89,7 @@ export type Mutation = {
   createSchedule: Schedule;
   createUser: User;
   deleteSchedule: Schedule;
+  registerPunch: ClockTime;
   syncUsers: UserSyncResult;
   updateOrganization: Organization;
   updateSchedule: Schedule;
@@ -161,6 +174,7 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
+  listPunches: ListPunches;
   scheduledShifts: Array<ScheduleAssignment>;
   user: User;
   users: Array<Maybe<User>>;
@@ -169,6 +183,11 @@ export type Query = {
 
 export type QueryCurrentUserArgs = {
   options?: InputMaybe<ViewUserOptions>;
+};
+
+
+export type QueryListPunchesArgs = {
+  filter?: InputMaybe<ListPunchesFilter>;
 };
 
 
@@ -385,6 +404,8 @@ export type ResolversTypes = ResolversObject<{
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  ListPunches: ResolverTypeWrapper<ListPunches>;
+  ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
   ListUsersFilter: ListUsersFilter;
   Mutation: ResolverTypeWrapper<{}>;
@@ -416,6 +437,8 @@ export type ResolversParentTypes = ResolversObject<{
   Decimal: Scalars['Decimal']['output'];
   ISODate: Scalars['ISODate']['output'];
   Int: Scalars['Int']['output'];
+  ListPunches: ListPunches;
+  ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
   ListUsersFilter: ListUsersFilter;
   Mutation: {};
@@ -437,10 +460,9 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ClockTime'] = ResolversParentTypes['ClockTime']> = ResolversObject<{
-  endTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  endTime?: Resolver<Maybe<ResolversTypes['ISODate']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
-  timesheetId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -452,12 +474,19 @@ export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
   name: 'ISODate';
 }
 
+export type ListPunchesResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ListPunches'] = ResolversParentTypes['ListPunches']> = ResolversObject<{
+  activePunch?: Resolver<Maybe<ResolversTypes['ClockTime']>, ParentType, ContextType>;
+  history?: Resolver<Maybe<Array<ResolversTypes['ClockTime']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
   createPosition?: Resolver<ResolversTypes['Position'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
   createSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationCreateScheduleArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   deleteSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationDeleteScheduleArgs, 'scheduleId'>>;
+  registerPunch?: Resolver<ResolversTypes['ClockTime'], ParentType, ContextType>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
   updateOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;
   updateSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationUpdateScheduleArgs, 'input' | 'scheduleId'>>;
@@ -487,6 +516,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
+  listPunches?: Resolver<ResolversTypes['ListPunches'], ParentType, ContextType, Partial<QueryListPunchesArgs>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
@@ -556,6 +586,7 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
   ISODate?: GraphQLScalarType;
+  ListPunches?: ListPunchesResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Position?: PositionResolvers<ContextType>;

@@ -10,6 +10,7 @@ import { apolloClient } from '../lib/apollo';
 import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
 import { LIST_MY_SCHEDULES } from '../lib/gql-queries';
 import { useMaterialTheme } from '../lib/material-theme';
+import PunchFab from '../components/PunchFab';
 
 export default function HomePage() {
   const theme = useMaterialTheme();
@@ -19,7 +20,7 @@ export default function HomePage() {
     <Paper
       elevation={0}
       sx={{
-        backgroundColor: theme.palette.grey[200],
+        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
         maxWidth: theme.breakpoints.values.xs - 1,
       }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -60,6 +61,7 @@ export default function HomePage() {
     <Container>
       {schedulesTodayView}
       {schedulesUpcomingView}
+      <PunchFab />
     </Container>
   );
 }

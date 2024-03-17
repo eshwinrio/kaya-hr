@@ -11,6 +11,7 @@ import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
 import LoginPage, { loginAction } from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
+import PunchPage, { punchPageAction, punchPageLoader } from './pages/PunchPage';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,12 @@ const router = createBrowserRouter([
             index: true,
             Component: HomePage,
             loader: homePageLoader,
+          },
+          {
+            path: "punch",
+            Component: PunchPage,
+            loader: punchPageLoader,
+            action: punchPageAction,
           },
           {
             path: "settings",

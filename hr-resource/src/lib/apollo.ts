@@ -1,15 +1,15 @@
 import { ApolloServer, ApolloServerOptions, BaseContext } from "@apollo/server";
 import { ExpressMiddlewareOptions } from "@apollo/server/express4";
-import { Organization, Position, Role, TimeSheet, User } from "@prisma/client";
+import { Organization, Role, User } from "@prisma/client";
 import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
-import { Resolvers, ScheduleAssignment, SyncStatus } from "./gql-codegen/graphql.js";
+import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
-import { mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
+import { mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverRegisterPunch, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
-import { qResolverCurrentUser, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverListPunches, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
 
 export interface ApolloServerContext extends BaseContext {
@@ -67,6 +67,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     users: qResolverUsers,
     user: qResolverUser,
     scheduledShifts: qResolverScheduledShifts,
+    listPunches: qResolverListPunches,
   },
   Mutation: {
     createUser: mResolverCreateUser,
@@ -77,6 +78,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     createSchedule: mResolverCreateSchedule,
     updateSchedule: mResolverUpdateSchedule,
     deleteSchedule: mResolverDeleteSchedule,
+    registerPunch: mResolverRegisterPunch,
   },
   Decimal: Decimal,
   ISODate: ISODate,

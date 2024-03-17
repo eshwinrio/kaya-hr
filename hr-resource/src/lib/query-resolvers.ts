@@ -3,6 +3,7 @@ import { GraphQLError } from "graphql";
 import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
+import dayjs from "dayjs";
 
 
 export const qResolverUser: QueryResolvers['user'] = async (
@@ -32,7 +33,6 @@ export const qResolverUser: QueryResolvers['user'] = async (
           },
         }
       },
-      TimeSheet: true,
     },
   });
 
@@ -40,7 +40,7 @@ export const qResolverUser: QueryResolvers['user'] = async (
     throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
   };
 
-  const { UserRoleMap, UserPositionMap, UserScheduleMap, TimeSheet, ...user } = mixedUserDocument;
+  const { UserRoleMap, UserPositionMap, UserScheduleMap, ...user } = mixedUserDocument;
 
   return {
     ...user,
@@ -50,7 +50,6 @@ export const qResolverUser: QueryResolvers['user'] = async (
       ...schedule,
       user: { ...user, syncStatus: user.syncStatus as SyncStatus },
     })),
-    timesheets: TimeSheet,
     syncStatus: mixedUserDocument.syncStatus as SyncStatus,
   };
 }
@@ -156,4 +155,48 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
       syncStatus: user.syncStatus as SyncStatus,
     },
   }));
+}
+
+export const qResolverListPunches: QueryResolvers['listPunches'] = async (
+  _root,
+  { filter },
+  { user, roles, organization },
+) => {
+  const activePunch = await prisma.clockTime
+    .findFirst({
+      where: {
+        userId: user.id,
+        AND: {
+          startTime: { lte: dayjs().toISOString() },
+          endTime: null
+        },
+      }
+    });
+
+  const history = await prisma.clockTime
+    .findMany({
+      include: {
+        user: {
+          include: {
+            UserPositionMap: { include: { position: true } },
+            UserRoleMap: true,
+          },
+        },
+      },
+      where: {
+        userId: (
+          roles.includes("SUPER") ||
+          roles.includes("ADMIN") ||
+          roles.includes("MANAGER") ||
+          roles.includes("LEAD")
+        ) ? undefined : user.id,
+        user: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
+        id: { not: activePunch?.id },
+      },
+    });
+
+  return {
+    activePunch,
+    history
+  };
 }
