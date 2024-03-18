@@ -35,3 +35,27 @@ export const signout = (requestInit?: RequestInit) => fetch(
     ...requestInit
   }
 );
+
+export const forgotPassword = (email: string, requestInit?: RequestInit) => fetch(
+  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/reset-password?email=${email}`,
+  {
+    method: 'GET',
+    headers: {
+      'X-Application': process.env['REACT_APP_APPLICATION_SECRET']!,
+    },
+    ...requestInit
+  }
+);
+
+export const resetPassword = (resetToken: string, password: string, requestInit?: RequestInit) => fetch(
+  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/reset-password?token=${resetToken}`,
+  {
+    method: 'POST',
+    body: JSON.stringify({ password }),
+    headers: {
+      'X-Application': process.env['REACT_APP_APPLICATION_SECRET']!,
+      'Content-Type': 'application/json',
+    },
+    ...requestInit
+  }
+);

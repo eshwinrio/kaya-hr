@@ -39,7 +39,7 @@ export default function PopoverProfile({ sx, ...props }: PopoverProfileProps) {
             <Button variant="outlined" color="primary" sx={{ width: "100%" }} startIcon={<SettingsIcon />}>
               Manage
             </Button>
-            <Button variant="outlined" color="error" sx={{ width: "100%" }} startIcon={<LogoutIcon />} component={Link} to="/signout">
+            <Button variant="outlined" color="error" sx={{ width: "100%" }} startIcon={<LogoutIcon />} component={Link} to="/auth/signout">
               Signout
             </Button>
           </ButtonGroup>
