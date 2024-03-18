@@ -15,11 +15,11 @@ import { GraphQLError } from 'graphql';
 import { useState } from 'react';
 import { ActionFunction, Form, LoaderFunction, useLoaderData } from 'react-router-dom';
 import validator from 'validator';
-import InputPassword from './components/InputPassword';
-import SelectRole from './components/SelectRole';
-import { apolloClient } from './lib/apollo';
-import { CreateUserMutation, Role, UpdateUserMutation, User, ViewUserQuery } from './lib/gql-codegen/graphql';
-import { CREATE_USER, UPDATE_USER, VIEW_USER } from './lib/gql-queries';
+import InputPassword from '../components/InputPassword';
+import SelectRole from '../components/SelectRole';
+import { apolloClient } from '../lib/apollo';
+import { CreateUserMutation, Role, UpdateUserMutation, User, ViewUserQuery } from '../lib/gql-codegen/graphql';
+import { CREATE_USER, UPDATE_USER, VIEW_USER } from '../lib/gql-queries';
 
 type FormKeys =
   | 'firstName'

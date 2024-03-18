@@ -9,15 +9,16 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
-import DashCard from './components/DashCard';
-import ListEmployee from './components/ListEmployee';
-import WeatherWidget from './components/WeatherWidget';
-import { apolloClient } from './lib/apollo';
-import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
-import { LOAD_USERS } from './lib/gql-queries';
-import { useWhoAmI } from './lib/whoami-provider';
+import DashCard from '../components/DashCard';
+import UserList from '../components/UserList';
+import WeatherWidget from '../components/WeatherWidget';
+import { apolloClient } from '../lib/apollo';
+import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
+import { LOAD_USERS } from '../lib/gql-queries';
+import { useWhoAmI } from '../lib/whoami-provider';
+import { FC } from 'react';
 
-export default function Home() {
+const HomePage: FC = () => {
   const whoAmI = useWhoAmI();
   const data = useLoaderData() as LoadAllUsersQuery;
 
@@ -90,10 +91,10 @@ export default function Home() {
               <Typography>Active</Typography>
               <Button size='small' startIcon={<LaunchIcon fontSize='inherit' />} component={Link} to='/employees/list'>View all</Button>
             </Toolbar>
-            <ListEmployee
+            <UserList
               disablePadding dense
               listItemProps={{ disableGutters: true, disablePadding: true, divider: true }}
-              data={data}
+              users={data.users}
               sx={{ height: 273, overflowY: 'auto' }}
             />
           </Paper>
@@ -102,6 +103,8 @@ export default function Home() {
     </Container>
   );
 }
+
+export default HomePage;
 
 export const homeLoader: LoaderFunction = async () => {
   return (await apolloClient.query({ query: LOAD_USERS })).data;

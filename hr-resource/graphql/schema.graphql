@@ -30,6 +30,7 @@ type Timesheet {
 type Schedule {
   id: Int!
   title: String!
+  notes: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
   employees: [User!]
@@ -193,6 +194,7 @@ input ViewUserOptions {
 
 input ListUsersFilter {
   searchTerm: String
+  limit: Int
 }
 
 input ListPunchesFilter {
@@ -207,9 +209,10 @@ type Query {
   # Users
   currentUser(options: ViewUserOptions): User!
   user(id: Int!, options: ViewUserOptions): User!
-  users(options: ListUsersFilter): [User]!
+  users(options: ListUsersFilter): [User!]!
 
   # Shift scheduling
+  schedule(id: Int!): Schedule!
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 
   # Timesheet

@@ -11,15 +11,15 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { useEffect } from 'react';
 import { Link, LoaderFunction, useFetcher, useNavigate } from 'react-router-dom';
-import ListEmployee from './components/ListEmployee';
-import SearchIconWrapper from './components/SearchIconWrapper';
-import SearchWidget from './components/SearchWidget';
-import SearchWidgetInputBase from './components/SearchWidgetInputBase';
-import SyncInProgressIcon from './components/SyncInProgressIcon';
-import { apolloClient } from './lib/apollo';
-import { LoadAllUsersQuery } from './lib/gql-codegen/graphql';
-import { LOAD_USERS, SYNC_USERS } from './lib/gql-queries';
-import { useMaterialTheme } from './lib/material-theme';
+import SearchIconWrapper from '../components/SearchIconWrapper';
+import SearchWidget from '../components/SearchWidget';
+import SearchWidgetInputBase from '../components/SearchWidgetInputBase';
+import SyncInProgressIcon from '../components/SyncInProgressIcon';
+import UserList from '../components/UserList';
+import { apolloClient } from '../lib/apollo';
+import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
+import { LOAD_USERS, SYNC_USERS } from '../lib/gql-queries';
+import { useMaterialTheme } from '../lib/material-theme';
 
 const columns: GridColDef[] = [
   {
@@ -153,10 +153,10 @@ export default function EmployeeList() {
           disableRowSelectionOnClick
         />
       ) : (
-        <ListEmployee
+        <UserList
           listItemProps={{ disablePadding: true }}
           listItemButtonProps={{ disableGutters: true }}
-          data={fetcher.data}
+          users={fetcher.data?.users}
         />
       )}
     </Container>

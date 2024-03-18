@@ -79,6 +79,7 @@ export type ListScheduleFilter = {
 };
 
 export type ListUsersFilter = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -175,9 +176,10 @@ export type Query = {
   __typename?: 'Query';
   currentUser: User;
   listPunches: ListPunches;
+  schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
   user: User;
-  users: Array<Maybe<User>>;
+  users: Array<User>;
 };
 
 
@@ -188,6 +190,11 @@ export type QueryCurrentUserArgs = {
 
 export type QueryListPunchesArgs = {
   filter?: InputMaybe<ListPunchesFilter>;
+};
+
+
+export type QueryScheduleArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -222,6 +229,7 @@ export type Schedule = {
   dateTimeStart: Scalars['ISODate']['output'];
   employees?: Maybe<Array<User>>;
   id: Scalars['Int']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
   positions?: Maybe<Array<Position>>;
   title: Scalars['String']['output'];
 };
@@ -517,9 +525,10 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
   listPunches?: Resolver<ResolversTypes['ListPunches'], ParentType, ContextType, Partial<QueryListPunchesArgs>>;
+  schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
-  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, Partial<QueryUsersArgs>>;
+  users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType, Partial<QueryUsersArgs>>;
 }>;
 
 export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
@@ -529,6 +538,7 @@ export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType exte
   dateTimeStart?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   employees?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   positions?: Resolver<Maybe<Array<ResolversTypes['Position']>>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

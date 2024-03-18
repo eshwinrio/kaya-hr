@@ -7,7 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { Link } from "react-router-dom";
-import { useWhoAmI } from "./lib/whoami-provider";
+import { useWhoAmI } from "../lib/whoami-provider";
 
 export default function SettingsPage() {
   const whoAmI = useWhoAmI();

@@ -299,8 +299,8 @@ export const LIST_SCHEDULES = gql(`
   }
 `);
 
-export const SCHEDULE_SHIFT = gql(`
-  mutation ScheduleShift($input: ScheduleInput!) {
+export const CREATE_SCHEDULE = gql(`
+  mutation CreateSchedule($input: ScheduleInput!) {
     createSchedule(input: $input) {
       id
       title

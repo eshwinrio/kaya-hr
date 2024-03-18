@@ -16,12 +16,12 @@ import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { GraphQLError } from 'graphql';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
-import Banner from './components/Banner';
-import ScheduleAssignmentList from './components/ScheduleAssignmentList';
-import { apolloClient } from './lib/apollo';
-import { ListUserSchedulesQuery } from './lib/gql-codegen/graphql';
-import { VIEW_USER_WITH_SCHEDULES } from './lib/gql-queries';
-import { useMaterialTheme } from './lib/material-theme';
+import Banner from '../components/Banner';
+import ScheduleAssignmentList from '../components/ScheduleAssignmentList';
+import { apolloClient } from '../lib/apollo';
+import { ListUserSchedulesQuery } from '../lib/gql-codegen/graphql';
+import { VIEW_USER_WITH_SCHEDULES } from '../lib/gql-queries';
+import { useMaterialTheme } from '../lib/material-theme';
 
 export default function ViewEmployee() {
   const userWithSchedules = useLoaderData() as ListUserSchedulesQuery;
