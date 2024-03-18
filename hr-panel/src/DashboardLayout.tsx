@@ -181,7 +181,7 @@ export const dashboardLayoutLoader: LoaderFunction = async () => {
     return whoAmI.data;
   } catch (error: any) {
     if (isApolloError(error) && error.networkError?.name === 'ServerError') {
-      return redirect('/login');
+      return redirect('/auth');
     }
     throw error;
   }

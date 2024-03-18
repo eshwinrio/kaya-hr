@@ -13,6 +13,7 @@ import requireUser from "../middlewares/require-user.js";
 import requireUserApplicationLink from "../middlewares/require-userApplication-link.js";
 import forgotPasswordRequestHandler from "../handlers/forgot-password-handler.js";
 import requireQuery from "../middlewares/require-query.js";
+import resetPasswordRequestHandler from "../handlers/reset-password-handler.js";
 
 const authRouter = Router();
 
@@ -86,8 +87,19 @@ authRouter.get(
 
 authRouter.get(
   "/auth/reset-password",
+  requireHeaders("X-Application"),
+  requireApplication(),
   requireQuery("email"),
   forgotPasswordRequestHandler
-)
+);
+
+authRouter.post(
+  "/auth/reset-password",
+  requireHeaders("X-Application"),
+  requireApplication(),
+  requireBody("password"),
+  requireQuery("token"),
+  resetPasswordRequestHandler,
+);
 
 export default authRouter;

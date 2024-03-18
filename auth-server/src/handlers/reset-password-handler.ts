@@ -1,21 +1,22 @@
 import { RequestHandler } from "express";
-import { transporter } from "../lib/nodemailer.js";
-import { Api, Bcrypt, JWT, Nodemailer } from "../config/environment.js";
+import { Bcrypt, JWT } from "../config/environment.js";
 import jsonwebtoken from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 import { hash } from "bcrypt";
 import httpErrors from "http-errors";
+import createHttpError from "http-errors";
 
 export interface ReqBody {
-  readonly token: string;
   readonly password: string;
 }
-export type ResetPasswordRequestHandler = RequestHandler<unknown, unknown, ReqBody>;
+export type ReqQuery = Record<'token', string>;
+export type ResetPasswordRequestHandler = RequestHandler<unknown, unknown, ReqBody, ReqQuery>;
 
 const resetPasswordRequestHandler: ResetPasswordRequestHandler = async (req, res, next) => {
-  const { password, token } = req.body;
+  const { token: resetToken } = req.query;
+  const { password } = req.body;
   try {
-    const decoded = jsonwebtoken.verify(token, JWT.accessSecret) as { email: string };
+    const decoded = jsonwebtoken.verify(resetToken, JWT.accessSecret) as { email: string };
     const { email } = decoded;
     
     const user = await prisma.users.findUnique({
@@ -25,7 +26,7 @@ const resetPasswordRequestHandler: ResetPasswordRequestHandler = async (req, res
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new createHttpError.NotFound('User not found');
     }
 
     await prisma.users.update({
