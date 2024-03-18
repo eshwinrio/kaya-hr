@@ -16,6 +16,8 @@ import OrganizationSettingsPage, { organizationSettingsAction } from './Organiza
 import ScheduleViewer, { scheduleViewerLoader } from './ScheduleViewer';
 import SettingsPage from './SettingsPage';
 import ViewEmployee, { viewEmployeeLoader } from './ViewEmployee';
+import ForgotPasswordPage, { forgotPasswordAction } from './ForgotPasswordPage';
+import ResetPasswordPage, { resetPasswordAction } from './ResetPasswordPage';
 
 const router = createBrowserRouter([
   {
@@ -77,21 +79,37 @@ const router = createBrowserRouter([
         ]
       },
       {
-        path: 'login',
-        action: loginAction,
-        Component: Login,
-      },
-      {
-        path: 'signout',
-        loader: signoutLoader,
+        id: 'auth',
+        path: 'auth',
+        Component: Layout,
+        children: [
+          {
+            index: true,
+            Component: Login,
+            action: loginAction
+          },
+          {
+            path: 'signout',
+            loader: signoutLoader,
+          },
+          {
+            path: 'forgot-password',
+            Component: ForgotPasswordPage,
+            action: forgotPasswordAction,
+          },
+          {
+            path: 'reset-password',
+            Component: ResetPasswordPage,
+            action: resetPasswordAction,
+          }
+        ],
       },
       {
         path: '*',
         Component: () => <div>404</div>
       }
     ],
-
-  }
+  },
 ]);
 
 function App() {

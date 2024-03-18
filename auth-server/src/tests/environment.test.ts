@@ -1,6 +1,45 @@
 import { expect } from "chai";
 import validator from "validator";
 
+describe('Authentication API configurations', () => {
+
+  it('API_AUTH_FORGOT_PASSWORD_ENABLED', (done) => {
+    const value = process.env['API_AUTH_FORGOT_PASSWORD_ENABLED'];
+    expect(value).not.to.be.undefined;
+    const parsed = JSON.parse(value!);
+    expect(parsed).to.be.a('boolean');
+    done();
+  });
+
+  it('API_AUTH_FORGOT_PASSWORD_ROUTE', (done) => {
+    const value = process.env['API_AUTH_FORGOT_PASSWORD_ROUTE'];
+    expect(value).not.to.be.undefined;
+    done();
+  });
+
+  it('API_AUTH_FORGOT_PASSWORD_MAIL_SUBJECT', (done) => {
+    const value = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_SUBJECT'];
+    if (value) {
+      expect(value).to.not.be.empty;
+    }
+    done();
+  });
+
+  it('API_AUTH_FORGOT_PASSWORD_MAIL_TEXT', (done) => {
+    const value = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_TEXT'];
+    expect(value).not.to.be.undefined;
+    expect(value).not.to.be.empty;
+    done();
+  });
+
+  it('API_AUTH_FORGOT_PASSWORD_MAIL_HTML', (done) => {
+    const value = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_HTML'];
+    expect(value).not.to.be.undefined;
+    expect(value).not.to.be.empty;
+    done();
+  });
+});
+
 describe('Bcrypt configurations', () => {
   it('Salt rounds', (done) => {
     const value = process.env['BCRYPT_SALT_ROUNDS'];
@@ -117,6 +156,52 @@ describe('JWT configurations', () => {
     expect(value).not.to.be.undefined;
     const parsed = parseInt(value!);
     expect(parsed).to.be.a('number').and.not.to.be.NaN;
+    done();
+  });
+});
+
+describe('Nodemailer configurations', () => {
+
+  it('NODEMAILER_TRANSPORT_AUTH_PASS', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_AUTH_PASS'];
+    expect(value).to.be.a('string');
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_AUTH_USER', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_AUTH_USER'];
+    expect(value).to.be.a('string');
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_HOST', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_HOST'];
+    expect(value).to.be.a('string');
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_PORT', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_PORT'];
+    expect(value).to.be.a('string');
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_SECURE_CONNECTION', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_SECURE_CONNECTION'];
+    expect(value).not.to.be.undefined.empty;
+    expect(value).to.be.oneOf(['true', 'false']);
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_SERVICE', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_SERVICE'];
+    expect(value).to.be.a('string');
+    done();
+  });
+
+  it('NODEMAILER_TRANSPORT_TLS_CIPHERS', (done) => {
+    const value = process.env['NODEMAILER_TRANSPORT_TLS_CIPHERS'];
+    expect(value).to.be.a('string');
     done();
   });
 });

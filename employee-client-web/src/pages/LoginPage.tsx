@@ -7,7 +7,7 @@ import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
-import { ActionFunction, Form, useActionData, useNavigate } from 'react-router-dom';
+import { ActionFunction, Form, Link, useActionData, useNavigate } from 'react-router-dom';
 import validator from 'validator';
 import logo from '../assets/logo-full.svg';
 import InputPassword from '../components/InputPassword';
@@ -89,6 +89,7 @@ export default function LoginPage() {
               error={!!errors.password} helperText={errors.password}
             />
             {actionData?.message && <Alert severity='error' sx={{ mt: 2 }}>{actionData.message}</Alert>}
+            <Button component={Link} to='./forgot-password'>Forgot Password?</Button>
             <Button
               type='submit'
               variant='contained' color='primary'
