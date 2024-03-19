@@ -1,7 +1,25 @@
-#landing-container{
-  height: 55vh;
+#home{
+  height: 87vh;
+  padding: 40px;
 }
-#footer-container{
-  background: #000;
-  width: 100%;
+#banner-content{
+  margin-top: 100px;
+  margin-left: 50px ;
+  max-width: 1000px;
+}
+#banner-img{
+  position: absolute;
+  margin-top: 200px;
+  margin-left: 60%;
+}
+
+#header-logo{
+  margin-right: 30px;
+}
+#testimonial{
+  display: inline-flex;
+  flex-wrap: wrap;  
+}
+.testimonial-card{
+  margin: 30px;
 }
