@@ -11,12 +11,15 @@ import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
 import { LIST_MY_SCHEDULES } from '../lib/gql-queries';
 import { useMaterialTheme } from '../lib/material-theme';
 import PunchFab from '../components/PunchFab';
+import Box from '@mui/material/Box';
+import relaxingIllustration from '../assets/6524977_3322680.svg';
 
 export default function HomePage() {
   const theme = useMaterialTheme();
   const loaderData = useLoaderData() as HomePageLoader;
+  const { schedulesToday, schedulesUpcoming } = loaderData;
 
-  const schedulesTodayView = loaderData.schedulesToday && (
+  const schedulesTodayView = schedulesToday && (
     <Paper
       elevation={0}
       sx={{
@@ -26,9 +29,9 @@ export default function HomePage() {
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="body1" fontWeight="bold">Today</Typography>
       </Toolbar>
-      {loaderData.schedulesToday.data.currentUser.schedules
+      {schedulesToday.data.currentUser.schedules
         && <ScheduleList
-          schedules={loaderData.schedulesToday.data.currentUser.schedules}
+          schedules={schedulesToday.data.currentUser.schedules}
           disablePadding
           itemProps={{
             disableGutters: true,
@@ -36,34 +39,40 @@ export default function HomePage() {
           }}
         />
       }
-    </Paper>
+      {schedulesToday.data.currentUser.schedules?.length === 0 && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+          <Typography variant="body1">Nothing scheduled for today.</Typography>
+          <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
+        </Box>
+      )}
+    </Paper >
   );
 
-  const schedulesUpcomingView = loaderData.schedulesUpcoming && (
-    <Paper component='section' variant='outlined' sx={{ mt: 2 }}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Typography variant="body1" fontWeight="bold">Upcoming</Typography>
-      </Toolbar>
-      {loaderData.schedulesUpcoming.data.currentUser.schedules
-        && <ScheduleList
-          schedules={loaderData.schedulesUpcoming.data.currentUser.schedules}
-          disablePadding
-          itemProps={{
-            disableGutters: true,
-            disablePadding: true,
-          }}
-        />
-      }
-    </Paper>
-  );
+const schedulesUpcomingView = schedulesUpcoming && (
+  <Paper component='section' variant='outlined' sx={{ mt: 2 }}>
+    <Toolbar sx={{ justifyContent: 'space-between' }}>
+      <Typography variant="body1" fontWeight="bold">Upcoming</Typography>
+    </Toolbar>
+    {schedulesUpcoming.data.currentUser.schedules
+      && <ScheduleList
+        schedules={schedulesUpcoming.data.currentUser.schedules}
+        disablePadding
+        itemProps={{
+          disableGutters: true,
+          disablePadding: true,
+        }}
+      />
+    }
+  </Paper>
+);
 
-  return (
-    <Container>
-      {schedulesTodayView}
-      {schedulesUpcomingView}
-      <PunchFab />
-    </Container>
-  );
+return (
+  <Container>
+    {schedulesTodayView}
+    {schedulesUpcomingView}
+    <PunchFab />
+  </Container>
+);
 }
 
 interface HomePageLoader {

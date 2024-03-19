@@ -3,6 +3,11 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -11,15 +16,16 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import { useModal } from 'mui-modal-provider';
 import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, useActionData } from 'react-router-dom';
-import PickUserDialog from '../components/PickUserDialog';
+import UserAvatar from '../components/UserAvatar';
 import { apolloClient } from '../lib/apollo';
 import dayjs from '../lib/dayjs';
-import { CreateScheduleMutation, ScheduleInput } from '../lib/gql-codegen/graphql';
+import { CreateScheduleMutation, ScheduleInput, User } from '../lib/gql-codegen/graphql';
 import { CREATE_SCHEDULE } from '../lib/gql-queries';
 import AlertDialog from '../shared/AlertDialog';
+import PickUserDialog from '../shared/PickUserDialog';
 
 
-const initialFormData = {
+const initialFormData: ScheduleInput = {
   title: '', notes: '',
   dateTimeStart: '', dateTimeEnd: '',
   assignees: [],
@@ -27,6 +33,7 @@ const initialFormData = {
 
 const ScheduleEditorPage: FC = () => {
   const [formData, setFormData] = useState<ScheduleInput>({ ...initialFormData });
+  const [users, setUsers] = useState<Array<User>>([]);
   const [errors, setErrors] = useState<ScheduleInput>({ ...initialFormData });
   const actionData = useActionData() as ScheduleEditorAction;
   const { showModal } = useModal();
@@ -39,7 +46,7 @@ const ScheduleEditorPage: FC = () => {
       });
       return modal.destroy;
     }
-  })
+  });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -67,10 +74,16 @@ const ScheduleEditorPage: FC = () => {
     }
   }
 
-  const openUserPicker = () => showModal(PickUserDialog, {
-    maxWidth: 'xs',
-    fullWidth: true,
-  });
+  const openUserPicker = () => {
+    const picker = showModal(PickUserDialog, {
+      maxWidth: 'xs',
+      fullWidth: true,
+      onPick(user) {
+        setUsers(current => [user, ...current]);
+        picker.hide();
+      },
+    });
+  }
 
   return (
     <Container maxWidth='xl'>
@@ -146,6 +159,19 @@ const ScheduleEditorPage: FC = () => {
           <Typography variant='h6' fontWeight='bold'>Schedule assignees</Typography>
           <Button color='primary' onClick={openUserPicker}>Pick assignees</Button>
         </Toolbar>
+        <List disablePadding>
+          {users.map((user, index) => (
+            <ListItem key={index}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <UserAvatar user={user} />
+                </ListItemIcon>
+                <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} />
+                <input type='hidden' name='assignees' value={JSON.stringify({ userId: user.id, positionId: 1 })} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
 
 
         {/* Section 5: Form actions */}
@@ -180,7 +206,7 @@ export const scheduleEditorAction: ActionFunction = async ({ params, request }) 
         notes: formData.get('notes')!.toString(),
         dateTimeStart: formData.get('dateTimeStart')!.toString(),
         dateTimeEnd: formData.get('dateTimeEnd')!.toString(),
-        assignees: []
+        assignees: formData.getAll('assignees').map((assignee: any) => JSON.parse(assignee)),
       }
     }
   });

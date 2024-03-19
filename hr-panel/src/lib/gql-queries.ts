@@ -108,6 +108,10 @@ export const LOAD_USERS = gql(`
       streetName
       pincode
       syncStatus
+      positions {
+        id
+        title
+      }
     }
   }
 `);

@@ -80,6 +80,7 @@ export type ListScheduleFilter = {
 
 export type ListUsersFilter = {
   limit?: InputMaybe<Scalars['Int']['input']>;
+  roles?: InputMaybe<Array<Role>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 

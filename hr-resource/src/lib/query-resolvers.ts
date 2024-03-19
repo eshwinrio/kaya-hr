@@ -99,7 +99,13 @@ export const qResolverUsers: QueryResolvers['users'] = async (
         }
         : {}
       ),
+      UserRoleMap: {
+        some: {
+          role: { in: options?.roles ?? undefined }
+        }
+      }
     },
+    take: options?.limit ?? undefined,
   });
 
   return users.map(({ UserRoleMap, UserPositionMap, syncStatus, ...user }) => ({

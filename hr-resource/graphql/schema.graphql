@@ -194,6 +194,7 @@ input ViewUserOptions {
 
 input ListUsersFilter {
   searchTerm: String
+  roles: [Role!]
   limit: Int
 }
 

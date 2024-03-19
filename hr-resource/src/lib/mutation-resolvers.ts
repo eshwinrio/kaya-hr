@@ -292,14 +292,21 @@ export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = asyn
   { input },
   { organization, user }
 ) => {
+  const now = new Date();
+  if (new Date(input.dateTimeStart) < now || new Date(input.dateTimeEnd) < now) {
+    throw new GraphQLError('Can\'t schedule anything in the past', { extensions: { code: 'BAD_REQUEST' } });
+  }
+
   const collidingSchedules = await prisma.userScheduleMap
     .findMany({
       include: { schedule: true },
       where: {
         schedule: {
           organizationId: organization?.id,
-          dateTimeStart: { gte: new Date(input.dateTimeStart) },
-          dateTimeEnd: { lte: new Date(input.dateTimeEnd) },
+          AND: [
+            { dateTimeStart: { lte: new Date(input.dateTimeEnd) } },
+            { dateTimeEnd: { gte: new Date(input.dateTimeStart) } },
+          ],
         },
       },
     })
@@ -348,7 +355,7 @@ export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = asyn
     })
     .catch(error => {
       logSystem.error(error);
-      throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+      throw new GraphQLError('Could not assign shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
   return schedule;

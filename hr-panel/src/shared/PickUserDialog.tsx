@@ -10,11 +10,11 @@ import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import { FC, useState } from "react";
-import { User } from "../lib/gql-codegen/graphql";
+import { Role, User } from "../lib/gql-codegen/graphql";
 import { LOAD_USERS } from '../lib/gql-queries';
-import SearchIconWrapper from "./SearchIconWrapper";
-import SearchWidget from "./SearchWidget";
-import SearchWidgetInputBase from "./SearchWidgetInputBase";
+import SearchIconWrapper from "../components/SearchIconWrapper";
+import SearchWidget from "../components/SearchWidget";
+import SearchWidgetInputBase from "../components/SearchWidgetInputBase";
 
 interface PickUserDialogProps extends DialogProps {
   children?: never;
@@ -39,7 +39,7 @@ const PickUserDialog: FC<PickUserDialogProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { data } = useQuery(LOAD_USERS, {
-    variables: { options: { searchTerm } },
+    variables: { options: { searchTerm, roles: [Role.Employee], limit: 5 } },
   });
 
   return (
@@ -57,7 +57,7 @@ const PickUserDialog: FC<PickUserDialogProps> = ({
           />
         </SearchWidget>
       </Toolbar>
-      <List disablePadding {...listProps}>
+      <List dense {...listProps}>
         {data?.users.map((user, index) => (
           <ListItem key={index} {...listItemProps}>
             <ListItemButton {...listItemButtonProps} onClick={onPick.bind(null, user)}>
