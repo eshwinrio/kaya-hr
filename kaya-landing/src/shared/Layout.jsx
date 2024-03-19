@@ -13,6 +13,7 @@ import { Outlet } from "react-router";
 import { useMaterialTheme } from "../lib/material-theme";
 import { IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo-full.svg';
 
 export default function Layout() {
   const materialTheme = useMaterialTheme();
@@ -33,9 +34,10 @@ export default function Layout() {
       <CssBaseline />
       <AppBar position="static">
         <Toolbar sx={{ flexWrap: 'wrap' }}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <img src={logo} alt="logo" width={96} />
+          {/* <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             KayaHR
-          </Typography>
+          </Typography> */}
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Button color="inherit" href="/">Home</Button>
             <Button color="inherit" href="/about">About</Button>
