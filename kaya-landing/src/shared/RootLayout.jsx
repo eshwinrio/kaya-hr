@@ -6,7 +6,6 @@ import Toolbar from '@mui/material/Toolbar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
-import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { ThemeProvider } from '@mui/material/styles';
 import { Outlet } from "react-router";
@@ -73,18 +72,6 @@ export default function Layout() {
         </Toolbar>
       </AppBar>
       <Outlet />
-      {/* <Container id='footer-container' component='footer'>
-        <Grid container>
-          <Grid item>
-            <Typography variant='h4' sx={{ margin: "15px" }}>Links</Typography>
-            <Typography variant='h6' sx={{ margin: "15px" }}><a href='#home'>Home</a></Typography>
-            <Typography variant='h6' sx={{ margin: "15px" }}><a href='../pages/AboutPage.jsx'>About</a></Typography>
-            <Typography variant='h6' sx={{ margin: "15px" }}><a href='...'>Pricing</a></Typography>
-            <Typography variant='h6' sx={{ margin: "15px" }}><a href='...'>Features</a></Typography>
-            <Typography variant='h6' sx={{ margin: "15px" }}><a href='...'>Login</a></Typography>
-          </Grid>
-        </Grid>
-      </Container> */}
     </ThemeProvider>
   );
 }

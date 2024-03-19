@@ -1,6 +1,5 @@
 import React from 'react';
 import { Typography, Skeleton, Container, Box } from '@mui/material';
-import Header from '../components/Header';
 import '../css/style.css';
 
 export default function AboutPage() {
