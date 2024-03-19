@@ -8,9 +8,7 @@
   max-width: 1000px;
 }
 #banner-img{
-  position: absolute;
-  margin-top: 200px;
-  margin-left: 60%;
+  float: right;
 }
 
 #header-logo{
