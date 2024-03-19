@@ -4,11 +4,12 @@
 }
 #banner-content{
   margin-top: 100px;
-  margin-left: 50px ;
+  margin-left: 150px ;
   max-width: 1000px;
 }
 #banner-img{
   float: right;
+  margin-right: 150px;
 }
 
 #header-logo{
@@ -20,4 +21,8 @@
 }
 .testimonial-card{
   margin: 30px;
+}
+.khr{
+  text-decoration: underline;
+  text-decoration-color: rgba(170, 111, 248, 0.54);
 }

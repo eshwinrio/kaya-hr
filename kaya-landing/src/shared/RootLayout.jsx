@@ -34,9 +34,6 @@ export default function Layout() {
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <img src={logo} alt="logo" width={96} />
-          {/* <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            KayaHR
-          </Typography> */}
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Button color="inherit" href="/">Home</Button>
             <Button color="inherit" href="/about">About</Button>
