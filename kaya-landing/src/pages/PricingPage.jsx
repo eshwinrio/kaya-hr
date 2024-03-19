@@ -5,11 +5,11 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Container, Typography, Button, Grid, Box, ListItem, List, ListItemIcon, ListItemText } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles'; 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Header from "../components/Header";
 
 
-const theme = createTheme(); 
+const theme = createTheme();
 const useStyles = makeStyles(() => ({
   root: {
     minHeight: '100vh',
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
     width: '300px',
     borderRadius: '20px',
     // margin: '0 10px',
-    margin : "auto",
+    margin: "auto",
     background: '#FFF',
     boxShadow: '0 1rem 2rem rgba(0, 0, 0, 20%)',
     [theme.breakpoints.down('md')]: {
@@ -120,131 +120,129 @@ const PricingPage = () => {
 
   return (
     <>
-    <Header></Header>
       <Box sx={{ textAlign: "center" }} className={classes.siteHeading}>
-            <Typography variant="h2" className={classes.siteHeadingH2}>
-              Our <span className={classes.siteHeadingSpan}>Pricing</span>
-            </Typography>
-            <Typography variant="h4" className={classes.siteHeadingH4}>
-              Checkout our premium memberships
-              <span className={classes.siteHeadingH4Before}></span>
-            </Typography>
-          </Box>
-    <Container className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={4} sm={12}>
-          <Box className={`${classes.box}`}>
-            <Typography variant="h4" className={`${classes.title}`}>
-              Basic
-            </Typography>
-            <Box className={classes.view}>
-              <Box className={classes.icon}>
-                <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
+        <Typography variant="h2" className={classes.siteHeadingH2}>
+          Our <span className={classes.siteHeadingSpan}>Pricing</span>
+        </Typography>
+        <Typography variant="h4" className={classes.siteHeadingH4}>
+          Checkout our premium memberships
+          <span className={classes.siteHeadingH4Before}></span>
+        </Typography>
+      </Box>
+      <Container className={classes.root}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4} sm={12}>
+            <Box className={`${classes.box}`}>
+              <Typography variant="h4" className={`${classes.title}`}>
+                Basic
+              </Typography>
+              <Box className={classes.view}>
+                <Box className={classes.icon}>
+                  <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
+                </Box>
+                <Box className={classes.cost}>
+                  <Typography variant="h3" className={classes.amount}>
+                    FREE
+                  </Typography>
+                  <Typography variant="body1" className={classes.detail}>
+                  </Typography>
+                </Box>
               </Box>
-              <Box className={classes.cost}>
-                <Typography variant="h3" className={classes.amount}>
-                  FREE
-                </Typography>
-                <Typography variant="body1" className={classes.detail}>
-                  
-                </Typography>
+              <Box className={classes.description}>
+                <List>
+                  {['20 Employees', 'Free Training', 'Employee Schedule'].map((text, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon>
+                        <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Box sx={{ textAlign: "center" }} className={classes.button}>
+                <Button variant="contained" color="primary">
+                  Start Free
+                </Button>
               </Box>
             </Box>
-            <Box className={classes.description}>
-              <List>
-                {['20 Employees', 'Free Training', 'Employee Schedule'].map((text, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
-                    </ListItemIcon>
-                    <ListItemText primary={text} />
-                  </ListItem>
-                ))}
-              </List>
+          </Grid>
+          <Grid item xs={12} md={4} sm={12}>
+            <Box className={`${classes.box}`}>
+              <Typography variant="h4" className={`${classes.title}`}>
+                Small Businesses
+              </Typography>
+              <Box className={classes.view}>
+                <Box className={classes.icon}>
+                  <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
+                </Box>
+                <Box className={classes.cost}>
+                  <Typography variant="h3" className={classes.amount} >
+                    $49.99
+                  </Typography>
+                  <Typography variant="body1" className={classes.detail}>
+                    /month
+                  </Typography>
+                </Box>
+              </Box>
+              <Box className={classes.description}>
+                <List>
+                  {['All Basic Futures', '100 Employees', 'Payroll / Payout'].map((text, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon>
+                        <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Box sx={{ textAlign: "center" }} className={classes.button}>
+                <Button variant="contained" color="primary">
+                  Get it now
+                </Button>
+              </Box>
             </Box>
-            <Box sx={{textAlign:"center"}}  className={classes.button}>
-              <Button variant="contained" color="primary">
-                Start Free
-              </Button>
+          </Grid>
+          <Grid item xs={12} md={4} sm={12}>
+            <Box className={`${classes.box}`}>
+              <Typography variant="h4" className={`${classes.title}`}>
+                Enterprise
+              </Typography>
+              <Box className={classes.view}>
+                <Box className={classes.icon}>
+                  <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
+                </Box>
+                <Box className={classes.cost}>
+                  <Typography variant="h3" className={classes.amount}>
+                    $199.99
+                  </Typography>
+                  <Typography variant="body1" className={classes.detail}>
+
+                  </Typography>
+                </Box>
+              </Box>
+              <Box className={classes.description}>
+                <List>
+                  {['All Basic Features', 'Unlimited Employees', '24*7 Customer Support'].map((text, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon>
+                        <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Box sx={{ textAlign: "center" }} className={classes.button}>
+                <Button variant="contained" color="primary">
+                  get it now
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4} sm={12}>
-          <Box className={`${classes.box}`}>
-            <Typography variant="h4" className={`${classes.title}`}>
-              Small Businesses
-            </Typography>
-            <Box className={classes.view}>
-              <Box className={classes.icon}>
-                <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
-              </Box>
-              <Box className={classes.cost}>
-                <Typography variant="h3" className={classes.amount} >
-                  $49.99
-                </Typography>
-                <Typography variant="body1" className={classes.detail}>
-                  /month
-                </Typography>
-              </Box>
-            </Box>
-            <Box className={classes.description}>
-              <List>
-                {['All Basic Futures', '100 Employees', 'Payroll / Payout'].map((text, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
-                    </ListItemIcon>
-                    <ListItemText primary={text} />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-            <Box sx={{textAlign:"center"}} className={classes.button}>
-              <Button  variant="contained" color="primary">
-                Get it now
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={12} md={4} sm={12}>
-          <Box className={`${classes.box}`}>
-            <Typography variant="h4" className={`${classes.title}`}>
-              Enterprise
-            </Typography>
-            <Box className={classes.view}>
-              <Box className={classes.icon}>
-                <img src="https://i.postimg.cc/2jcfMcf4/hot-air-balloon.png" alt="hot-air-balloon" className={classes.iconImg} />
-              </Box>
-              <Box className={classes.cost}>
-                <Typography variant="h3" className={classes.amount}>
-                  $199.99
-                </Typography>
-                <Typography variant="body1" className={classes.detail}>
-                  
-                </Typography>
-              </Box>
-            </Box>
-            <Box className={classes.description}>
-              <List>
-                {['All Basic Features', 'Unlimited Employees', '24*7 Customer Support'].map((text, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <img src="https://i.postimg.cc/ht7g996V/check.png" alt="check" />
-                    </ListItemIcon>
-                    <ListItemText primary={text} />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-            <Box sx={{textAlign:"center"}}  className={classes.button}>
-              <Button variant="contained" color="primary">
-                get it now
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
     </>
   );
 };

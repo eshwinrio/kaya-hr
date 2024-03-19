@@ -19,20 +19,20 @@ const router = createBrowserRouter([
         Component: LandingPage,
       },
       {
-        path:'about',
+        path: 'about',
         Component: AboutPage,
       },
       {
-        path:  'features',
-        Component : FeaturesPage,
+        path: 'features',
+        Component: FeaturesPage,
       },
       {
-        path:  'contact-us',
-        Component : ContactUsPage,
+        path: 'contact-us',
+        Component: ContactUsPage,
       },
       {
-        path:  'pricing',
-        Component : PricingPage,
+        path: 'pricing',
+        Component: PricingPage,
       },
       {
         path: '*',

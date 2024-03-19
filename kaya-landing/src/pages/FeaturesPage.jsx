@@ -96,7 +96,6 @@ function FeaturesPage() {
   return (
 
     <>
-<Header></Header>
     <ThemeProvider theme={theme}>
       <section className={classes.section}>
         <Container>

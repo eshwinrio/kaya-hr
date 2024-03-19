@@ -102,7 +102,6 @@ const ContactUsPage = () => {
 
   return (
     <> 
-    <Header></Header>
     <Box sx={{ textAlign: "center" }} className={classes.siteHeading}>
             <Typography variant="h2" className={classes.siteHeadingH2}>
               Contact <span className={classes.siteHeadingSpan}>Kaya</span>
