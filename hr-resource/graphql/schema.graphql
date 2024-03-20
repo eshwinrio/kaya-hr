@@ -68,7 +68,7 @@ type User {
   profileIconUrl: String
   bannerUrl: String
   organization: Organization
-  timesheets: [Timesheet]
+  timesheets: [Timesheet!]
   schedules: [ScheduleAssignment!]
   roles: [Role!]
   positions: [Position!]
@@ -233,6 +233,7 @@ type Mutation {
   createSchedule(input: ScheduleInput!): Schedule!
   updateSchedule(scheduleId: Int!, input: ScheduleInput!): Schedule!
   deleteSchedule(scheduleId: Int!): Schedule!
+  assignUserToSchedule(scheduleId: Int!, userId: Int!, positionId: Int!): ScheduleAssignment!
 
   # Timesheet actions
   registerPunch: ClockTime!

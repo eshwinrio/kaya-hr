@@ -414,6 +414,79 @@ export const mResolverDeleteSchedule: MutationResolvers['deleteSchedule'] = asyn
   return schedule;
 }
 
+export const mResolverAssignUserToSchedule: MutationResolvers['assignUserToSchedule'] = async (
+  _root,
+  { scheduleId, userId, positionId },
+  { organization }
+) => {
+  const schedule = await prisma.schedule
+    .findUnique({
+      where: {
+        id: scheduleId,
+        AND: [
+          { createdBy: { organizationId: organization?.id } }
+        ]
+      },
+      include: {
+        createdBy: true
+      }
+    });
+  if (!schedule) {
+    throw new GraphQLError('Schedule doesn\'t exist', { extensions: { code: 'NOT_FOUND' } });
+  }
+
+  const assignee = await prisma.user
+    .findUnique({
+      where: {
+        id: userId,
+        AND: [
+          { organizationId: organization?.id },
+          { UserRoleMap: { some: { role: { in: ['LEAD', 'EMPLOYEE'] } } } }
+        ]
+      },
+      include: {
+        UserRoleMap: true,
+        UserPositionMap: true
+      }
+    })
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not query user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+  if (!assignee) {
+    throw new GraphQLError('Assignee doesn\'t exist', { extensions: { code: 'NOT_FOUND' } });
+  }
+
+  if (!assignee.UserPositionMap.some(({ positionId: posId }) => posId === positionId)) {
+    throw new GraphQLError('Position doesn\'t exist for this user', { extensions: { code: 'NOT_FOUND' } });
+  }
+
+  return await prisma.userScheduleMap
+    .upsert({
+      where: {
+        userId_scheduleId: { userId, scheduleId },
+      },
+      create: {
+        scheduleId,
+        userId,
+        positionId,
+      },
+      update: {
+        positionId,
+      },
+      include: {
+        schedule: true,
+        position: true,
+        user: true
+      }
+    })
+    .then(result => ({ ...result, user: { ...result.user, syncStatus: result.user.syncStatus as SyncStatus } }))
+    .catch(error => {
+      logSystem.error(error);
+      throw new GraphQLError('Could not assign user to shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+}
+
 export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async (
   _root,
   _args,
@@ -440,11 +513,11 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
     where: {
       AND: [
         { userId: user?.id },
-        {endTime: null},
+        { endTime: null },
       ],
     },
   });
-  
+
   if (existingClockTime) {
     return await prisma.clockTime.update({
       where: {

@@ -86,6 +86,7 @@ export type ListUsersFilter = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  assignUserToSchedule: ScheduleAssignment;
   createOrganization: Organization;
   createPosition: Position;
   createSchedule: Schedule;
@@ -96,6 +97,13 @@ export type Mutation = {
   updateOrganization: Organization;
   updateSchedule: Schedule;
   updateUser: User;
+};
+
+
+export type MutationAssignUserToScheduleArgs = {
+  positionId: Scalars['Int']['input'];
+  scheduleId: Scalars['Int']['input'];
+  userId: Scalars['Int']['input'];
 };
 
 
@@ -321,7 +329,7 @@ export type User = {
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
   syncStatus?: Maybe<SyncStatus>;
-  timesheets?: Maybe<Array<Maybe<Timesheet>>>;
+  timesheets?: Maybe<Array<Timesheet>>;
 };
 
 export type UserSyncResult = {
@@ -490,6 +498,7 @@ export type ListPunchesResolvers<ContextType = ApolloServerContext, ParentType e
 }>;
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  assignUserToSchedule?: Resolver<ResolversTypes['ScheduleAssignment'], ParentType, ContextType, RequireFields<MutationAssignUserToScheduleArgs, 'positionId' | 'scheduleId' | 'userId'>>;
   createOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
   createPosition?: Resolver<ResolversTypes['Position'], ParentType, ContextType, RequireFields<MutationCreatePositionArgs, 'input'>>;
   createSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationCreateScheduleArgs, 'input'>>;
@@ -583,7 +592,7 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   streetName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   syncStatus?: Resolver<Maybe<ResolversTypes['SyncStatus']>, ParentType, ContextType>;
-  timesheets?: Resolver<Maybe<Array<Maybe<ResolversTypes['Timesheet']>>>, ParentType, ContextType>;
+  timesheets?: Resolver<Maybe<Array<ResolversTypes['Timesheet']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
