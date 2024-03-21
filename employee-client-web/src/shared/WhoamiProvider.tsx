@@ -6,63 +6,19 @@ import { WhoAmIQuery } from "../lib/gql-codegen/graphql";
 export const WHOAMI = gql(`
   query WhoAmI {
     currentUser {
-         id
-         ...Profile
-         phone
-         streetName
-         city
-         country
-         province
-         pincode
-         dateOfBirth
-         dateJoined
-         organization {
-           id
-           name
-           summary
-           webUrl
-           logoUrl
-           bannerUrl
-         }
-         dateJoined
-         positions {
-           id
-           title
-           description
-         }
-         ...Avatar
-         bannerUrl
-         schedules {
-           id
-           position {
-             title
-             description
-             hourlyWage
-           }
-           schedule {
-             id
-             title
-             dateTimeStart
-             dateTimeEnd
-             createdAt
-             createdBy {
-               id
-               email
-               firstName
-               lastName
-               streetName
-               city
-               country
-               province
-               pincode
-               dateOfBirth
-               dateJoined
-               phone
-             }
-           }
-         }
-       }
-     }
+      id
+      ...Profile
+      ...Avatar
+      organization {
+        id
+        name
+        summary
+        webUrl
+        logoUrl
+        bannerUrl
+      }
+    }
+  }
 `);
 
 export const whoamiContext = createContext<WhoAmIQuery | null>(null);
