@@ -6,7 +6,7 @@ import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
-import { LoaderFunction, useLoaderData } from 'react-router-dom';
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
 import relaxingIllustration from '../assets/6524977_3322680.svg';
 import PunchFab from '../components/PunchFab';
 import ScheduleAssignmentListItem from '../components/ScheduleAssignmentListItem';
@@ -18,6 +18,7 @@ import { useMaterialTheme } from '../lib/material-theme';
 
 export default function HomePage() {
   const theme = useMaterialTheme();
+  const navigate = useNavigate();
   const loaderData = useLoaderData() as HomePageLoader;
   const { schedulesToday, schedulesUpcoming } = loaderData;
 
@@ -105,7 +106,7 @@ export default function HomePage() {
     <Container>
       {schedulesTodayView}
       {schedulesUpcomingView}
-      <PunchFab />
+      <PunchFab onClick={() => navigate('/punch')} />
     </Container>
   );
 }
