@@ -59,7 +59,7 @@ export default function HomePage() {
           </Box>
         )
       }
-    </Paper >
+    </Paper>
   );
 
   const schedulesUpcomingView = schedulesUpcoming && (

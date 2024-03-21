@@ -14,7 +14,6 @@ import Typography from "@mui/material/Typography";
 import { FC, Fragment, useMemo } from "react";
 import { ActionFunction, Form, LoaderFunction, useLoaderData } from "react-router-dom";
 import Timer from "../components/Timer";
-import { REGISTER_PUNCH } from "../graphql/gql-queries";
 import { apolloClient } from "../lib/apollo";
 import dayjs from "../lib/dayjs";
 import { ListPunchesQuery } from "../lib/gql-codegen/graphql";
@@ -136,6 +135,16 @@ export const punchPageLoader: LoaderFunction = async () => {
     }),
   };
 }
+
+export const REGISTER_PUNCH = gql(`
+  mutation RegisterPunch {
+    registerPunch {
+      id
+      startTime
+      endTime
+    }
+  }
+`);
 
 export const punchPageAction: ActionFunction = async (args) => {
   const registerPunchMutation = await apolloClient.mutate({

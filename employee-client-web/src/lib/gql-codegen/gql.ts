@@ -18,11 +18,9 @@ const documents = {
     "\n  fragment ScheduleTiming on Schedule {\n    dateTimeStart\n    dateTimeEnd\n  }\n": types.ScheduleTimingFragmentDoc,
     "\n  fragment Timer on ClockTime {\n    startTime\n  }\n": types.TimerFragmentDoc,
     "\n  fragment Avatar on User {\n    profileIconUrl\n    firstName\n  }\n": types.AvatarFragmentDoc,
-    "\n  fragment ContactDetails on User {\n    email\n    phone\n    streetName\n    city\n    province\n    pincode\n    country\n  }\n": types.ContactDetailsFragmentDoc,
-    "\n  fragment UserOrganization on User {\n    organization {\n      id\n      name\n      summary\n      webUrl\n      logoUrl\n      bannerUrl\n    }\n  }\n": types.UserOrganizationFragmentDoc,
-    "\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n": types.RegisterPunchDocument,
     "\n  query ListMySchedules ($options: ViewUserOptions) {\n    currentUser(options: $options) {\n      schedules {\n        ...ScheduleAssignment\n      }\n    }\n  }\n": types.ListMySchedulesDocument,
     "\n  query ListPunches($filter: ListPunchesFilter) {\n    listPunches (filter: $filter) {\n      activePunch {\n        ...Timer\n      }\n      history {\n        id\n        startTime\n        endTime\n      }\n    }\n  }\n": types.ListPunchesDocument,
+    "\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n": types.RegisterPunchDocument,
     "\n  query WhoAmI {\n    currentUser {\n         id\n         ...Profile\n         phone\n         streetName\n         city\n         country\n         province\n         pincode\n         dateOfBirth\n         dateJoined\n         organization {\n           id\n           name\n           summary\n           webUrl\n           logoUrl\n           bannerUrl\n         }\n         dateJoined\n         positions {\n           id\n           title\n           description\n         }\n         ...Avatar\n         bannerUrl\n         schedules {\n           id\n           position {\n             title\n             description\n             hourlyWage\n           }\n           schedule {\n             id\n             title\n             dateTimeStart\n             dateTimeEnd\n             createdAt\n             createdBy {\n               id\n               email\n               firstName\n               lastName\n               streetName\n               city\n               country\n               province\n               pincode\n               dateOfBirth\n               dateJoined\n               phone\n             }\n           }\n         }\n       }\n     }\n": types.WhoAmIDocument,
 };
 
@@ -63,23 +61,15 @@ export function gql(source: "\n  fragment Avatar on User {\n    profileIconUrl\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment ContactDetails on User {\n    email\n    phone\n    streetName\n    city\n    province\n    pincode\n    country\n  }\n"): (typeof documents)["\n  fragment ContactDetails on User {\n    email\n    phone\n    streetName\n    city\n    province\n    pincode\n    country\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  fragment UserOrganization on User {\n    organization {\n      id\n      name\n      summary\n      webUrl\n      logoUrl\n      bannerUrl\n    }\n  }\n"): (typeof documents)["\n  fragment UserOrganization on User {\n    organization {\n      id\n      name\n      summary\n      webUrl\n      logoUrl\n      bannerUrl\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n  query ListMySchedules ($options: ViewUserOptions) {\n    currentUser(options: $options) {\n      schedules {\n        ...ScheduleAssignment\n      }\n    }\n  }\n"): (typeof documents)["\n  query ListMySchedules ($options: ViewUserOptions) {\n    currentUser(options: $options) {\n      schedules {\n        ...ScheduleAssignment\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query ListPunches($filter: ListPunchesFilter) {\n    listPunches (filter: $filter) {\n      activePunch {\n        ...Timer\n      }\n      history {\n        id\n        startTime\n        endTime\n      }\n    }\n  }\n"): (typeof documents)["\n  query ListPunches($filter: ListPunchesFilter) {\n    listPunches (filter: $filter) {\n      activePunch {\n        ...Timer\n      }\n      history {\n        id\n        startTime\n        endTime\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

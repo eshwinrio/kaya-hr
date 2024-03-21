@@ -4,7 +4,6 @@ const config: CodegenConfig = {
   schema: '../hr-resource/graphql/schema.graphql',
   documents: [
     'src/components/**/*.{ts,tsx}',
-    'src/graphql/**/*.ts',
     'src/pages/**/*.{ts,tsx}',
     'src/shared/**/*.{ts,tsx}',
   ],
