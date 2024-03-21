@@ -17,7 +17,7 @@ import Timer from "../components/Timer";
 import { apolloClient } from "../lib/apollo";
 import dayjs from "../lib/dayjs";
 import { ListMySchedulesQuery, ListPunchesQuery } from "../lib/gql-codegen/graphql";
-import { LIST_MY_SCHEDULES, LIST_PUNCHES, REGISTER_PUNCH } from "../lib/gql-queries";
+import { LIST_MY_SCHEDULES, LIST_PUNCHES, REGISTER_PUNCH } from "../graphql/gql-queries";
 import { useMaterialTheme } from "../lib/material-theme";
 
 

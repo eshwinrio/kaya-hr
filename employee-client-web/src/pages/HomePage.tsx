@@ -8,7 +8,7 @@ import { LoaderFunction, useLoaderData } from 'react-router-dom';
 import ScheduleList from '../components/ScheduleAssignmentList';
 import { apolloClient } from '../lib/apollo';
 import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
-import { LIST_MY_SCHEDULES } from '../lib/gql-queries';
+import { LIST_MY_SCHEDULES } from '../graphql/gql-queries';
 import { useMaterialTheme } from '../lib/material-theme';
 import PunchFab from '../components/PunchFab';
 import Box from '@mui/material/Box';
