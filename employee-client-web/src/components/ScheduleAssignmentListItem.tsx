@@ -1,38 +1,47 @@
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ListItem, { ListItemProps } from "@mui/material/ListItem";
 import ListItemButton, { ListItemButtonProps } from "@mui/material/ListItemButton";
 import ListItemText, { ListItemTextProps } from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
-import dayjs from "dayjs";
-import { useEffect, useState } from 'react';
-import { ScheduleAssignment } from "../lib/gql-codegen/graphql";
-import BorderLinearProgress from './BorderLinearProgress';
+import { FragmentType, gql, useFragment } from '../lib/gql-codegen';
+import ScheduleTiming, { ScheduleTimingProps } from './ScheduleTiming';
+
+const ScheduleAssignmentFragment = gql(`
+  fragment ScheduleAssignment on ScheduleAssignment {
+    id
+    schedule {
+      id
+      title
+      ...ScheduleTiming
+    }
+    position {
+      id
+      title
+    }
+    user {
+      id
+      firstName
+      lastName
+    }
+  }
+`);
 
 export interface ScheduleAssignmentListItemProps extends ListItemProps {
   children?: never;
+  readonly scheduleAssignment: FragmentType<typeof ScheduleAssignmentFragment>;
   readonly listItemButtonProps?: ListItemButtonProps;
   readonly listItemTextProps?: ListItemTextProps;
-  readonly schedule: Omit<ScheduleAssignment, 'user'>;
+  readonly scheduleTimingProps?: Omit<ScheduleTimingProps, 'schedule'>;
 }
 
 export default function ScheduleAssignmentListItem({
   children,
+  scheduleAssignment,
   listItemButtonProps,
   listItemTextProps,
-  schedule,
+  scheduleTimingProps,
   ...props
 }: ScheduleAssignmentListItemProps) {
-  const dayjsStart = dayjs(schedule.schedule.dateTimeStart);
-  const dayjsEnd = dayjs(schedule.schedule.dateTimeEnd);
-  const [dayjsNow, setDayjsNow] = useState(dayjs());
-  const isShiftInProgress = dayjsStart.isBefore(dayjsNow) && dayjsEnd.isAfter(dayjsNow);
-  const shiftProgress = Math.round((dayjsNow.diff(dayjsStart, 'milliseconds') / dayjsEnd.diff(dayjsStart, 'milliseconds')) * 100);
-
-  useEffect(() => {
-    const interval = setInterval(() => setDayjsNow(dayjs()), 1000);
-    return () => clearInterval(interval);
-  });
+  const scheduleAssignmentFragment = useFragment(ScheduleAssignmentFragment, scheduleAssignment);
 
   return (
     <ListItem {...props}>
@@ -41,26 +50,15 @@ export default function ScheduleAssignmentListItem({
           <Grid2 xs={12} sm='auto'>
             <ListItemText
               {...listItemTextProps}
-              primary={schedule.schedule.title}
-              secondary={schedule.position?.title}
+              primary={scheduleAssignmentFragment.schedule.title}
+              secondary={scheduleAssignmentFragment.position.title}
             />
           </Grid2>
-          <Grid2 container direction='row' alignItems='center' xs={12} sm='auto'>
-            <Grid2>
-              <Typography variant='subtitle2'>{dayjsStart.format("ddd, MMM DD")}</Typography>
-              <Typography align="right" variant='h6'>{dayjsStart.format("HH:mm A")}</Typography>
-            </Grid2>
-            <Grid2>
-              <ArrowRightIcon />
-            </Grid2>
-            <Grid2>
-              <Typography variant='subtitle2'>{dayjsEnd.format("ddd, MMM DD")}</Typography>
-              <Typography align="left" variant='h6'>{dayjsEnd.format("HH:mm A")}</Typography>
-            </Grid2>
-          </Grid2>
-          {isShiftInProgress && <Grid2 xs={12}>
-            <BorderLinearProgress variant="determinate" value={shiftProgress} />
-          </Grid2>}
+          <ScheduleTiming
+            elevation={0}
+            {...scheduleTimingProps}
+            schedule={scheduleAssignmentFragment.schedule}
+          />
         </Grid2>
       </ListItemButton>
     </ListItem>

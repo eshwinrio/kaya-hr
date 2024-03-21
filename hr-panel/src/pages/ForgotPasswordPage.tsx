@@ -6,35 +6,32 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
-import { ActionFunction, Form, Link, useActionData, useNavigate } from 'react-router-dom';
+import { FC, useEffect, useState } from 'react';
+import { ActionFunction, Form, useActionData } from 'react-router-dom';
 import validator from 'validator';
-import logo from './assets/logo-full.svg';
-import InputPassword from './components/InputPassword';
-import { fetchAccessToken } from './lib/fetch-requests';
-import { useMaterialTheme } from './lib/material-theme';
+import logo from '../assets/logo-full.svg';
+import { forgotPassword } from '../lib/fetch-requests';
+import { useMaterialTheme } from '../lib/material-theme';
 
-const initialFormData: Record<'username' | 'password', string> = {
-  username: '',
-  password: ''
+const initialFormData = {
+  email: '',
 }
 
-export default function Login(d: any) {
+const ForgotPasswordPage: FC = () => {
   const { breakpoints } = useMaterialTheme();
   const actionData = useActionData() as { message: string };
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({ ...initialFormData });
+  const [formData, setFormData] = useState({...initialFormData});
   const [errors, setErrors] = useState({ ...initialFormData });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
     switch (event.target.name) {
-      case 'username':
+      case 'email':
         setErrors({
           ...errors,
-          username: validator.isEmpty(event.target.value) || validator.isEmail(event.target.value)
+          email: validator.isEmpty(event.target.value) || validator.isEmail(event.target.value)
             ? ''
-            : 'Invalid email'
+            : 'Invalid email',
         });
         break;
     }
@@ -43,11 +40,9 @@ export default function Login(d: any) {
   useEffect(() => {
     if (actionData) {
       setErrors({ ...initialFormData });
-    } else {
-      navigate('../', { replace: true });
     }
-  }, [actionData, navigate]);
-
+  }, [actionData]);
+  
 
   return (
     <Box sx={{
@@ -67,33 +62,25 @@ export default function Login(d: any) {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
             <img src={logo} alt="logo" width={96} />
             <Divider orientation='vertical' flexItem sx={{ my: 0.2 }} />
-            <Typography variant='h6' lineHeight={1}>Dashboard Login</Typography>
+            <Typography variant='h6' lineHeight={1}>Password Reset</Typography>
           </Box>
           <Form method='post' autoComplete='on'>
             <TextField
               type='text'
-              name='username' label='Username'
+              name='email' label='Username'
               variant='outlined' sx={{ mt: 4 }} fullWidth
               autoFocus required
-              value={formData.username} onChange={onChange}
-              error={!!errors.username} helperText={errors.username}
+              value={formData.email} onChange={onChange}
+              error={!!errors.email} helperText={errors.email}
             />
-            <InputPassword
-              name='password' label='Password'
-              variant='outlined' sx={{ mt: 2 }} fullWidth
-              required
-              value={formData.password} onChange={onChange}
-              error={!!errors.password} helperText={errors.password}
-            />
-            {actionData?.message && <Alert severity='error' sx={{ mt: 2 }}>{actionData.message}</Alert>}
-            <Button component={Link} to='./forgot-password'>Forgot Password?</Button>
-            <Button
+            {actionData?.message 
+              ? <Alert severity='error' sx={{ mt: 2 }}>{actionData.message}</Alert>
+              : <Button
               type='submit'
               variant='contained' color='primary'
-              sx={{ mt: 4, width: '100%' }}
-            >
-              Login
-            </Button>
+              sx={{ mt: 4, width: '100%' }}>
+              Proceed
+            </Button>}
           </Form>
         </CardContent>
       </Card>
@@ -101,9 +88,16 @@ export default function Login(d: any) {
   );
 }
 
-export const loginAction: ActionFunction = async ({ request }) => {
+export default ForgotPasswordPage;
+
+export const forgotPasswordAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const username = formData.get('username')!.toString();
-  const password = formData.get('password')!.toString();
-  return await fetchAccessToken(username, password);
+  const email = formData.get('email')!.toString();
+  if (!email) {
+    throw new Response('Invalid request', { status: 400 });
+  }
+  await forgotPassword(email);
+  return {
+    message: 'Password reset link sent to ' + email
+  }
 }

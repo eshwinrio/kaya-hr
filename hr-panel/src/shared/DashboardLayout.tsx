@@ -24,15 +24,15 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useMemo, useRef, useState } from "react";
 import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
-import logo from './assets/logo-icon.svg';
-import PopoverProfile from "./components/PopoverProfile";
-import ToolbarSpacer from "./components/ToolbarSpacer";
-import { apolloClient } from "./lib/apollo";
-import { WHOAMI } from "./lib/gql-queries";
-import { useMaterialTheme } from "./lib/material-theme";
-import { useAppDispatch, useUiPreferences } from './lib/redux-hooks';
-import { setMode } from './lib/redux-slice-ui-preferences';
-import WhoamiProvider, { useWhoAmILoader } from "./lib/whoami-provider";
+import logo from '../assets/logo-icon.svg';
+import PopoverProfile from "../components/PopoverProfile";
+import ToolbarSpacer from "../components/ToolbarSpacer";
+import { apolloClient } from "../lib/apollo";
+import { WHOAMI } from "../lib/gql-queries";
+import { useMaterialTheme } from "../lib/material-theme";
+import { useAppDispatch, useUiPreferences } from '../lib/redux-hooks';
+import { setMode } from '../lib/redux-slice-ui-preferences';
+import WhoamiProvider, { useWhoAmILoader } from "../lib/whoami-provider";
 
 const drawerWidth = 240;
 

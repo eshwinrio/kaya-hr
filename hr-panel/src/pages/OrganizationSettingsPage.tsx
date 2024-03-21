@@ -9,11 +9,11 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React from "react";
 import { ActionFunction, Form } from "react-router-dom";
-import Banner from "./components/Banner";
-import { apolloClient } from "./lib/apollo";
-import { UPDATE_ORGANIZATION } from "./lib/gql-queries";
-import { useMaterialTheme } from "./lib/material-theme";
-import { useWhoAmI } from "./lib/whoami-provider";
+import Banner from "../components/Banner";
+import { apolloClient } from "../lib/apollo";
+import { UPDATE_ORGANIZATION } from "../lib/gql-queries";
+import { useMaterialTheme } from "../lib/material-theme";
+import { useWhoAmI } from "../lib/whoami-provider";
 
 // TODO: Replace dummy data with query data
 const names = [

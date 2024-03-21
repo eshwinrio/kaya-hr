@@ -8,10 +8,10 @@ import Typography from '@mui/material/Typography';
 import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, useActionData } from 'react-router-dom';
 import validator from 'validator';
-import logo from './assets/logo-full.svg';
-import InputPassword from './components/InputPassword';
-import { resetPassword } from './lib/fetch-requests';
-import { useMaterialTheme } from './lib/material-theme';
+import logo from '../assets/logo-full.svg';
+import InputPassword from '../components/InputPassword';
+import { resetPassword } from '../lib/fetch-requests';
+import { useMaterialTheme } from '../lib/material-theme';
 
 const initialFormData = {
   tryPassword: '',

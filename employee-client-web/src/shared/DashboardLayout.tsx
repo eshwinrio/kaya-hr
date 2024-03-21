@@ -24,11 +24,11 @@ import logo from '../assets/logo-icon.svg';
 import PopoverProfile from "../components/PopoverProfile";
 import ToolbarSpacer from "../components/ToolbarSpacer";
 import { apolloClient } from "../lib/apollo";
-import { WHOAMI } from "../lib/gql-queries";
 import { useMaterialTheme } from "../lib/material-theme";
 import { useAppDispatch, useUiPreferences } from '../lib/redux-hooks';
 import { setMode } from '../lib/redux-slice-ui-preferences';
-import WhoamiProvider, { useWhoAmILoader } from "../lib/whoami-provider";
+import WhoamiProvider, { WHOAMI, useWhoAmILoader } from "./WhoamiProvider";
+import UserAvatar from "../components/UserAvatar";
 
 const drawerWidth = 240;
 
@@ -44,7 +44,7 @@ export default function DashboardLayout() {
   const whoamiData = useWhoAmILoader();
 
   return (
-    <WhoamiProvider value={whoamiData}>
+    <WhoamiProvider>
       <Box sx={{ display: 'flex' }}>
         <AppBar
           position="fixed"
@@ -66,9 +66,9 @@ export default function DashboardLayout() {
               <IconButton onClick={() => dispatch(setMode(mode === 'light' ? 'dark' : 'light'))}>
                 {mode === 'light' ? <BrightnessFull /> : <BrightnessHigh />}
               </IconButton>
-              <Avatar
+              <UserAvatar
                 ref={avatarRef}
-                src={whoamiData.currentUser?.profileIconUrl ?? ''}
+                user={whoamiData.currentUser}
                 sx={{ cursor: 'pointer', width: 32, height: 32 }}
                 onClick={() => setIsProfilePopoverOpen(state => !state)}
               />
@@ -104,7 +104,7 @@ export default function DashboardLayout() {
               alignItems: 'flex-start',
               overflow: 'hidden',
               p: 1
-              }}>
+            }}>
               <Typography variant="body1" noWrap>{whoamiData.currentUser?.organization?.name || 'Kaya HR'}</Typography>
               <Typography variant="caption" noWrap>Panel v0.0.1</Typography>
             </Box>
@@ -137,7 +137,12 @@ export default function DashboardLayout() {
           <Outlet />
         </Box>
       </Box>
-      <PopoverProfile open={isProfilePopoverOpen} anchorEl={avatarRef.current} onClose={() => setIsProfilePopoverOpen(false)} />
+      <PopoverProfile
+        open={isProfilePopoverOpen}
+        user={whoamiData.currentUser}
+        anchorEl={avatarRef.current}
+        onClose={() => setIsProfilePopoverOpen(false)}
+      />
     </WhoamiProvider>
   );
 }

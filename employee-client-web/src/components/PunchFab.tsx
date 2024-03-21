@@ -1,5 +1,5 @@
 import PunchClockIcon from '@mui/icons-material/PunchClock';
-import Fab from '@mui/material/Fab';
+import Fab, { FabProps } from '@mui/material/Fab';
 import { styled } from '@mui/material/styles';
 
 const StyledFab = styled(Fab)(({ theme }) => ({
@@ -8,13 +8,11 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   right: theme.spacing(2),
 }));
 
-export default function PunchFab() {
+interface PunchFabProps extends FabProps {}
+
+export default function PunchFab(props: PunchFabProps) {
   return (
-    <StyledFab
-      color="primary"
-      aria-label="Punch Clock"
-      href="/punch"
-    >
+    <StyledFab color="primary" aria-label="Punch Clock" {...props}>
       <PunchClockIcon />
     </StyledFab>
   );

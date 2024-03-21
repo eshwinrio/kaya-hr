@@ -11,21 +11,19 @@ import ListSubheader from "@mui/material/ListSubheader";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { FC, Fragment, useEffect, useMemo } from "react";
-import { ActionFunction, LoaderFunction, useFetcher } from "react-router-dom";
+import { FC, Fragment, useMemo } from "react";
+import { ActionFunction, Form, LoaderFunction, useLoaderData } from "react-router-dom";
 import Timer from "../components/Timer";
 import { apolloClient } from "../lib/apollo";
 import dayjs from "../lib/dayjs";
-import { ListMySchedulesQuery, ListPunchesQuery } from "../lib/gql-codegen/graphql";
-import { LIST_MY_SCHEDULES, LIST_PUNCHES, REGISTER_PUNCH } from "../lib/gql-queries";
+import { ListPunchesQuery } from "../lib/gql-codegen/graphql";
 import { useMaterialTheme } from "../lib/material-theme";
+import { gql } from "../lib/gql-codegen";
 
 
 const PunchPage: FC = () => {
   const theme = useMaterialTheme();
-  const fetcher = useFetcher<Awaited<PunchPageLoader> | null>();
-
-  const loaderData = useMemo(() => fetcher.data, [fetcher.data]);
+  const loaderData = useLoaderData() as Awaited<PunchPageLoader>;
   const punches = useMemo(() => loaderData?.punches, [loaderData?.punches]);
   const activePunch = useMemo(() => punches?.data.listPunches.activePunch, [punches?.data.listPunches.activePunch]);
   const seggregatedHistory = useMemo<Record<string, ListPunchesQuery['listPunches']['history']>>(() => {
@@ -39,12 +37,6 @@ const PunchPage: FC = () => {
     })
     return dict;
   }, [punches?.data.listPunches.history]);
-
-  useEffect(() => {
-    if (fetcher.state === 'idle' && !fetcher.data) {
-      fetcher.load('/punch');
-    }
-  }, [fetcher]);
 
   if (!loaderData) {
     return (
@@ -69,15 +61,12 @@ const PunchPage: FC = () => {
         <Toolbar sx={{ justifyContent: 'center' }}>
           <Typography variant="body1" fontWeight="bold">{activePunch ? 'You are Clocked In' : 'Ready to Clock In?'}</Typography>
         </Toolbar>
-        <fetcher.Form method="post">
+        <Form method="post">
           <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
             {activePunch
               ? (
                 <>
-                  <Timer startedAt={dayjs(activePunch.startTime)} fabProps={{ color: 'success' }} />
-                  <Typography variant="body1" sx={{ mt: 1 }}>
-                    Punched-in {dayjs(activePunch.startTime).fromNow()}
-                  </Typography>
+                  <Timer timer={activePunch} fabProps={{ color: 'success' }} />
                   <Button type="submit" variant="contained" color="info" sx={{ mt: 1 }}>Clock Out</Button>
                 </>
               )
@@ -89,7 +78,7 @@ const PunchPage: FC = () => {
               )
             }
           </Box>
-        </fetcher.Form>
+        </Form>
       </Paper>
 
       <Box component='section'>
@@ -120,10 +109,23 @@ const PunchPage: FC = () => {
 
 export default PunchPage;
 
+const LIST_PUNCHES = gql(`
+  query ListPunches($filter: ListPunchesFilter) {
+    listPunches (filter: $filter) {
+      activePunch {
+        ...Timer
+      }
+      history {
+        id
+        startTime
+        endTime
+      }
+    }
+  }
+`);
+
 interface PunchPageLoader {
   readonly punches: Awaited<ApolloQueryResult<ListPunchesQuery>>;
-  readonly activeSchedule: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
-  readonly upcomingSchedules: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
 }
 
 export const punchPageLoader: LoaderFunction = async () => {
@@ -131,29 +133,18 @@ export const punchPageLoader: LoaderFunction = async () => {
     punches: await apolloClient.query({
       query: LIST_PUNCHES
     }),
-    activeSchedule: await apolloClient.query({
-      query: LIST_MY_SCHEDULES,
-      variables: {
-        options: {
-          scheduleFilters: {
-            from: dayjs().startOf('day').toISOString(),
-            to: dayjs().toISOString(),
-          }
-        }
-      }
-    }),
-    upcomingSchedules: await apolloClient.query({
-      query: LIST_MY_SCHEDULES,
-      variables: {
-        options: {
-          scheduleFilters: {
-            to: dayjs().add(1, 'hour').toISOString(),
-          }
-        }
-      }
-    })
   };
 }
+
+export const REGISTER_PUNCH = gql(`
+  mutation RegisterPunch {
+    registerPunch {
+      id
+      startTime
+      endTime
+    }
+  }
+`);
 
 export const punchPageAction: ActionFunction = async (args) => {
   const registerPunchMutation = await apolloClient.mutate({

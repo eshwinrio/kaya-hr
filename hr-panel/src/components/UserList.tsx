@@ -5,12 +5,10 @@ import ListItemButton, { ListItemButtonProps } from '@mui/material/ListItemButto
 import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
-import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
+import { User } from '../lib/gql-codegen/graphql';
 
 interface ListEmployeeProps extends ListProps {
-  readonly data?: LoadAllUsersQuery;
-  readonly error?: unknown;
-  readonly loading?: boolean;
+  readonly users?: Array<User>;
   children?: never;
   readonly avatarProps?: AvatarProps;
   readonly listItemProps?: ListItemProps;
@@ -19,10 +17,8 @@ interface ListEmployeeProps extends ListProps {
   readonly listItemTextProps?: ListItemTextProps;
 }
 
-export default function ListEmployee({
-  data,
-  error,
-  loading,
+export default function UserList({
+  users: data,
   avatarProps,
   listItemProps,
   listItemButtonProps,
@@ -32,7 +28,7 @@ export default function ListEmployee({
 }: ListEmployeeProps) {
   return (
     <List {...props}>
-      {data?.users.map((user, index) => (
+      {data?.map((user, index) => (
         <ListItem key={index} {...listItemProps}>
           <ListItemButton component={Link} to={`/employees/view/${user?.id}`} {...listItemButtonProps}>
             <ListItemIcon {...listItemIconProps}>

@@ -2,19 +2,19 @@ import AddIcon from '@mui/icons-material/Add';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { LoaderFunction, useLoaderData } from "react-router-dom";
-import ScheduleList from "./components/ScheduleList";
-import { apolloClient } from "./lib/apollo";
-import { ListAllSchedulesQuery } from "./lib/gql-codegen/graphql";
-import { LIST_SCHEDULES } from "./lib/gql-queries";
-import { useMaterialTheme } from "./lib/material-theme";
+import { FC } from 'react';
+import { Link, LoaderFunction, useLoaderData } from "react-router-dom";
+import ScheduleList from "../components/ScheduleList";
+import { apolloClient } from "../lib/apollo";
+import { ListAllSchedulesQuery } from "../lib/gql-codegen/graphql";
+import { LIST_SCHEDULES } from "../lib/gql-queries";
+import { useMaterialTheme } from "../lib/material-theme";
 
-export default function ScheduleViewer() {
+const ScheduleViewerPage: FC = () => {
   const schedules = useLoaderData() as ListAllSchedulesQuery;
   const theme = useMaterialTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -24,10 +24,7 @@ export default function ScheduleViewer() {
       <Toolbar disableGutters sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6">Schedules</Typography>
         <Box>
-          {isMobileScreen
-            ? <IconButton><AddIcon /></IconButton>
-            : <Button>Create</Button>
-          }
+          <Button startIcon={<AddIcon />} component={Link} to="editor" size={isMobileScreen ? 'small' : 'medium'}>Create</Button>
         </Box>
       </Toolbar>
       <Paper variant="outlined">
@@ -43,6 +40,8 @@ export default function ScheduleViewer() {
     </Container>
   );
 }
+
+export default ScheduleViewerPage;
 
 export const scheduleViewerLoader: LoaderFunction = async () => {
   const listSchedulesQuery = await apolloClient.query({ query: LIST_SCHEDULES });

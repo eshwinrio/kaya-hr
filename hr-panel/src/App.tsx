@@ -4,20 +4,21 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
-import DashboardLayout, { dashboardLayoutLoader } from './DashboardLayout';
-import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './EmployeeEditor';
-import EmployeeList, { employeeListLoader } from './EmployeeList';
-import Home, { homeLoader } from './Home';
-import Layout from './Layout';
 import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
-import Login, { loginAction } from './Login';
-import OrganizationSettingsPage, { organizationSettingsAction } from './OrganizationSettingsPage';
-import ScheduleViewer, { scheduleViewerLoader } from './ScheduleViewer';
-import SettingsPage from './SettingsPage';
-import ViewEmployee, { viewEmployeeLoader } from './ViewEmployee';
-import ForgotPasswordPage, { forgotPasswordAction } from './ForgotPasswordPage';
-import ResetPasswordPage, { resetPasswordAction } from './ResetPasswordPage';
+import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './pages/EmployeeEditorPage';
+import EmployeeList, { employeeListLoader } from './pages/EmployeeList';
+import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
+import HomePage, { homeLoader } from './pages/HomePage';
+import Login, { loginAction } from './pages/Login';
+import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
+import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
+import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
+import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
+import SettingsPage from './pages/SettingsPage';
+import ViewEmployee, { viewEmployeeLoader } from './pages/ViewEmployee';
+import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
+import Layout from './shared/Layout';
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: Home,
+            Component: HomePage,
             loader: homeLoader,
           },
           {
@@ -58,9 +59,20 @@ const router = createBrowserRouter([
             ]
           },
           {
+            id: 'schedules',
             path: "scheduler",
-            Component: ScheduleViewer,
-            loader: scheduleViewerLoader,
+            children: [
+              {
+                index: true,
+                Component: ScheduleViewerPage,
+                loader: scheduleViewerLoader,
+              },
+              {
+                path: "editor",
+                Component: ScheduleEditorPage,
+                action: scheduleEditorAction,
+              }
+            ]
           },
           {
             path: "settings",
@@ -81,7 +93,6 @@ const router = createBrowserRouter([
       {
         id: 'auth',
         path: 'auth',
-        Component: Layout,
         children: [
           {
             index: true,
