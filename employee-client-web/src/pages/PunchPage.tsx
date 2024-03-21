@@ -14,10 +14,10 @@ import Typography from "@mui/material/Typography";
 import { FC, Fragment, useEffect, useMemo } from "react";
 import { ActionFunction, LoaderFunction, useFetcher } from "react-router-dom";
 import Timer from "../components/Timer";
+import { LIST_PUNCHES, REGISTER_PUNCH } from "../graphql/gql-queries";
 import { apolloClient } from "../lib/apollo";
 import dayjs from "../lib/dayjs";
-import { ListMySchedulesQuery, ListPunchesQuery } from "../lib/gql-codegen/graphql";
-import { LIST_MY_SCHEDULES, LIST_PUNCHES, REGISTER_PUNCH } from "../graphql/gql-queries";
+import { ListPunchesQuery } from "../lib/gql-codegen/graphql";
 import { useMaterialTheme } from "../lib/material-theme";
 
 
@@ -122,8 +122,8 @@ export default PunchPage;
 
 interface PunchPageLoader {
   readonly punches: Awaited<ApolloQueryResult<ListPunchesQuery>>;
-  readonly activeSchedule: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
-  readonly upcomingSchedules: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
+  // readonly activeSchedule: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
+  // readonly upcomingSchedules: Awaited<ApolloQueryResult<ListMySchedulesQuery>>;
 }
 
 export const punchPageLoader: LoaderFunction = async () => {
@@ -131,27 +131,27 @@ export const punchPageLoader: LoaderFunction = async () => {
     punches: await apolloClient.query({
       query: LIST_PUNCHES
     }),
-    activeSchedule: await apolloClient.query({
-      query: LIST_MY_SCHEDULES,
-      variables: {
-        options: {
-          scheduleFilters: {
-            from: dayjs().startOf('day').toISOString(),
-            to: dayjs().toISOString(),
-          }
-        }
-      }
-    }),
-    upcomingSchedules: await apolloClient.query({
-      query: LIST_MY_SCHEDULES,
-      variables: {
-        options: {
-          scheduleFilters: {
-            to: dayjs().add(1, 'hour').toISOString(),
-          }
-        }
-      }
-    })
+    // activeSchedule: await apolloClient.query({
+    //   query: LIST_MY_SCHEDULES,
+    //   variables: {
+    //     options: {
+    //       scheduleFilters: {
+    //         from: dayjs().startOf('day').toISOString(),
+    //         to: dayjs().toISOString(),
+    //       }
+    //     }
+    //   }
+    // }),
+    // upcomingSchedules: await apolloClient.query({
+    //   query: LIST_MY_SCHEDULES,
+    //   variables: {
+    //     options: {
+    //       scheduleFilters: {
+    //         to: dayjs().add(1, 'hour').toISOString(),
+    //       }
+    //     }
+    //   }
+    // })
   };
 }
 

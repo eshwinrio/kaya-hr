@@ -1,18 +1,20 @@
 import { ApolloQueryResult } from '@apollo/client';
+import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import { LoaderFunction, useLoaderData } from 'react-router-dom';
-import ScheduleList from '../components/ScheduleAssignmentList';
-import { apolloClient } from '../lib/apollo';
-import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
-import { LIST_MY_SCHEDULES } from '../graphql/gql-queries';
-import { useMaterialTheme } from '../lib/material-theme';
-import PunchFab from '../components/PunchFab';
-import Box from '@mui/material/Box';
 import relaxingIllustration from '../assets/6524977_3322680.svg';
+import PunchFab from '../components/PunchFab';
+import ScheduleAssignmentListItem from '../components/ScheduleAssignmentListItem';
+import { apolloClient } from '../lib/apollo';
+import { gql } from '../lib/gql-codegen';
+import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
+import { useMaterialTheme } from '../lib/material-theme';
+
 
 export default function HomePage() {
   const theme = useMaterialTheme();
@@ -30,55 +32,98 @@ export default function HomePage() {
         <Typography variant="body1" fontWeight="bold">Today</Typography>
       </Toolbar>
       {schedulesToday.data.currentUser.schedules
-        && <ScheduleList
-          schedules={schedulesToday.data.currentUser.schedules}
-          disablePadding
-          itemProps={{
-            disableGutters: true,
-            disablePadding: true,
-          }}
-        />
+        ? schedulesToday.data.currentUser.schedules.length > 0
+          ? (
+            <List>
+              {schedulesToday.data.currentUser.schedules.map((schedule, index, schedules) => (
+                <ScheduleAssignmentListItem
+                  key={index}
+                  scheduleAssignment={schedule}
+                  divider={index < schedules.length - 1}
+                  disableGutters disablePadding
+                />
+              ))}
+            </List>
+          )
+          : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+              <Typography variant="body1">Nothing scheduled for today.</Typography>
+              <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
+            </Box>
+          )
+        : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+            <Typography variant="body1">Could not load today's schedules.</Typography>
+            <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
+          </Box>
+        )
       }
-      {schedulesToday.data.currentUser.schedules?.length === 0 && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-          <Typography variant="body1">Nothing scheduled for today.</Typography>
-          <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
-        </Box>
-      )}
     </Paper >
   );
 
-const schedulesUpcomingView = schedulesUpcoming && (
-  <Paper component='section' variant='outlined' sx={{ mt: 2 }}>
-    <Toolbar sx={{ justifyContent: 'space-between' }}>
-      <Typography variant="body1" fontWeight="bold">Upcoming</Typography>
-    </Toolbar>
-    {schedulesUpcoming.data.currentUser.schedules
-      && <ScheduleList
-        schedules={schedulesUpcoming.data.currentUser.schedules}
-        disablePadding
-        itemProps={{
-          disableGutters: true,
-          disablePadding: true,
-        }}
-      />
-    }
-  </Paper>
-);
+  const schedulesUpcomingView = schedulesUpcoming && (
+    <Paper component='section' variant='outlined' sx={{ mt: 2 }}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="body1" fontWeight="bold">Upcoming</Typography>
+      </Toolbar>
+      {schedulesUpcoming.data.currentUser.schedules
+        ? schedulesUpcoming.data.currentUser.schedules.length > 0
+          ? (
+            <List disablePadding>
+              {schedulesUpcoming.data.currentUser.schedules.map((schedule, index, schedules) => (
+                <ScheduleAssignmentListItem
+                  key={index}
+                  scheduleAssignment={schedule}
+                  divider={index < schedules.length - 1}
+                  disableGutters disablePadding
+                  scheduleTimingProps={{
+                    sx: {
+                      backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
+                    }
+                  }}
+                />
+              ))}
+            </List>
+          )
+          : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+              <Typography variant="body1">Nothing scheduled for the next 7 days.</Typography>
+              <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
+            </Box>
+          )
+        : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+            <Typography variant="body1">Could not load upcoming schedules.</Typography>
+            <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
+          </Box>
+        )
+      }
+    </Paper>
+  );
 
-return (
-  <Container>
-    {schedulesTodayView}
-    {schedulesUpcomingView}
-    <PunchFab />
-  </Container>
-);
+  return (
+    <Container>
+      {schedulesTodayView}
+      {schedulesUpcomingView}
+      <PunchFab />
+    </Container>
+  );
 }
 
 interface HomePageLoader {
   readonly schedulesToday: ApolloQueryResult<ListMySchedulesQuery>;
   readonly schedulesUpcoming: ApolloQueryResult<ListMySchedulesQuery>;
 }
+
+export const LIST_MY_SCHEDULES = gql(`
+  query ListMySchedules ($options: ViewUserOptions) {
+    currentUser(options: $options) {
+      schedules {
+        ...ScheduleAssignment
+      }
+    }
+  }
+`);
 
 export const homePageLoader: LoaderFunction = async () => {
   return {
