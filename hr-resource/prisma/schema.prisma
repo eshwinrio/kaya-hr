@@ -70,6 +70,7 @@ model User {
   UserPositionMap UserPositionMap[]
   UserScheduleMap UserScheduleMap[]
   ClockTime       ClockTime[]
+  Payroll         Payroll[]
 }
 
 model Schedule {
@@ -92,6 +93,23 @@ model ClockTime {
   endTime    DateTime?
   hourlyWage Decimal
   user       User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Payroll {
+  id             Int       @id @default(autoincrement())
+  employeeId     Int
+  periodStart    DateTime
+  periodEnd      DateTime
+  generatedOn    DateTime
+  dispensedOn    DateTime?
+  hours          Decimal
+  wage           Decimal
+  deductions     Decimal?
+  netPay         Decimal
+  paymentMethod  String?
+  paymentDetails String?
+
+  employee User @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 // Mapping models

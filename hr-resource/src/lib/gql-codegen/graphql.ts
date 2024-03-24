@@ -21,7 +21,9 @@ export type Scalars = {
 
 export type ClockTime = {
   __typename?: 'ClockTime';
+  earning?: Maybe<Scalars['Decimal']['output']>;
   endTime?: Maybe<Scalars['ISODate']['output']>;
+  hourlyWage: Scalars['Decimal']['output'];
   id: Scalars['Int']['output'];
   startTime: Scalars['ISODate']['output'];
 };
@@ -59,8 +61,8 @@ export type CreateUserInput = {
 
 export type ListPunches = {
   __typename?: 'ListPunches';
-  activePunch?: Maybe<ClockTime>;
-  history?: Maybe<Array<ClockTime>>;
+  active: Array<ClockTime>;
+  history: Array<ClockTime>;
 };
 
 export type ListPunchesFilter = {
@@ -477,7 +479,9 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ClockTime'] = ResolversParentTypes['ClockTime']> = ResolversObject<{
+  earning?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   endTime?: Resolver<Maybe<ResolversTypes['ISODate']>, ParentType, ContextType>;
+  hourlyWage?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -492,8 +496,8 @@ export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 }
 
 export type ListPunchesResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ListPunches'] = ResolversParentTypes['ListPunches']> = ResolversObject<{
-  activePunch?: Resolver<Maybe<ResolversTypes['ClockTime']>, ParentType, ContextType>;
-  history?: Resolver<Maybe<Array<ResolversTypes['ClockTime']>>, ParentType, ContextType>;
+  active?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType>;
+  history?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

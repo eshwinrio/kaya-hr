@@ -4,6 +4,7 @@ import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 import dayjs from "dayjs";
+import { Decimal } from "@prisma/client/runtime/library";
 
 
 export const qResolverUser: QueryResolvers['user'] = async (
@@ -168,15 +169,24 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
   { filter },
   { user, roles, organization },
 ) => {
-  const activePunch = await prisma.clockTime
-    .findFirst({
+  const active = await prisma.clockTime
+    .findMany({
       where: {
-        userId: user.id,
+        user: {
+          organizationId: roles.includes("SUPER")
+            ? undefined
+            : organization?.id
+          },
+          userId: roles.every(role => role !== "EMPLOYEE")
+            ? user?.id
+            : filter?.userId ?? undefined,
         AND: {
           startTime: { lte: dayjs().toISOString() },
           endTime: null
         },
-      }
+      },
+      take: filter?.pageSize ?? undefined,
+      skip: filter?.pageNumber ?? undefined,
     });
 
   const history = await prisma.clockTime
@@ -196,13 +206,26 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
           roles.includes("MANAGER") ||
           roles.includes("LEAD")
         ) ? undefined : user.id,
-        user: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
-        id: { not: activePunch?.id },
+        user: {
+          organizationId: roles.includes("SUPER")
+            ? undefined
+            : organization?.id
+          },
+        id: {
+          notIn: active.map(({ id }) => id)
+        },
       },
     });
 
   return {
-    activePunch,
-    history
+    active,
+    history: history.map(({ user, ...clockTime }) => ({
+      ...clockTime,
+      earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+      user: {
+        ...user,
+        syncStatus: user.syncStatus as SyncStatus,
+      },
+    }))
   };
 }

@@ -19,6 +19,8 @@ type ClockTime {
   id: Int!
   startTime: ISODate!
   endTime: ISODate
+  hourlyWage: Decimal!
+  earning: Decimal
 }
 
 type Timesheet {
@@ -97,8 +99,8 @@ type UserSyncResult {
 }
 
 type ListPunches {
-  activePunch: ClockTime
-  history: [ClockTime!]
+  active: [ClockTime!]!
+  history: [ClockTime!]!
 }
 
 # Input types
@@ -218,6 +220,7 @@ type Query {
 
   # Timesheet
   listPunches(filter: ListPunchesFilter): ListPunches!
+
 }
 
 type Mutation {

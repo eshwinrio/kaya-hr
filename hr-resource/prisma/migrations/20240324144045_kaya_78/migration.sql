@@ -71,6 +71,24 @@ CREATE TABLE `ClockTime` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Payroll` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `employeeId` INTEGER NOT NULL,
+    `periodStart` DATETIME(3) NOT NULL,
+    `periodEnd` DATETIME(3) NOT NULL,
+    `generatedOn` DATETIME(3) NOT NULL,
+    `dispensedOn` DATETIME(3) NULL,
+    `hours` DECIMAL(65, 30) NOT NULL,
+    `wage` DECIMAL(65, 30) NOT NULL,
+    `deductions` DECIMAL(65, 30) NULL,
+    `netPay` DECIMAL(65, 30) NOT NULL,
+    `paymentMethod` VARCHAR(191) NULL,
+    `paymentDetails` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `UserPositionMap` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
@@ -112,6 +130,9 @@ ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_organizationId_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `ClockTime` ADD CONSTRAINT `ClockTime_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Payroll` ADD CONSTRAINT `Payroll_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserPositionMap` ADD CONSTRAINT `UserPositionMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
