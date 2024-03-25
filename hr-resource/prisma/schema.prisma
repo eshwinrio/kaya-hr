@@ -22,14 +22,20 @@ enum SyncStatus {
   FAIL
 }
 
+enum PaymentStatus {
+  CANCELED
+  PENDING
+  COMPLETED
+}
+
 // Primitive models
 model Position {
   id              Int               @id @default(autoincrement())
   title           String
   description     String?
   hourlyWage      Decimal
-  UserPositionMap UserPositionMap[]
   UserScheduleMap UserScheduleMap[]
+  User            User[]
 }
 
 model Organization {
@@ -63,11 +69,12 @@ model User {
   organizationId  Int
   profileIconUrl  String?
   bannerUrl       String?
+  positionId      Int?
   syncStatus      SyncStatus        @default(NEVER)
   organization    Organization      @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  position        Position?         @relation(fields: [positionId], references: [id], onUpdate: Cascade, onDelete: Restrict)
   Schedule        Schedule[]
   UserRoleMap     UserRoleMap[]
-  UserPositionMap UserPositionMap[]
   UserScheduleMap UserScheduleMap[]
   ClockTime       ClockTime[]
   Payroll         Payroll[]
@@ -87,41 +94,32 @@ model Schedule {
 }
 
 model ClockTime {
-  id         Int       @id @default(autoincrement())
-  userId     Int
-  startTime  DateTime
-  endTime    DateTime?
-  hourlyWage Decimal
-  user       User      @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  startTime     DateTime
+  endTime       DateTime?
+  hourlyWage    Decimal
+  paymentStatus PaymentStatus @default(PENDING)
+  payrollId     Int?
+  user          User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payroll       Payroll?      @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Payroll {
-  id            Int       @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   employeeId    Int
   periodStart   DateTime
   periodEnd     DateTime
   generatedOn   DateTime
   dispensedOn   DateTime?
-  hours         Decimal
-  hourlyWage    Decimal
   deductions    Decimal?
   netPay        Decimal
   paymentMethod String?
-
-  employee User @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  employee      User        @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ClockTime     ClockTime[]
 }
 
 // Mapping models
-model UserPositionMap {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  positionId Int
-  user       User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  position   Position @relation(fields: [positionId], references: [id], onUpdate: Cascade, onDelete: Restrict)
-
-  @@unique([userId, positionId])
-}
-
 model UserRoleMap {
   id     Int  @id @default(autoincrement())
   userId Int

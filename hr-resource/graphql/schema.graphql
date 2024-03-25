@@ -15,19 +15,22 @@ enum SyncStatus {
   FAIL
 }
 
+enum PaymentStatus {
+  CANCELED
+  PENDING
+  COMPLETED
+}
+
 type ClockTime {
   id: Int!
   startTime: ISODate!
   endTime: ISODate
+  netHours: Decimal
   hourlyWage: Decimal!
   earning: Decimal
+  paymentStatus: PaymentStatus!
   user: User!
-}
-
-type Timesheet {
-  id: Int!
-  userId: Int!
-  hourlyWage: Decimal!
+  payroll: Payroll
 }
 
 type Schedule {
@@ -39,7 +42,6 @@ type Schedule {
   employees: [User!]
   createdBy: User
   createdAt: ISODate!
-  positions: [Position!]
 }
 
 type Position {
@@ -48,21 +50,21 @@ type Position {
   description: String
   hourlyWage: Decimal
   users: [User!]
-  schedules: [User!]
+  schedules: [Schedule!]
 }
 
 type Payroll {
   id: Int!
-  employee: User!
   periodStart: ISODate!
   periodEnd: ISODate!
   generatedOn: ISODate!
   dispensedOn: ISODate
-  hours: Decimal!
-  hourlyWage: Decimal!
+  totalHours: Decimal!
   deductions: Decimal
   netPay: Decimal!
   paymentMethod: String
+  employee: User!
+  clockTimes: [ClockTime!]!
 }
 
 type User {
@@ -85,7 +87,6 @@ type User {
   profileIconUrl: String
   bannerUrl: String
   organization: Organization
-  timesheets: [Timesheet!]
   schedules: [ScheduleAssignment!]
   roles: [Role!]
   positions: [Position!]
@@ -139,7 +140,7 @@ input CreateUserInput {
   bannerUrl: String
   password: String!
   roles: [Role!]
-  positionIds: [Int!]
+  positionId: Int!
 }
 
 input UpdateUserInput {
@@ -159,7 +160,7 @@ input UpdateUserInput {
   profileIconUrl: String
   bannerUrl: String
   roles: [Role!]
-  positionIds: [Int!]
+  positionId: Int!
 }
 
 input CreateOrganizationInput {
@@ -186,7 +187,6 @@ input PositionInput {
 
 input ScheduleAssigneeInput {
   userId: Int!
-  positionId: Int!
 }
 
 input ScheduleInput {
@@ -211,6 +211,7 @@ input ViewUserOptions {
 
 input ListUsersFilter {
   searchTerm: String
+  ids: [Int!]
   roles: [Role!]
   limit: Int
 }

@@ -40,6 +40,7 @@ CREATE TABLE `User` (
     `organizationId` INTEGER NOT NULL,
     `profileIconUrl` VARCHAR(191) NULL,
     `bannerUrl` VARCHAR(191) NULL,
+    `positionId` INTEGER NULL,
     `syncStatus` ENUM('NEVER', 'OK', 'FAIL') NOT NULL DEFAULT 'NEVER',
 
     UNIQUE INDEX `User_email_key`(`email`),
@@ -88,16 +89,6 @@ CREATE TABLE `Payroll` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `UserPositionMap` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userId` INTEGER NOT NULL,
-    `positionId` INTEGER NOT NULL,
-
-    UNIQUE INDEX `UserPositionMap_userId_positionId_key`(`userId`, `positionId`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `UserRoleMap` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
@@ -122,6 +113,9 @@ CREATE TABLE `UserScheduleMap` (
 ALTER TABLE `User` ADD CONSTRAINT `User_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `User` ADD CONSTRAINT `User_positionId_fkey` FOREIGN KEY (`positionId`) REFERENCES `Position`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_createdByUserId_fkey` FOREIGN KEY (`createdByUserId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -132,12 +126,6 @@ ALTER TABLE `ClockTime` ADD CONSTRAINT `ClockTime_userId_fkey` FOREIGN KEY (`use
 
 -- AddForeignKey
 ALTER TABLE `Payroll` ADD CONSTRAINT `Payroll_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `UserPositionMap` ADD CONSTRAINT `UserPositionMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `UserPositionMap` ADD CONSTRAINT `UserPositionMap_positionId_fkey` FOREIGN KEY (`positionId`) REFERENCES `Position`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserRoleMap` ADD CONSTRAINT `UserRoleMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

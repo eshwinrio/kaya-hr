@@ -25,6 +25,9 @@ export type ClockTime = {
   endTime?: Maybe<Scalars['ISODate']['output']>;
   hourlyWage: Scalars['Decimal']['output'];
   id: Scalars['Int']['output'];
+  netHours?: Maybe<Scalars['Decimal']['output']>;
+  paymentStatus: PaymentStatus;
+  payroll?: Maybe<Payroll>;
   startTime: Scalars['ISODate']['output'];
   user: User;
 };
@@ -52,7 +55,7 @@ export type CreateUserInput = {
   password: Scalars['String']['input'];
   phone: Scalars['String']['input'];
   pincode: Scalars['String']['input'];
-  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  positionId: Scalars['Int']['input'];
   profileIconUrl?: InputMaybe<Scalars['String']['input']>;
   province: Scalars['String']['input'];
   roles?: InputMaybe<Array<Role>>;
@@ -180,19 +183,25 @@ export type Organization = {
   webUrl?: Maybe<Scalars['String']['output']>;
 };
 
+export enum PaymentStatus {
+  Canceled = 'CANCELED',
+  Completed = 'COMPLETED',
+  Pending = 'PENDING'
+}
+
 export type Payroll = {
   __typename?: 'Payroll';
+  clockTimes: Array<ClockTime>;
   deductions?: Maybe<Scalars['Decimal']['output']>;
   dispensedOn?: Maybe<Scalars['ISODate']['output']>;
   employee: User;
   generatedOn: Scalars['ISODate']['output'];
-  hourlyWage: Scalars['Decimal']['output'];
-  hours: Scalars['Decimal']['output'];
   id: Scalars['Int']['output'];
   netPay: Scalars['Decimal']['output'];
   paymentMethod?: Maybe<Scalars['String']['output']>;
   periodEnd: Scalars['ISODate']['output'];
   periodStart: Scalars['ISODate']['output'];
+  totalHours: Scalars['Decimal']['output'];
 };
 
 export type Position = {
@@ -200,7 +209,7 @@ export type Position = {
   description?: Maybe<Scalars['String']['output']>;
   hourlyWage?: Maybe<Scalars['Decimal']['output']>;
   id: Scalars['Int']['output'];
-  schedules?: Maybe<Array<User>>;
+  schedules?: Maybe<Array<Schedule>>;
   title: Scalars['String']['output'];
   users?: Maybe<Array<User>>;
 };
@@ -270,12 +279,10 @@ export type Schedule = {
   employees?: Maybe<Array<User>>;
   id: Scalars['Int']['output'];
   notes?: Maybe<Scalars['String']['output']>;
-  positions?: Maybe<Array<Position>>;
   title: Scalars['String']['output'];
 };
 
 export type ScheduleAssigneeInput = {
-  positionId: Scalars['Int']['input'];
   userId: Scalars['Int']['input'];
 };
 
@@ -301,13 +308,6 @@ export enum SyncStatus {
   Ok = 'OK'
 }
 
-export type Timesheet = {
-  __typename?: 'Timesheet';
-  hourlyWage: Scalars['Decimal']['output'];
-  id: Scalars['Int']['output'];
-  userId: Scalars['Int']['output'];
-};
-
 export type UpdateOrganizationInput = {
   bannerUrl?: InputMaybe<Scalars['String']['input']>;
   logoUrl?: InputMaybe<Scalars['String']['input']>;
@@ -328,7 +328,7 @@ export type UpdateUserInput = {
   middleName?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   pincode?: InputMaybe<Scalars['String']['input']>;
-  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  positionId: Scalars['Int']['input'];
   profileIconUrl?: InputMaybe<Scalars['String']['input']>;
   province?: InputMaybe<Scalars['String']['input']>;
   roles?: InputMaybe<Array<Role>>;
@@ -360,7 +360,6 @@ export type User = {
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
   syncStatus?: Maybe<SyncStatus>;
-  timesheets?: Maybe<Array<Timesheet>>;
 };
 
 export type UserSyncResult = {
@@ -459,6 +458,7 @@ export type ResolversTypes = ResolversObject<{
   ListUsersFilter: ListUsersFilter;
   Mutation: ResolverTypeWrapper<{}>;
   Organization: ResolverTypeWrapper<Organization>;
+  PaymentStatus: PaymentStatus;
   Payroll: ResolverTypeWrapper<Payroll>;
   Position: ResolverTypeWrapper<Position>;
   PositionInput: PositionInput;
@@ -470,7 +470,6 @@ export type ResolversTypes = ResolversObject<{
   ScheduleInput: ScheduleInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   SyncStatus: SyncStatus;
-  Timesheet: ResolverTypeWrapper<Timesheet>;
   UpdateOrganizationInput: UpdateOrganizationInput;
   UpdateUserInput: UpdateUserInput;
   User: ResolverTypeWrapper<User>;
@@ -503,7 +502,6 @@ export type ResolversParentTypes = ResolversObject<{
   ScheduleAssignment: ScheduleAssignment;
   ScheduleInput: ScheduleInput;
   String: Scalars['String']['output'];
-  Timesheet: Timesheet;
   UpdateOrganizationInput: UpdateOrganizationInput;
   UpdateUserInput: UpdateUserInput;
   User: User;
@@ -516,6 +514,9 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
   endTime?: Resolver<Maybe<ResolversTypes['ISODate']>, ParentType, ContextType>;
   hourlyWage?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  netHours?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
+  paymentStatus?: Resolver<ResolversTypes['PaymentStatus'], ParentType, ContextType>;
+  payroll?: Resolver<Maybe<ResolversTypes['Payroll']>, ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -562,17 +563,17 @@ export type OrganizationResolvers<ContextType = ApolloServerContext, ParentType 
 }>;
 
 export type PayrollResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Payroll'] = ResolversParentTypes['Payroll']> = ResolversObject<{
+  clockTimes?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType>;
   deductions?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   dispensedOn?: Resolver<Maybe<ResolversTypes['ISODate']>, ParentType, ContextType>;
   employee?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   generatedOn?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
-  hourlyWage?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
-  hours?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   netPay?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   paymentMethod?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   periodEnd?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   periodStart?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  totalHours?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -580,7 +581,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hourlyWage?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  schedules?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
+  schedules?: Resolver<Maybe<Array<ResolversTypes['Schedule']>>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -604,7 +605,6 @@ export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType exte
   employees?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  positions?: Resolver<Maybe<Array<ResolversTypes['Position']>>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -614,13 +614,6 @@ export type ScheduleAssignmentResolvers<ContextType = ApolloServerContext, Paren
   position?: Resolver<ResolversTypes['Position'], ParentType, ContextType>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TimesheetResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Timesheet'] = ResolversParentTypes['Timesheet']> = ResolversObject<{
-  hourlyWage?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  userId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -647,7 +640,6 @@ export type UserResolvers<ContextType = ApolloServerContext, ParentType extends 
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   streetName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   syncStatus?: Resolver<Maybe<ResolversTypes['SyncStatus']>, ParentType, ContextType>;
-  timesheets?: Resolver<Maybe<Array<ResolversTypes['Timesheet']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -669,7 +661,6 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   Query?: QueryResolvers<ContextType>;
   Schedule?: ScheduleResolvers<ContextType>;
   ScheduleAssignment?: ScheduleAssignmentResolvers<ContextType>;
-  Timesheet?: TimesheetResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserSyncResult?: UserSyncResultResolvers<ContextType>;
 }>;

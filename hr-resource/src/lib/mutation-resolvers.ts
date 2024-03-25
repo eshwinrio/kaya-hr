@@ -5,7 +5,7 @@ import createHttpError from "http-errors";
 import validator from "validator";
 import { Seed } from "../config/environment.js";
 import { syncUsers } from "./fetch-requests.js";
-import { MutationResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import { MutationResolvers, PaymentStatus, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp, logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
@@ -47,6 +47,9 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
         province: input.province,
         streetName: input.streetName,
         addressL2: input.addressL2,
+        position: {
+          connect: { id: input.positionId }
+        },
         organization: {
           connect: { id: organization?.id }
         },
@@ -55,15 +58,10 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
             data: input.roles?.map(role => ({ role })) ?? []
           }
         },
-        UserPositionMap: {
-          createMany: {
-            data: input.positionIds?.map(positionId => ({ positionId })) ?? []
-          }
-        },
       },
       include: {
         UserRoleMap: true,
-        UserPositionMap: { include: { position: true } },
+        position: true,
         organization: true,
       }
     })
@@ -72,10 +70,9 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
       throw new GraphQLError('Could not create user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
-  const { UserPositionMap, UserRoleMap, ...user } = mixedUserDocument;
+  const { UserRoleMap, ...user } = mixedUserDocument;
   return {
     ...user,
-    positions: UserPositionMap.map(({ position }) => position),
     roles: UserRoleMap.map(({ role }) => role as Role),
     syncStatus: user.syncStatus as SyncStatus,
   }
@@ -106,6 +103,9 @@ export const mResolverUpdateUser: MutationResolvers['updateUser'] = async (
         province: input.province ?? undefined,
         streetName: input.streetName ?? undefined,
         addressL2: input.addressL2 ?? undefined,
+        position: {
+          connect: { id: input.positionId }
+        },
         ...(input.roles
           ? {
             UserRoleMap: {
@@ -130,37 +130,11 @@ export const mResolverUpdateUser: MutationResolvers['updateUser'] = async (
           }
           : {}
         ),
-        ...(input.positionIds?.length
-          ? {
-            UserPositionMap: {
-              deleteMany: {
-                AND: {
-                  userId,
-                  positionId: { notIn: input.positionIds ?? undefined }
-                }
-              },
-              upsert: input.positionIds.map(positionId => ({
-                create: {
-                  position: {
-                    connect: { id: positionId },
-                  },
-                },
-                update: {},
-                where: {
-                  userId_positionId: {
-                    userId, positionId
-                  }
-                }
-              }))
-            }
-          }
-          : {}
-        )
       },
       where: { id: userId },
       include: {
         UserRoleMap: true,
-        UserPositionMap: { include: { position: true } },
+        position: true,
         organization: true,
       }
     })
@@ -169,10 +143,9 @@ export const mResolverUpdateUser: MutationResolvers['updateUser'] = async (
       throw new GraphQLError('Could not create user', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
-  const { UserPositionMap, UserRoleMap, ...user } = mixedUserDocument;
+  const { UserRoleMap, ...user } = mixedUserDocument;
   return {
     ...user,
-    positions: UserPositionMap.map(({ position }) => position),
     roles: UserRoleMap.map(({ role }) => role as Role),
     syncStatus: user.syncStatus as SyncStatus,
   }
@@ -346,12 +319,23 @@ export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = asyn
       throw new GraphQLError('Could not schedule shift', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
     });
 
+  const assignees = await prisma.user.findMany({
+    where: {
+      id: { in: input.assignees?.map(assignee => assignee.userId) ?? [] },
+      AND: [
+        { organizationId: organization?.id },
+        { UserRoleMap: { some: { role: { in: ['LEAD', 'EMPLOYEE'] } } } },
+        { positionId: { not: null } },
+      ]
+    },
+  });
+
   await prisma.userScheduleMap
     .createMany({
-      data: input.assignees?.map(assignee => ({
+      data: assignees.map(assignee => ({
         scheduleId: schedule.id,
-        userId: assignee.userId,
-        positionId: assignee.positionId,
+        userId: assignee.id,
+        positionId: assignee.positionId!,
       })) ?? [],
     })
     .catch(error => {
@@ -447,7 +431,7 @@ export const mResolverAssignUserToSchedule: MutationResolvers['assignUserToSched
       },
       include: {
         UserRoleMap: true,
-        UserPositionMap: true
+        position: true
       }
     })
     .catch(error => {
@@ -456,10 +440,6 @@ export const mResolverAssignUserToSchedule: MutationResolvers['assignUserToSched
     });
   if (!assignee) {
     throw new GraphQLError('Assignee doesn\'t exist', { extensions: { code: 'NOT_FOUND' } });
-  }
-
-  if (!assignee.UserPositionMap.some(({ positionId: posId }) => posId === positionId)) {
-    throw new GraphQLError('Position doesn\'t exist for this user', { extensions: { code: 'NOT_FOUND' } });
   }
 
   return await prisma.userScheduleMap
@@ -541,6 +521,7 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
 
   return {
     ...clockTime,
+    paymentStatus: clockTime?.paymentStatus as PaymentStatus,
     user: {
       ...user,
       syncStatus: user?.syncStatus as SyncStatus
@@ -548,54 +529,30 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
   }
 }
 
-const mResolverGeneratePayroll: MutationResolvers['generatePayroll'] = async (
+export const mResolverGeneratePayroll: MutationResolvers['generatePayroll'] = async (
   _root,
   { options },
   { user }
 ) => {
+  const errors: Array<GraphQLError> = [];
+
   const employees = await prisma.user
     .findMany({
       where: {
-        organizationId: user?.organizationId,
-        id: { in: options?.employeeIds ?? undefined },
+        AND: [
+          { organizationId: user?.organizationId },
+          { id: { in: options.employeeIds ?? undefined } },
+          { position: { isNot: null } }
+        ]
       },
       include: {
-        UserPositionMap: {
-          include: { position: true },
-        },
-        ClockTime: {
-          where: {
-            startTime: {
-              gte: options.periodStart
-            },
-            endTime: {
-              lte: options.periodEnd
-            }
-          }
-        }
+        position: true
       }
     });
 
-  const payrollDocuments = await prisma.payroll.createMany({
-    data: employees.map(employee => {
-      const hours = employee.ClockTime.reduce((total, clockTime) => total + (dayjs(clockTime.endTime).diff(dayjs(clockTime.startTime), 'hour')), 0);
-      const hourlyWage = employee.UserPositionMap[0].position.hourlyWage;
-      const deductions = 0;
-      return {
-        employeeId: employee.id,
-        periodStart: options.periodStart,
-        periodEnd: options.periodEnd,
-        hours,
-        hourlyWage,
-        deductions: 0,
-        netPay: hours * hourlyWage.toNumber() - deductions,
-        generatedOn: new Date(),
-      }
-    }),
-    skipDuplicates: true,
-  });
+  if (employees.length !== options.employeeIds?.length) {
+    errors.push(new GraphQLError('One or more employees do not exist', { extensions: { code: 'NOT_FOUND' } }));
+  }
 
-  
-
-  return payrollDocuments.count;
+  return 0;
 }
