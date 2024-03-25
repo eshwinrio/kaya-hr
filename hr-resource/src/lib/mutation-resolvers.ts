@@ -1,4 +1,5 @@
 import { Prisma, Role as PrismaRole } from "@prisma/client";
+import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
@@ -518,8 +519,9 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
     },
   });
 
+  let clockTime;
   if (existingClockTime) {
-    return await prisma.clockTime.update({
+    clockTime = await prisma.clockTime.update({
       where: {
         id: existingClockTime.id,
       },
@@ -528,7 +530,7 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
       },
     });
   } else {
-    return await prisma.clockTime.create({
+    clockTime = await prisma.clockTime.create({
       data: {
         userId: user?.id,
         startTime: currentTime,
@@ -536,4 +538,64 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
       },
     });
   }
+
+  return {
+    ...clockTime,
+    user: {
+      ...user,
+      syncStatus: user?.syncStatus as SyncStatus
+    }
+  }
+}
+
+const mResolverGeneratePayroll: MutationResolvers['generatePayroll'] = async (
+  _root,
+  { options },
+  { user }
+) => {
+  const employees = await prisma.user
+    .findMany({
+      where: {
+        organizationId: user?.organizationId,
+        id: { in: options?.employeeIds ?? undefined },
+      },
+      include: {
+        UserPositionMap: {
+          include: { position: true },
+        },
+        ClockTime: {
+          where: {
+            startTime: {
+              gte: options.periodStart
+            },
+            endTime: {
+              lte: options.periodEnd
+            }
+          }
+        }
+      }
+    });
+
+  const payrollDocuments = await prisma.payroll.createMany({
+    data: employees.map(employee => {
+      const hours = employee.ClockTime.reduce((total, clockTime) => total + (dayjs(clockTime.endTime).diff(dayjs(clockTime.startTime), 'hour')), 0);
+      const hourlyWage = employee.UserPositionMap[0].position.hourlyWage;
+      const deductions = 0;
+      return {
+        employeeId: employee.id,
+        periodStart: options.periodStart,
+        periodEnd: options.periodEnd,
+        hours,
+        hourlyWage,
+        deductions: 0,
+        netPay: hours * hourlyWage.toNumber() - deductions,
+        generatedOn: new Date(),
+      }
+    }),
+    skipDuplicates: true,
+  });
+
+  
+
+  return payrollDocuments.count;
 }

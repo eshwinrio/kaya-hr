@@ -79,11 +79,10 @@ CREATE TABLE `Payroll` (
     `generatedOn` DATETIME(3) NOT NULL,
     `dispensedOn` DATETIME(3) NULL,
     `hours` DECIMAL(65, 30) NOT NULL,
-    `wage` DECIMAL(65, 30) NOT NULL,
+    `hourlyWage` DECIMAL(65, 30) NOT NULL,
     `deductions` DECIMAL(65, 30) NULL,
     `netPay` DECIMAL(65, 30) NOT NULL,
     `paymentMethod` VARCHAR(191) NULL,
-    `paymentDetails` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

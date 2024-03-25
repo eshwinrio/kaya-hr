@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
 import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
-import dayjs from "dayjs";
-import { Decimal } from "@prisma/client/runtime/library";
 
 
 export const qResolverUser: QueryResolvers['user'] = async (
@@ -171,6 +171,14 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
 ) => {
   const active = await prisma.clockTime
     .findMany({
+      include: {
+        user: {
+          include: {
+            UserPositionMap: { include: { position: true } },
+            UserRoleMap: true,
+          },
+        },
+      },
       where: {
         user: {
           organizationId: roles.includes("SUPER")
@@ -215,10 +223,19 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
           notIn: active.map(({ id }) => id)
         },
       },
+      take: filter?.pageSize ?? undefined,
+      skip: filter?.pageNumber ?? undefined,
     });
 
   return {
-    active,
+    active: active.map(({ user, ...clockTime }) => ({
+      ...clockTime,
+      earning: new Decimal(dayjs().diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+      user: {
+        ...user,
+        syncStatus: user.syncStatus as SyncStatus,
+      },
+    })),
     history: history.map(({ user, ...clockTime }) => ({
       ...clockTime,
       earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
@@ -228,4 +245,35 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
       },
     }))
   };
+}
+
+
+export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
+  _root,
+  _args,
+  { roles, organization },
+) => {
+  const payrolls = await prisma.payroll.findMany({
+    include: {
+      employee: {
+        include: {
+          UserPositionMap: { include: { position: true } },
+          UserRoleMap: true,
+        },
+      }
+    },
+    where: {
+      employee: {
+        organizationId: roles.includes("SUPER") ? undefined : organization?.id
+      }
+    },
+  });
+
+  return payrolls.map(({ employee, ...payroll }) => ({
+    ...payroll,
+    employee: {
+      ...employee,
+      syncStatus: employee.syncStatus as SyncStatus,
+    },
+  }));
 }

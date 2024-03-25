@@ -96,18 +96,17 @@ model ClockTime {
 }
 
 model Payroll {
-  id             Int       @id @default(autoincrement())
-  employeeId     Int
-  periodStart    DateTime
-  periodEnd      DateTime
-  generatedOn    DateTime
-  dispensedOn    DateTime?
-  hours          Decimal
-  wage           Decimal
-  deductions     Decimal?
-  netPay         Decimal
-  paymentMethod  String?
-  paymentDetails String?
+  id            Int       @id @default(autoincrement())
+  employeeId    Int
+  periodStart   DateTime
+  periodEnd     DateTime
+  generatedOn   DateTime
+  dispensedOn   DateTime?
+  hours         Decimal
+  hourlyWage    Decimal
+  deductions    Decimal?
+  netPay        Decimal
+  paymentMethod String?
 
   employee User @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }

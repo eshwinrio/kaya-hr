@@ -21,6 +21,7 @@ type ClockTime {
   endTime: ISODate
   hourlyWage: Decimal!
   earning: Decimal
+  user: User!
 }
 
 type Timesheet {
@@ -48,6 +49,20 @@ type Position {
   hourlyWage: Decimal
   users: [User!]
   schedules: [User!]
+}
+
+type Payroll {
+  id: Int!
+  employee: User!
+  periodStart: ISODate!
+  periodEnd: ISODate!
+  generatedOn: ISODate!
+  dispensedOn: ISODate
+  hours: Decimal!
+  hourlyWage: Decimal!
+  deductions: Decimal
+  netPay: Decimal!
+  paymentMethod: String
 }
 
 type User {
@@ -207,6 +222,12 @@ input ListPunchesFilter {
   pageNumber: Int
 }
 
+input GeneratePayrollOptions {
+  employeeIds: [Int!]
+  periodStart: ISODate!
+  periodEnd: ISODate!
+}
+
 # Root types
 type Query {
   # Users
@@ -220,7 +241,7 @@ type Query {
 
   # Timesheet
   listPunches(filter: ListPunchesFilter): ListPunches!
-
+  payrolls: [Payroll!]!
 }
 
 type Mutation {
@@ -240,4 +261,5 @@ type Mutation {
 
   # Timesheet actions
   registerPunch: ClockTime!
+  generatePayroll(options: GeneratePayrollOptions!): Int!
 }

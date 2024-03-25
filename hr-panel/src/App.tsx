@@ -12,6 +12,7 @@ import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPassword
 import HomePage, { homeLoader } from './pages/HomePage';
 import Login, { loginAction } from './pages/Login';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
+import PayrollsPage from './pages/PayrollsPage';
 import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
@@ -75,6 +76,17 @@ const router = createBrowserRouter([
             ]
           },
           {
+            id: 'financial',
+            path: "financial",
+            children: [
+              {
+                index: true,
+                path: "payroll",
+                Component: PayrollsPage
+              }
+            ]
+          },
+          {
             path: "settings",
             children: [
               {
@@ -121,7 +133,9 @@ const router = createBrowserRouter([
       }
     ],
   },
-]);
+], {
+  basename: '/hr-panel',
+});
 
 function App() {
   return (
