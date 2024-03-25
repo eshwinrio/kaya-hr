@@ -147,8 +147,6 @@ export const LOAD_ALL_PAYROLLS = gql(`
       periodEnd
       generatedOn
       dispensedOn
-      hours
-      hourlyWage
       deductions
       netPay
       paymentMethod

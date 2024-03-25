@@ -41,7 +41,6 @@ const router = createBrowserRouter([
             path: "employees",
             children: [
               {
-                path: "list",
                 index: true,
                 Component: EmployeeList,
                 loader: employeeListLoader,
@@ -81,7 +80,6 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                path: "payroll",
                 Component: PayrollsPage
               }
             ]

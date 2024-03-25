@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import SearchIcon from '@mui/icons-material/Search';
-import Avatar, { AvatarProps } from '@mui/material/Avatar';
+import { AvatarProps } from '@mui/material/Avatar';
 import Dialog, { DialogProps } from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import List, { ListProps } from '@mui/material/List';
@@ -10,11 +10,12 @@ import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import { FC, useState } from "react";
-import { Role, User } from "../lib/gql-codegen/graphql";
-import { LOAD_USERS } from '../lib/gql-queries';
+import { PickUserDialogQuery, Role } from "../lib/gql-codegen/graphql";
 import SearchIconWrapper from "../components/SearchIconWrapper";
 import SearchWidget from "../components/SearchWidget";
 import SearchWidgetInputBase from "../components/SearchWidgetInputBase";
+import { gql } from '../lib/gql-codegen';
+import UserAvatar from '../components/UserAvatar';
 
 interface PickUserDialogProps extends DialogProps {
   children?: never;
@@ -24,8 +25,20 @@ interface PickUserDialogProps extends DialogProps {
   readonly listItemIconProps?: ListItemIconProps;
   readonly listItemTextProps?: ListItemTextProps;
   readonly avatarProps?: AvatarProps;
-  readonly onPick?: (user: User) => void;
+  readonly onPick?: (userId: PickUserDialogQuery['users'][number]) => void;
 }
+
+const query = gql(`
+  query PickUserDialog($options: ListUsersFilter!) {
+    users(options: $options) {
+      id
+      firstName
+      lastName
+      email
+      ...Avatar
+    }
+  }
+`);
 
 const PickUserDialog: FC<PickUserDialogProps> = ({
   listProps,
@@ -38,7 +51,7 @@ const PickUserDialog: FC<PickUserDialogProps> = ({
   ...props
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data } = useQuery(LOAD_USERS, {
+  const { data } = useQuery(query, {
     variables: { options: { searchTerm, roles: [Role.Employee], limit: 5 } },
   });
 
@@ -62,7 +75,7 @@ const PickUserDialog: FC<PickUserDialogProps> = ({
           <ListItem key={index} {...listItemProps}>
             <ListItemButton {...listItemButtonProps} onClick={onPick.bind(null, user)}>
               <ListItemIcon {...listItemIconProps}>
-                <Avatar src={user?.profileIconUrl ?? undefined} alt={user?.firstName + " " + user?.lastName} {...avatarProps}></Avatar>
+                <UserAvatar user={user} />
               </ListItemIcon>
               <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} {...listItemTextProps} />
             </ListItemButton>

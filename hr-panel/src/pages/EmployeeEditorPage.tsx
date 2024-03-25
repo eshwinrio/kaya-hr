@@ -348,6 +348,7 @@ export const employeeEditorAction: ActionFunction = async ({ params, request }) 
           country: formData.get('country')!.toString(),
           dateJoined: formData.get('dateJoined')!.toString(),
           roles: formData.get('role')!.toString().split(',') as Array<Role>,
+          positionId: 1
         }
       }
     });
@@ -374,6 +375,7 @@ export const employeeEditorAction: ActionFunction = async ({ params, request }) 
           password: formData.get('password')!.toString(),
           dateJoined: formData.get('dateJoined')!.toString(),
           roles: formData.get('role')!.toString().split(',') as Array<Role>,
+          positionId: 1
         }
       }
     });
