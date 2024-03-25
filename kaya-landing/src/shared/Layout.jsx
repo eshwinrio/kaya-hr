@@ -33,7 +33,7 @@ export default function Layout() {
     <ThemeProvider theme={materialTheme}>
       <CssBaseline />
       <AppBar position="static">
-        <Toolbar sx={{ flexWrap: 'wrap' }}>
+        <Toolbar sx={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <img src={logo} alt="logo" width={96} />
           {/* <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             KayaHR

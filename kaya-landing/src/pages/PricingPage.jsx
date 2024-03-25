@@ -29,8 +29,8 @@ const useStyles = makeStyles(() => ({
     background: '#FFF',
     boxShadow: '0 1rem 2rem rgba(0, 0, 0, 20%)',
     [theme.breakpoints.down('md')]: {
-      height: '700px', // Auto height on smaller screens
-      overflowY: 'auto', // Enable vertical scrollbar when content exceeds height
+      height: '700px', 
+      overflowY: 'auto', 
     },
   },
   title: {
