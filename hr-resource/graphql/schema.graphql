@@ -21,11 +21,13 @@ enum PaymentStatus {
   COMPLETED
 }
 
+
+# <Primitive types>
 type ClockTime {
   id: Int!
   startTime: ISODate!
   endTime: ISODate
-  netHours: Decimal
+  netHours: Int
   hourlyWage: Decimal!
   earning: Decimal
   paymentStatus: PaymentStatus!
@@ -33,15 +35,14 @@ type ClockTime {
   payroll: Payroll
 }
 
-type Schedule {
+type Organization {
   id: Int!
-  title: String!
-  notes: String
-  dateTimeStart: ISODate!
-  dateTimeEnd: ISODate!
-  employees: [User!]
-  createdBy: User
-  createdAt: ISODate!
+  name: String!
+  summary: String
+  webUrl: String
+  bannerUrl: String
+  logoUrl: String
+  users: [User!]
 }
 
 type Position {
@@ -65,6 +66,24 @@ type Payroll {
   paymentMethod: String
   employee: User!
   clockTimes: [ClockTime!]!
+}
+
+type Schedule {
+  id: Int!
+  title: String!
+  notes: String
+  dateTimeStart: ISODate!
+  dateTimeEnd: ISODate!
+  employees: [User!]
+  createdBy: User
+  createdAt: ISODate!
+}
+
+type ScheduleAssignment {
+  id: Int!
+  user: User!
+  schedule: Schedule!
+  position: Position!
 }
 
 type User {
@@ -91,24 +110,10 @@ type User {
   roles: [Role!]
   positions: [Position!]
 }
+# </Primitive types>
 
-type ScheduleAssignment {
-  id: Int!
-  user: User!
-  schedule: Schedule!
-  position: Position!
-}
 
-type Organization {
-  id: Int!
-  name: String!
-  summary: String
-  webUrl: String
-  bannerUrl: String
-  logoUrl: String
-  users: [User!]
-}
-
+# <Output types>
 type UserSyncResult {
   accepted: Int!
   rejected: Int!
@@ -118,8 +123,10 @@ type ListPunches {
   active: [ClockTime!]!
   history: [ClockTime!]!
 }
+# </Output types>
 
-# Input types
+
+# <Input types>
 input CreateUserInput {
   firstName: String!
   middleName: String
@@ -228,6 +235,8 @@ input GeneratePayrollOptions {
   periodStart: ISODate!
   periodEnd: ISODate!
 }
+# </Input types>
+
 
 # Root types
 type Query {
@@ -241,7 +250,7 @@ type Query {
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 
   # Timesheet
-  listPunches(filter: ListPunchesFilter): ListPunches!
+  punches(filter: ListPunchesFilter): ListPunches!
   payrolls: [Payroll!]!
 }
 

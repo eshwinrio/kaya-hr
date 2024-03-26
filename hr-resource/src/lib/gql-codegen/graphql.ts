@@ -25,7 +25,7 @@ export type ClockTime = {
   endTime?: Maybe<Scalars['ISODate']['output']>;
   hourlyWage: Scalars['Decimal']['output'];
   id: Scalars['Int']['output'];
-  netHours?: Maybe<Scalars['Decimal']['output']>;
+  netHours?: Maybe<Scalars['Int']['output']>;
   paymentStatus: PaymentStatus;
   payroll?: Maybe<Payroll>;
   startTime: Scalars['ISODate']['output'];
@@ -91,6 +91,7 @@ export type ListScheduleFilter = {
 };
 
 export type ListUsersFilter = {
+  ids?: InputMaybe<Array<Scalars['Int']['input']>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   roles?: InputMaybe<Array<Role>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -223,8 +224,8 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
-  listPunches: ListPunches;
   payrolls: Array<Payroll>;
+  punches: ListPunches;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
   user: User;
@@ -237,7 +238,7 @@ export type QueryCurrentUserArgs = {
 };
 
 
-export type QueryListPunchesArgs = {
+export type QueryPunchesArgs = {
   filter?: InputMaybe<ListPunchesFilter>;
 };
 
@@ -514,7 +515,7 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
   endTime?: Resolver<Maybe<ResolversTypes['ISODate']>, ParentType, ContextType>;
   hourlyWage?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  netHours?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
+  netHours?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   paymentStatus?: Resolver<ResolversTypes['PaymentStatus'], ParentType, ContextType>;
   payroll?: Resolver<Maybe<ResolversTypes['Payroll']>, ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
@@ -589,8 +590,8 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
-  listPunches?: Resolver<ResolversTypes['ListPunches'], ParentType, ContextType, Partial<QueryListPunchesArgs>>;
   payrolls?: Resolver<Array<ResolversTypes['Payroll']>, ParentType, ContextType>;
+  punches?: Resolver<ResolversTypes['ListPunches'], ParentType, ContextType, Partial<QueryPunchesArgs>>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;

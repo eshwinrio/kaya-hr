@@ -160,7 +160,7 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
   }));
 }
 
-export const qResolverListPunches: QueryResolvers['listPunches'] = async (
+export const qResolverPunches: QueryResolvers['punches'] = async (
   _root,
   { filter },
   { user, roles, organization },

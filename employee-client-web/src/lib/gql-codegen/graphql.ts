@@ -24,7 +24,11 @@ export type ClockTime = {
   endTime?: Maybe<Scalars['ISODate']['output']>;
   hourlyWage: Scalars['Decimal']['output'];
   id: Scalars['Int']['output'];
+  netHours?: Maybe<Scalars['Int']['output']>;
+  paymentStatus: PaymentStatus;
+  payroll?: Maybe<Payroll>;
   startTime: Scalars['ISODate']['output'];
+  user: User;
 };
 
 export type CreateOrganizationInput = {
@@ -50,12 +54,18 @@ export type CreateUserInput = {
   password: Scalars['String']['input'];
   phone: Scalars['String']['input'];
   pincode: Scalars['String']['input'];
-  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  positionId: Scalars['Int']['input'];
   profileIconUrl?: InputMaybe<Scalars['String']['input']>;
   province: Scalars['String']['input'];
   roles?: InputMaybe<Array<Role>>;
   status?: InputMaybe<Scalars['String']['input']>;
   streetName: Scalars['String']['input'];
+};
+
+export type GeneratePayrollOptions = {
+  employeeIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  periodEnd: Scalars['ISODate']['input'];
+  periodStart: Scalars['ISODate']['input'];
 };
 
 export type ListPunches = {
@@ -80,6 +90,7 @@ export type ListScheduleFilter = {
 };
 
 export type ListUsersFilter = {
+  ids?: InputMaybe<Array<Scalars['Int']['input']>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   roles?: InputMaybe<Array<Role>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -93,6 +104,7 @@ export type Mutation = {
   createSchedule: Schedule;
   createUser: User;
   deleteSchedule: Schedule;
+  generatePayroll: Scalars['Int']['output'];
   registerPunch: ClockTime;
   syncUsers: UserSyncResult;
   updateOrganization: Organization;
@@ -133,6 +145,11 @@ export type MutationDeleteScheduleArgs = {
 };
 
 
+export type MutationGeneratePayrollArgs = {
+  options: GeneratePayrollOptions;
+};
+
+
 export type MutationSyncUsersArgs = {
   force?: InputMaybe<Scalars['Boolean']['input']>;
 };
@@ -166,12 +183,33 @@ export type Organization = {
   webUrl?: Maybe<Scalars['String']['output']>;
 };
 
+export enum PaymentStatus {
+  Canceled = 'CANCELED',
+  Completed = 'COMPLETED',
+  Pending = 'PENDING'
+}
+
+export type Payroll = {
+  __typename?: 'Payroll';
+  clockTimes: Array<ClockTime>;
+  deductions?: Maybe<Scalars['Decimal']['output']>;
+  dispensedOn?: Maybe<Scalars['ISODate']['output']>;
+  employee: User;
+  generatedOn: Scalars['ISODate']['output'];
+  id: Scalars['Int']['output'];
+  netPay: Scalars['Decimal']['output'];
+  paymentMethod?: Maybe<Scalars['String']['output']>;
+  periodEnd: Scalars['ISODate']['output'];
+  periodStart: Scalars['ISODate']['output'];
+  totalHours: Scalars['Decimal']['output'];
+};
+
 export type Position = {
   __typename?: 'Position';
   description?: Maybe<Scalars['String']['output']>;
   hourlyWage?: Maybe<Scalars['Decimal']['output']>;
   id: Scalars['Int']['output'];
-  schedules?: Maybe<Array<User>>;
+  schedules?: Maybe<Array<Schedule>>;
   title: Scalars['String']['output'];
   users?: Maybe<Array<User>>;
 };
@@ -185,7 +223,8 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
-  listPunches: ListPunches;
+  payrolls: Array<Payroll>;
+  punches: ListPunches;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
   user: User;
@@ -198,7 +237,7 @@ export type QueryCurrentUserArgs = {
 };
 
 
-export type QueryListPunchesArgs = {
+export type QueryPunchesArgs = {
   filter?: InputMaybe<ListPunchesFilter>;
 };
 
@@ -240,12 +279,10 @@ export type Schedule = {
   employees?: Maybe<Array<User>>;
   id: Scalars['Int']['output'];
   notes?: Maybe<Scalars['String']['output']>;
-  positions?: Maybe<Array<Position>>;
   title: Scalars['String']['output'];
 };
 
 export type ScheduleAssigneeInput = {
-  positionId: Scalars['Int']['input'];
   userId: Scalars['Int']['input'];
 };
 
@@ -271,13 +308,6 @@ export enum SyncStatus {
   Ok = 'OK'
 }
 
-export type Timesheet = {
-  __typename?: 'Timesheet';
-  hourlyWage: Scalars['Decimal']['output'];
-  id: Scalars['Int']['output'];
-  userId: Scalars['Int']['output'];
-};
-
 export type UpdateOrganizationInput = {
   bannerUrl?: InputMaybe<Scalars['String']['input']>;
   logoUrl?: InputMaybe<Scalars['String']['input']>;
@@ -298,7 +328,7 @@ export type UpdateUserInput = {
   middleName?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   pincode?: InputMaybe<Scalars['String']['input']>;
-  positionIds?: InputMaybe<Array<Scalars['Int']['input']>>;
+  positionId: Scalars['Int']['input'];
   profileIconUrl?: InputMaybe<Scalars['String']['input']>;
   province?: InputMaybe<Scalars['String']['input']>;
   roles?: InputMaybe<Array<Role>>;
@@ -330,7 +360,6 @@ export type User = {
   status?: Maybe<Scalars['String']['output']>;
   streetName: Scalars['String']['output'];
   syncStatus?: Maybe<SyncStatus>;
-  timesheets?: Maybe<Array<Timesheet>>;
 };
 
 export type UserSyncResult = {
@@ -349,11 +378,11 @@ export type ProfileFragment = (
 ) & { ' $fragmentName'?: 'ProfileFragment' };
 
 export type PunchHistoryFragment = (
-  { __typename?: 'ClockTime', id: number, hourlyWage: any, earning?: any | null }
+  { __typename?: 'ClockTime', id: number, netHours?: number | null, hourlyWage: any, earning?: any | null, paymentStatus: PaymentStatus }
   & { ' $fragmentRefs'?: { 'PunchTimingFragment': PunchTimingFragment } }
 ) & { ' $fragmentName'?: 'PunchHistoryFragment' };
 
-export type PunchTimingFragment = { __typename?: 'ClockTime', startTime: any, endTime?: any | null } & { ' $fragmentName'?: 'PunchTimingFragment' };
+export type PunchTimingFragment = { __typename?: 'ClockTime', startTime: any, endTime?: any | null, netHours?: number | null } & { ' $fragmentName'?: 'PunchTimingFragment' };
 
 export type ScheduleAssignmentFragment = { __typename?: 'ScheduleAssignment', id: number, schedule: (
     { __typename?: 'Schedule', id: number, title: string }
@@ -381,7 +410,7 @@ export type ListPunchesQueryVariables = Exact<{
 }>;
 
 
-export type ListPunchesQuery = { __typename?: 'Query', listPunches: { __typename?: 'ListPunches', active: Array<(
+export type ListPunchesQuery = { __typename?: 'Query', punches: { __typename?: 'ListPunches', active: Array<(
       { __typename?: 'ClockTime' }
       & { ' $fragmentRefs'?: { 'TimerFragment': TimerFragment } }
     )>, history: Array<(
@@ -404,12 +433,12 @@ export type WhoAmIQuery = { __typename?: 'Query', currentUser: (
 
 export const AvatarFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Avatar"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profileIconUrl"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}}]}}]} as unknown as DocumentNode<AvatarFragment, unknown>;
 export const ProfileFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Profile"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"middleName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Avatar"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Avatar"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profileIconUrl"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}}]}}]} as unknown as DocumentNode<ProfileFragment, unknown>;
-export const PunchTimingFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}}]} as unknown as DocumentNode<PunchTimingFragment, unknown>;
-export const PunchHistoryFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchHistory"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"hourlyWage"}},{"kind":"Field","name":{"kind":"Name","value":"earning"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchTiming"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}}]} as unknown as DocumentNode<PunchHistoryFragment, unknown>;
+export const PunchTimingFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}},{"kind":"Field","name":{"kind":"Name","value":"netHours"}}]}}]} as unknown as DocumentNode<PunchTimingFragment, unknown>;
+export const PunchHistoryFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchHistory"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"netHours"}},{"kind":"Field","name":{"kind":"Name","value":"hourlyWage"}},{"kind":"Field","name":{"kind":"Name","value":"earning"}},{"kind":"Field","name":{"kind":"Name","value":"paymentStatus"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchTiming"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}},{"kind":"Field","name":{"kind":"Name","value":"netHours"}}]}}]} as unknown as DocumentNode<PunchHistoryFragment, unknown>;
 export const ScheduleTimingFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ScheduleTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Schedule"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dateTimeStart"}},{"kind":"Field","name":{"kind":"Name","value":"dateTimeEnd"}}]}}]} as unknown as DocumentNode<ScheduleTimingFragment, unknown>;
 export const ScheduleAssignmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ScheduleAssignment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ScheduleAssignment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"schedule"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ScheduleTiming"}}]}},{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ScheduleTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Schedule"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dateTimeStart"}},{"kind":"Field","name":{"kind":"Name","value":"dateTimeEnd"}}]}}]} as unknown as DocumentNode<ScheduleAssignmentFragment, unknown>;
 export const TimerFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Timer"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}}]}}]} as unknown as DocumentNode<TimerFragment, unknown>;
 export const ListMySchedulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListMySchedules"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"options"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ViewUserOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"options"},"value":{"kind":"Variable","name":{"kind":"Name","value":"options"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"schedules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ScheduleAssignment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ScheduleTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Schedule"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dateTimeStart"}},{"kind":"Field","name":{"kind":"Name","value":"dateTimeEnd"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ScheduleAssignment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ScheduleAssignment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"schedule"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ScheduleTiming"}}]}},{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}}]}}]} as unknown as DocumentNode<ListMySchedulesQuery, ListMySchedulesQueryVariables>;
-export const ListPunchesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListPunches"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ListPunchesFilter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"listPunches"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"active"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"Timer"}}]}},{"kind":"Field","name":{"kind":"Name","value":"history"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchHistory"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Timer"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchHistory"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"hourlyWage"}},{"kind":"Field","name":{"kind":"Name","value":"earning"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchTiming"}}]}}]} as unknown as DocumentNode<ListPunchesQuery, ListPunchesQueryVariables>;
+export const ListPunchesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListPunches"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ListPunchesFilter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"punches"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"active"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"Timer"}}]}},{"kind":"Field","name":{"kind":"Name","value":"history"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchHistory"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchTiming"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}},{"kind":"Field","name":{"kind":"Name","value":"netHours"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Timer"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startTime"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PunchHistory"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ClockTime"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"netHours"}},{"kind":"Field","name":{"kind":"Name","value":"hourlyWage"}},{"kind":"Field","name":{"kind":"Name","value":"earning"}},{"kind":"Field","name":{"kind":"Name","value":"paymentStatus"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PunchTiming"}}]}}]} as unknown as DocumentNode<ListPunchesQuery, ListPunchesQueryVariables>;
 export const RegisterPunchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RegisterPunch"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerPunch"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}}]}}]} as unknown as DocumentNode<RegisterPunchMutation, RegisterPunchMutationVariables>;
 export const WhoAmIDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"WhoAmI"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Profile"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Avatar"}},{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"summary"}},{"kind":"Field","name":{"kind":"Name","value":"webUrl"}},{"kind":"Field","name":{"kind":"Name","value":"logoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"bannerUrl"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Avatar"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profileIconUrl"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Profile"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"middleName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Avatar"}}]}}]} as unknown as DocumentNode<WhoAmIQuery, WhoAmIQueryVariables>;
