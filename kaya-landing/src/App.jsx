@@ -1,8 +1,11 @@
 import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import store from './lib/redux-store';
-import LandingPage from './pages/LandingPage';
 import AboutPage from './pages/AboutPage';
+import ContactUsPage from './pages/ContactUsPage';
+import FeaturesPage from './pages/FeaturesPage';
+import LandingPage from './pages/LandingPage';
+import PricingPage from './pages/PricingPage';
 import RootLayout from './shared/RootLayout';
 
 const router = createBrowserRouter([
@@ -16,8 +19,20 @@ const router = createBrowserRouter([
         Component: LandingPage,
       },
       {
-        path:'about',
+        path: 'about',
         Component: AboutPage,
+      },
+      {
+        path: 'features',
+        Component: FeaturesPage,
+      },
+      {
+        path: 'contact-us',
+        Component: ContactUsPage,
+      },
+      {
+        path: 'pricing',
+        Component: PricingPage,
       },
       {
         path: '*',
