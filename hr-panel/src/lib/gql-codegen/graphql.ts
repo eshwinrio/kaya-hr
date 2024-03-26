@@ -78,6 +78,7 @@ export type ListPunchesFilter = {
   organizationId?: InputMaybe<Scalars['Int']['input']>;
   pageNumber?: InputMaybe<Scalars['Int']['input']>;
   pageSize?: InputMaybe<Scalars['Int']['input']>;
+  paymentStatus?: InputMaybe<Array<PaymentStatus>>;
   userId?: InputMaybe<Scalars['Int']['input']>;
 };
 

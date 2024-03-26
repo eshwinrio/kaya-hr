@@ -226,6 +226,7 @@ input ListUsersFilter {
 input ListPunchesFilter {
   userId: Int
   organizationId: Int
+  paymentStatus: [PaymentStatus!]
   pageSize: Int
   pageNumber: Int
 }

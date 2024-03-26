@@ -5,6 +5,7 @@ import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import dayjs from 'dayjs';
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router-dom';
 import relaxingIllustration from '../assets/6524977_3322680.svg';
@@ -12,7 +13,7 @@ import PunchFab from '../components/PunchFab';
 import ScheduleAssignmentListItem from '../components/ScheduleAssignmentListItem';
 import { apolloClient } from '../lib/apollo';
 import { gql } from '../lib/gql-codegen';
-import { ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
+import { GrossEarningsQuery, ListMySchedulesQuery } from '../lib/gql-codegen/graphql';
 import { useMaterialTheme } from '../lib/material-theme';
 
 
@@ -20,14 +21,13 @@ export default function HomePage() {
   const theme = useMaterialTheme();
   const navigate = useNavigate();
   const loaderData = useLoaderData() as HomePageLoader;
-  const { schedulesToday, schedulesUpcoming } = loaderData;
+  const { schedulesToday, schedulesUpcoming, grossEarnings } = loaderData;
 
   const schedulesTodayView = schedulesToday && (
     <Paper
       elevation={0}
       sx={{
         backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
-        maxWidth: theme.breakpoints.values.xs - 1,
       }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="body1" fontWeight="bold">Today</Typography>
@@ -47,7 +47,7 @@ export default function HomePage() {
             </List>
           )
           : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 3 }}>
               <Typography variant="body1">Nothing scheduled for today.</Typography>
               <img src={relaxingIllustration} alt="Relax" width={112} height={112} />
             </Box>
@@ -102,18 +102,32 @@ export default function HomePage() {
     </Paper>
   );
 
+  const grossEarningsView = grossEarnings && (
+    <Paper component='section' variant='outlined' sx={{ height: '100%' }}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="body1" fontWeight="bold">Balance</Typography>
+      </Toolbar>
+      <Box sx={{ px: 3, py: 1 }}>
+        <Typography variant="body1">Gross earnings</Typography>
+        <Typography variant="h5" fontWeight="bold">${grossEarnings.data.punches.history.reduce((acc, cur) => acc + cur.earning, 0)}</Typography>
+      </Box>
+    </Paper>
+  );
+
   return (
     <Container>
-      {schedulesTodayView}
+      <Grid2 container alignItems='stretch' spacing={2}>
+        <Grid2 xs={12} sm={6} md='auto'>
+          {schedulesTodayView}
+        </Grid2>
+        <Grid2 xs={12} sm={6} md='auto'>
+          {grossEarningsView}
+        </Grid2>
+      </Grid2>
       {schedulesUpcomingView}
       <PunchFab onClick={() => navigate('/punch')} />
     </Container>
   );
-}
-
-interface HomePageLoader {
-  readonly schedulesToday: ApolloQueryResult<ListMySchedulesQuery>;
-  readonly schedulesUpcoming: ApolloQueryResult<ListMySchedulesQuery>;
 }
 
 export const LIST_MY_SCHEDULES = gql(`
@@ -125,6 +139,22 @@ export const LIST_MY_SCHEDULES = gql(`
     }
   }
 `);
+
+export const grossEarningsQuery = gql(`
+  query GrossEarnings {
+    punches(filter: { paymentStatus: [PENDING] }) {
+      history {
+        earning
+      }
+    }
+  }
+`);
+
+interface HomePageLoader {
+  readonly schedulesToday: ApolloQueryResult<ListMySchedulesQuery>;
+  readonly schedulesUpcoming: ApolloQueryResult<ListMySchedulesQuery>;
+  readonly grossEarnings: ApolloQueryResult<GrossEarningsQuery>;
+}
 
 export const homePageLoader: LoaderFunction = async () => {
   return {
@@ -149,6 +179,7 @@ export const homePageLoader: LoaderFunction = async () => {
           }
         }
       }
-    })
+    }),
+    grossEarnings: await apolloClient.query({ query: grossEarningsQuery }),
   }
 };

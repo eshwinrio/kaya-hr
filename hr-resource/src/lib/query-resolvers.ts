@@ -218,6 +218,7 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
         id: {
           notIn: active.map(({ id }) => id)
         },
+        paymentStatus: { in: filter?.paymentStatus ?? undefined },
       },
       take: filter?.pageSize ?? undefined,
       skip: filter?.pageNumber ?? undefined,
@@ -245,7 +246,6 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
     }))
   };
 }
-
 
 export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
   _root,
