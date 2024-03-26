@@ -1,19 +1,16 @@
-"use client";
-// features page
-import React from "react";
-import {
-  Container,
-  Typography,
-  Grid,
-  Box,
-  createTheme,
-  ThemeProvider,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import AcUnitIcon from '@mui/icons-material/AcUnit';
 import GroupsIcon from "@mui/icons-material/Groups";
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import AcUnitIcon from '@mui/icons-material/AcUnit';
-import Header from "../components/Header";
+import {
+  Box,
+  Container,
+  Grid,
+  ThemeProvider,
+  Typography,
+  createTheme,
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import React from "react";
 
 
 const theme = createTheme({

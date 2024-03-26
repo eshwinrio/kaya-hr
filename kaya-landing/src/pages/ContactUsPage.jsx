@@ -1,11 +1,8 @@
-"use client";
-
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Box, Container, Grid, Typography } from '@mui/material';
 import CallIcon from '@mui/icons-material/Call';
 import EmailIcon from '@mui/icons-material/Email';
-import Header from "../components/Header";
+import { Box, Container, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import React from 'react';
 
 
 const useStyles = makeStyles(() => ({
@@ -16,7 +13,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     position: 'relative',
     marginTop: '50px',
-    justifyItems:"center"
+    justifyItems: "center"
   },
   item: {
     border: '5px solid black',
@@ -27,10 +24,10 @@ const useStyles = makeStyles(() => ({
     width: '270px',
     height: '20rem',
     borderRadius: '0.5rem',
-    color:"black",
+    color: "black",
     position: 'relative',
     boxShadow: '0 2px 2px 0 rgba(0, 0, 0, 0.1), 0px 10px 10px 0 rgba(0, 0, 0, 0.1)',
-    
+
   },
   title: {
     fontSize: '22px',
@@ -101,41 +98,41 @@ const ContactUsPage = () => {
   const classes = useStyles();
 
   return (
-    <> 
-    <Box sx={{ textAlign: "center" }} className={classes.siteHeading}>
-            <Typography variant="h2" className={classes.siteHeadingH2}>
-              Contact <span className={classes.siteHeadingSpan}>Kaya</span>
-            </Typography>
-            <Typography variant="h4" className={classes.siteHeadingH4}>
-              We are here to help
-              <span className={classes.siteHeadingH4Before}></span>
-            </Typography>
-          </Box>
-  
-    <Container>
+    <>
+      <Box sx={{ textAlign: "center" }} className={classes.siteHeading}>
+        <Typography variant="h2" className={classes.siteHeadingH2}>
+          Contact <span className={classes.siteHeadingSpan}>Kaya</span>
+        </Typography>
+        <Typography variant="h4" className={classes.siteHeadingH4}>
+          We are here to help
+          <span className={classes.siteHeadingH4Before}></span>
+        </Typography>
+      </Box>
 
-    <div className={classes.section}>
-      <div className={classes.item}>
-        <div className={classes.icon} style={{ backgroundColor: '#ccacf7' }}>
-          <CallIcon></CallIcon>
+      <Container>
+
+        <div className={classes.section}>
+          <div className={classes.item}>
+            <div className={classes.icon} style={{ backgroundColor: '#ccacf7' }}>
+              <CallIcon></CallIcon>
+            </div>
+            <Typography variant="h4" className={classes.title}>Call Us</Typography>
+            <Typography variant="body1" className={classes.text}>For inquiries or assistance, We'll be happy to provide you with information and support tailored to your needs.</Typography>
+            <a style={{ textDecoration: "underline", fontWeight: "bold" }} href={`tel:+19898989898`}>+1(230) 987 8765</a>
+          </div>
+
+          <div className={classes.item}>
+            <div className={classes.icon} style={{ backgroundColor: '#ccacf7' }}>
+              <EmailIcon>
+
+              </EmailIcon>
+            </div>
+            <Typography variant="h4" className={classes.title}>Ask a Question</Typography>
+            <Typography variant="body1" className={classes.text}>For inquiries or assistance, We'll be happy to provide you with information and support tailored to your needs.</Typography>
+            <a style={{ textDecoration: "underline", fontWeight: "bold" }} href="mailto:kaya@example.com">kaya@example.com</a>
+          </div>
         </div>
-        <Typography variant="h4" className={classes.title}>Call Us</Typography>
-        <Typography variant="body1" className={classes.text}>For inquiries or assistance, We'll be happy to provide you with information and support tailored to your needs.</Typography>
-        <a style={{textDecoration: "underline", fontWeight:"bold"}} href={`tel:+19898989898`}>+1(230) 987 8765</a>
-      </div>
-
-      <div className={classes.item}>
-        <div className={classes.icon} style={{ backgroundColor: '#ccacf7' }}>
-         <EmailIcon>
-
-         </EmailIcon>
-        </div>
-        <Typography variant="h4" className={classes.title}>Ask a Question</Typography>
-        <Typography variant="body1" className={classes.text}>For inquiries or assistance, We'll be happy to provide you with information and support tailored to your needs.</Typography>
-        <a style={{textDecoration: "underline", fontWeight:"bold"}} href="mailto:kaya@example.com">kaya@example.com</a>
-      </div>
-    </div>
-    </Container>
+      </Container>
     </>
   );
 };

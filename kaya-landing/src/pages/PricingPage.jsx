@@ -1,12 +1,7 @@
-"use client";
-
-
-
-import React from 'react';
+import { Box, Button, Container, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
-import { Container, Typography, Button, Grid, Box, ListItem, List, ListItemIcon, ListItemText } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Header from "../components/Header";
+import React from 'react';
 
 
 const theme = createTheme();
@@ -29,8 +24,8 @@ const useStyles = makeStyles(() => ({
     background: '#FFF',
     boxShadow: '0 1rem 2rem rgba(0, 0, 0, 20%)',
     [theme.breakpoints.down('md')]: {
-      height: '700px', 
-      overflowY: 'auto', 
+      height: '700px',
+      overflowY: 'auto',
     },
   },
   title: {
