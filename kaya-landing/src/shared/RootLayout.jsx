@@ -31,7 +31,7 @@ export default function Layout() {
   return (
     <ThemeProvider theme={materialTheme}>
       <CssBaseline />
-      <AppBar position="static">
+      <AppBar position="static" elevation={0} color="transparent">
         <Toolbar sx={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <img src={logo} alt="logo" width={96} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -41,17 +41,18 @@ export default function Layout() {
             <Button color="inherit" href="/features">Features</Button>
             <Button color="inherit" href="/contact-us">Contact Us</Button>
           </Box>
-          <IconButton
-            id="basic-button"
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}
-            color='inherit'
-            sx={{ display: { md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              id="basic-button"
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClick}
+              color='inherit'
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
           <Menu
             id="basic-menu"
             anchorEl={anchorEl}
