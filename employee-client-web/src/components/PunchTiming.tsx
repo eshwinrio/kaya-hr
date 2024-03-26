@@ -10,6 +10,7 @@ export const PunchTimingFragment = gql(`
   fragment PunchTiming on ClockTime {
     startTime
     endTime
+    netHours
   }
 `);
 
@@ -41,7 +42,7 @@ const PunchTiming: FC<PunchTimingProps> = ({ punchTiming, dateTypographyProps, t
           <Typography variant='caption' {...timeTypographyProps}>{endDayjs.format("A")}</Typography>
         </Grid2>
       </Grid2>
-      <Typography variant='caption' {...timeTypographyProps}>{startDayjs.to(endDayjs, true)}</Typography>
+      <Typography variant='caption' {...timeTypographyProps}>{punchTimingFragment.netHours} hours</Typography>
     </Paper>
   )
 }

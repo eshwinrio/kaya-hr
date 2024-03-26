@@ -160,7 +160,7 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
   }));
 }
 
-export const qResolverListPunches: QueryResolvers['listPunches'] = async (
+export const qResolverPunches: QueryResolvers['punches'] = async (
   _root,
   { filter },
   { user, roles, organization },
@@ -218,6 +218,7 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
         id: {
           notIn: active.map(({ id }) => id)
         },
+        paymentStatus: { in: filter?.paymentStatus ?? undefined },
       },
       take: filter?.pageSize ?? undefined,
       skip: filter?.pageNumber ?? undefined,
@@ -245,7 +246,6 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
     }))
   };
 }
-
 
 export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
   _root,

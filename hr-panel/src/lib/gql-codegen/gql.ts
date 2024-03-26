@@ -13,7 +13,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  fragment UserListItem on User {\n    id\n    email\n  }": types.UserListItemFragmentDoc,
     "\n  fragment Avatar on User {\n    profileIconUrl\n    firstName\n  }\n": types.AvatarFragmentDoc,
     "\n  query WhoAmI {\n    currentUser {\n      id\n      email\n      phone\n      firstName\n      middleName\n      lastName\n      streetName\n      city\n      country\n      province\n      pincode\n      dateOfBirth\n      dateJoined\n      organization {\n        id\n        name\n        summary\n        webUrl\n        logoUrl\n        bannerUrl\n      }\n      roles\n      dateJoined\n      positions {\n        id\n        title\n        description\n      }\n      profileIconUrl\n      bannerUrl\n    }\n  }\n": types.WhoAmIDocument,
     "\n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      id\n      firstName\n      middleName\n      lastName\n      dateOfBirth\n      email\n      streetName\n      addressL2\n      city\n      pincode\n      province\n      phone\n      country\n      dateJoined\n      status\n      syncStatus\n      profileIconUrl\n      bannerUrl\n      organization {\n        id\n        name\n        summary\n        webUrl\n        logoUrl\n        bannerUrl\n      }\n      roles\n      positions {\n        id\n        title\n      }\n    }\n  }\n": types.CreateUserDocument,
@@ -44,10 +43,6 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  fragment UserListItem on User {\n    id\n    email\n  }"): (typeof documents)["\n  fragment UserListItem on User {\n    id\n    email\n  }"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

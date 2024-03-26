@@ -22,8 +22,8 @@ const PunchPage: FC = () => {
   const theme = useMaterialTheme();
   const loaderData = useLoaderData() as Awaited<PunchPageLoader>;
   const punches = useMemo(() => loaderData?.punches, [loaderData?.punches]);
-  const active = useMemo(() => punches?.data.listPunches.active[0], [punches?.data.listPunches.active]);
-  const history = useMemo(() => punches?.data.listPunches.history, [punches?.data.listPunches.history]);
+  const active = useMemo(() => punches?.data.punches.active[0], [punches?.data.punches.active]);
+  const history = useMemo(() => punches?.data.punches.history, [punches?.data.punches.history]);
 
   if (!loaderData) {
     return (
@@ -75,7 +75,7 @@ const PunchPage: FC = () => {
         <Paper variant="outlined">
           <List dense disablePadding>
             {history.map((historyItem, index) => (
-              <PunchHistoryListItem key={index}  punchHistory={historyItem} />
+              <PunchHistoryListItem key={index} punchHistory={historyItem} />
             ))}
           </List>
         </Paper>
@@ -88,7 +88,7 @@ export default PunchPage;
 
 const LIST_PUNCHES = gql(`
   query ListPunches($filter: ListPunchesFilter) {
-    listPunches (filter: $filter) {
+    punches (filter: $filter) {
       active {
         ...Timer
       }
