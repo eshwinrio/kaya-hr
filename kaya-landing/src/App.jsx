@@ -3,11 +3,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import store from './lib/redux-store';
 import LandingPage from './pages/LandingPage';
 import AboutPage from './pages/AboutPage';
+import RootLayout from './shared/RootLayout';
 
 const router = createBrowserRouter([
   {
     id: 'root',
     path: '/',
+    Component: RootLayout,
     children: [
       {
         index: true,

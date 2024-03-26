@@ -19,6 +19,10 @@
 		{
 			"name": "Employee Client",
 			"path": "employee-client-web"
+		},
+		{
+			"name": "Kaya Web",
+			"path": "kaya-landing"
 		}
 	],
 	"settings": {
