@@ -18,13 +18,14 @@ import { GraphQLError } from 'graphql';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import Banner from '../components/Banner';
 import ScheduleAssignmentList from '../components/ScheduleAssignmentList';
+import UserAvatar from '../components/UserAvatar';
 import { apolloClient } from '../lib/apollo';
-import { ListUserSchedulesQuery } from '../lib/gql-codegen/graphql';
-import { VIEW_USER_WITH_SCHEDULES } from '../lib/gql-queries';
+import { gql } from '../lib/gql-codegen';
+import { ViewEmployeeQuery } from '../lib/gql-codegen/graphql';
 import { useMaterialTheme } from '../lib/material-theme';
 
 export default function ViewEmployee() {
-  const userWithSchedules = useLoaderData() as ListUserSchedulesQuery;
+  const userWithSchedules = useLoaderData() as ViewEmployeeQuery;
   const theme = useMaterialTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -36,10 +37,7 @@ export default function ViewEmployee() {
       }} />
       <Grid2 container sx={{ marginTop: -8 }}>
         <Grid2 xs={6}>
-          <UserAvatar
-            src={userWithSchedules.user.profileIconUrl ?? ''}
-            alt={userWithSchedules.user.firstName}
-          />
+          <StyledUserAvatar user={userWithSchedules.user} />
         </Grid2>
         <Grid2 container alignItems='flex-start' justifyContent='flex-end' xs={6} sx={{ pt: 8 }}>
           <ButtonGroup variant="outlined">
@@ -94,19 +92,79 @@ export default function ViewEmployee() {
   );
 }
 
+const query = gql(`
+  query ViewEmployee ($userId: Int!) {
+    user(id: $userId) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      city
+      country
+      province
+      roles
+      ...Avatar
+      bannerUrl
+      schedules {
+        id
+        position {
+          id
+          title
+          description
+          hourlyWage
+        }
+        schedule {
+          id
+          title
+          dateTimeStart
+          dateTimeEnd
+          createdBy {
+            id
+            email
+            firstName
+            lastName
+            streetName
+            city
+            country
+            province
+            pincode
+            dateOfBirth
+            dateJoined
+            phone
+          }
+          createdAt
+        }
+        user {
+          id
+          email
+          firstName
+          lastName
+          streetName
+          city
+          country
+          province
+          pincode
+          dateOfBirth
+          dateJoined
+          phone
+        }
+      }
+    }
+  }
+`);
+
 export const viewEmployeeLoader: LoaderFunction = async ({ params }) => {
   const userId = parseInt(params.id!);
   if (!userId) {
     throw new GraphQLError('Invalid ID')
   }
-  const user = await apolloClient.query({
-    query: VIEW_USER_WITH_SCHEDULES,
-    variables: { userId }
-  });
+  const user = await apolloClient.query({ query, variables: { userId } });
   return user.data;
 }
 
-const UserAvatar = styled(Avatar)(({ theme }) => ({
+const StyledUserAvatar = styled(UserAvatar)(({ theme }) => ({
   width: theme.spacing(16),
   height: theme.spacing(16),
   marginLeft: 16,

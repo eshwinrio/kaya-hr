@@ -2,29 +2,26 @@ import { isApolloError } from "@apollo/client";
 import BrightnessFull from '@mui/icons-material/Brightness4';
 import BrightnessHigh from '@mui/icons-material/Brightness7';
 import ChecklistIcon from '@mui/icons-material/Checklist';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MenuIcon from '@mui/icons-material/Menu';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import SettingsIcon from "@mui/icons-material/Settings";
 import WindowIcon from '@mui/icons-material/Window';
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import ListSubheader from "@mui/material/ListSubheader";
 import Toolbar from '@mui/material/Toolbar';
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useMemo, useRef, useState } from "react";
 import { Link, LoaderFunction, Outlet, redirect } from "react-router-dom";
 import logo from '../assets/logo-icon.svg';
+import DashboardMenu, { DashboardMenuItem } from "../components/DashboardMenu";
 import PopoverProfile from "../components/PopoverProfile";
 import ToolbarSpacer from "../components/ToolbarSpacer";
 import { apolloClient } from "../lib/apollo";
@@ -45,8 +42,49 @@ export default function DashboardLayout() {
   const { mode } = useUiPreferences();
   const avatarRef = useRef<HTMLDivElement>(null);
   const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
-  const [employeeDropdown, setEmployeeDropdown] = useState(false);
   const whoamiData = useWhoAmILoader();
+
+  const menus: Array<DashboardMenuItem> = [
+    {
+      title: 'Dashboard',
+      path: '/',
+      icon: <WindowIcon />,
+    },
+    {
+      title: 'Employees',
+      path: '/employees',
+      icon: <GroupsIcon />,
+      children: [
+        {
+          title: 'List',
+          path: '/employees/list',
+          icon: <GroupAddIcon />,
+        },
+        {
+          title: 'Editor',
+          path: '/employees/editor/new',
+          icon: <GroupAddIcon />,
+        },
+      ]
+    },
+    {
+      title: 'Schedules',
+      path: '/scheduler',
+      icon: <ChecklistIcon />,
+    },
+    {
+      title: 'Financial',
+      path: '/financial',
+      icon: <MonetizationOnIcon />,
+      children: [
+        {
+          title: 'Payrolls',
+          path: '/financial/payroll',
+          icon: <CurrencyExchangeIcon />,
+        },
+      ]
+    },
+  ];
 
   return (
     <WhoamiProvider value={whoamiData}>
@@ -115,50 +153,7 @@ export default function DashboardLayout() {
             </Box>
           </Toolbar>
           <Divider />
-          <List
-            sx={{ width: '100%', flex: 1 }}
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader" sx={{ backgroundColor: 'inherit' }}>
-                Team Management
-              </ListSubheader>
-            }>
-            <ListItemButton component={Link} to="/" replace>
-              <ListItemIcon>
-                <WindowIcon />
-              </ListItemIcon>
-              <ListItemText primary="Overview" />
-            </ListItemButton>
-            <ListItemButton onClick={() => setEmployeeDropdown(current => !current)}>
-              <ListItemIcon>
-                <GroupsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Employees" secondary="Add, list employees" />
-            </ListItemButton>
-            <Collapse in={employeeDropdown} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/editor/new">
-                  <ListItemIcon>
-                    <GroupAddIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Add member" />
-                </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }} component={Link} to="/employees/list">
-                  <ListItemIcon>
-                    <ChecklistIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="List members" />
-                </ListItemButton>
-              </List>
-            </Collapse>
-            <ListItemButton component={Link} to="/scheduler">
-              <ListItemIcon>
-                <ChecklistIcon />
-              </ListItemIcon>
-              <ListItemText primary="Scheduler" secondary="Plan schedules" />
-            </ListItemButton>
-          </List>
+          <DashboardMenu menus={menus} />
           <Box sx={{ p: 1 }}>
             <IconButton LinkComponent={Link} to="/settings" component={Link}>
               <SettingsIcon />

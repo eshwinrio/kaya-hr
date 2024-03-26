@@ -1,9 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
-import { QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import { PaymentStatus, QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
-import dayjs from "dayjs";
 
 
 export const qResolverUser: QueryResolvers['user'] = async (
@@ -17,9 +18,9 @@ export const qResolverUser: QueryResolvers['user'] = async (
       organizationId: roles.includes("SUPER") ? undefined : organization?.id,
     },
     include: {
-      UserPositionMap: { include: { position: true } },
       UserRoleMap: true,
       organization: true,
+      position: true,
       UserScheduleMap: {
         include: {
           schedule: true,
@@ -40,11 +41,10 @@ export const qResolverUser: QueryResolvers['user'] = async (
     throw new GraphQLError(`User with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
   };
 
-  const { UserRoleMap, UserPositionMap, UserScheduleMap, ...user } = mixedUserDocument;
+  const { UserRoleMap, UserScheduleMap, ...user } = mixedUserDocument;
 
   return {
     ...user,
-    positions: UserPositionMap.map(({ position }) => position),
     roles: UserRoleMap.map(({ role }) => role as Role),
     schedules: UserScheduleMap.map(schedule => ({
       ...schedule,
@@ -73,10 +73,8 @@ export const qResolverUsers: QueryResolvers['users'] = async (
 ) => {
   const users = await prisma.user.findMany({
     include: {
-      UserPositionMap: {
-        include: { position: true },
-      },
       UserRoleMap: true,
+      position: true,
       organization: true
     },
     where: {
@@ -108,8 +106,7 @@ export const qResolverUsers: QueryResolvers['users'] = async (
     take: options?.limit ?? undefined,
   });
 
-  return users.map(({ UserRoleMap, UserPositionMap, syncStatus, ...user }) => ({
-    positions: UserPositionMap.map(({ position }) => position),
+  return users.map(({ UserRoleMap, syncStatus, ...user }) => ({
     roles: UserRoleMap.map(({ role }) => role as Role),
     syncStatus: syncStatus as SyncStatus,
     ...user
@@ -126,7 +123,7 @@ export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async
       include: {
         user: {
           include: {
-            UserPositionMap: { include: { position: true } },
+            position: true,
             UserRoleMap: true,
           },
         },
@@ -168,15 +165,32 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
   { filter },
   { user, roles, organization },
 ) => {
-  const activePunch = await prisma.clockTime
-    .findFirst({
+  const active = await prisma.clockTime
+    .findMany({
+      include: {
+        user: {
+          include: {
+            position: true,
+            UserRoleMap: true,
+          },
+        },
+      },
       where: {
-        userId: user.id,
+        user: {
+          organizationId: roles.includes("SUPER")
+            ? undefined
+            : organization?.id
+        },
+        userId: roles.every(role => role !== "EMPLOYEE")
+          ? user?.id
+          : filter?.userId ?? undefined,
         AND: {
           startTime: { lte: dayjs().toISOString() },
           endTime: null
         },
-      }
+      },
+      take: filter?.pageSize ?? undefined,
+      skip: filter?.pageNumber ?? undefined,
     });
 
   const history = await prisma.clockTime
@@ -184,7 +198,7 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
       include: {
         user: {
           include: {
-            UserPositionMap: { include: { position: true } },
+            position: true,
             UserRoleMap: true,
           },
         },
@@ -196,13 +210,80 @@ export const qResolverListPunches: QueryResolvers['listPunches'] = async (
           roles.includes("MANAGER") ||
           roles.includes("LEAD")
         ) ? undefined : user.id,
-        user: { organizationId: roles.includes("SUPER") ? undefined : organization?.id },
-        id: { not: activePunch?.id },
+        user: {
+          organizationId: roles.includes("SUPER")
+            ? undefined
+            : organization?.id
+        },
+        id: {
+          notIn: active.map(({ id }) => id)
+        },
       },
+      take: filter?.pageSize ?? undefined,
+      skip: filter?.pageNumber ?? undefined,
     });
 
   return {
-    activePunch,
-    history
+    active: active.map(({ user, ...clockTime }) => ({
+      ...clockTime,
+      earning: new Decimal(dayjs().diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+      paymentStatus: clockTime.paymentStatus as PaymentStatus,
+      user: {
+        ...user,
+        syncStatus: user.syncStatus as SyncStatus,
+      },
+    })),
+    history: history.map(({ user, ...clockTime }) => ({
+      ...clockTime,
+      earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+      netHours: dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour'),
+      paymentStatus: clockTime.paymentStatus as PaymentStatus,
+      user: {
+        ...user,
+        syncStatus: user.syncStatus as SyncStatus,
+      },
+    }))
   };
+}
+
+
+export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
+  _root,
+  _args,
+  { roles, organization },
+) => {
+  const payrolls = await prisma.payroll.findMany({
+    include: {
+      employee: {
+        include: {
+          position: true,
+          UserRoleMap: true,
+        },
+      },
+      ClockTime: true,
+    },
+    where: {
+      employee: {
+        organizationId: roles.includes("SUPER") ? undefined : organization?.id
+      }
+    },
+  });
+
+  return payrolls.map(({ employee, ClockTime, ...payroll }) => ({
+    ...payroll,
+    clockTimes: ClockTime.map(clockTime => ({
+      ...clockTime,
+      user: {
+        ...employee,
+        syncStatus: employee.syncStatus as SyncStatus,
+      },
+      earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+      paymentStatus: clockTime.paymentStatus as PaymentStatus,
+    })),
+    totalHours: ClockTime.reduce((acc, clockTime) => acc + dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour'), 0),
+    employee: {
+      ...employee,
+      syncStatus: employee.syncStatus as SyncStatus,
+    },
+  }));
 }

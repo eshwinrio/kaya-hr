@@ -5,38 +5,25 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Fab from "@mui/material/Fab";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListSubheader from "@mui/material/ListSubheader";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { FC, Fragment, useMemo } from "react";
+import { FC, useMemo } from "react";
 import { ActionFunction, Form, LoaderFunction, useLoaderData } from "react-router-dom";
+import PunchHistoryListItem from "../components/PunchHistoryItem";
 import Timer from "../components/Timer";
 import { apolloClient } from "../lib/apollo";
-import dayjs from "../lib/dayjs";
+import { gql } from "../lib/gql-codegen";
 import { ListPunchesQuery } from "../lib/gql-codegen/graphql";
 import { useMaterialTheme } from "../lib/material-theme";
-import { gql } from "../lib/gql-codegen";
 
 
 const PunchPage: FC = () => {
   const theme = useMaterialTheme();
   const loaderData = useLoaderData() as Awaited<PunchPageLoader>;
   const punches = useMemo(() => loaderData?.punches, [loaderData?.punches]);
-  const activePunch = useMemo(() => punches?.data.listPunches.activePunch, [punches?.data.listPunches.activePunch]);
-  const seggregatedHistory = useMemo<Record<string, ListPunchesQuery['listPunches']['history']>>(() => {
-    const dict: Record<string, ListPunchesQuery['listPunches']['history']> = {};
-    punches?.data.listPunches.history?.forEach((punch) => {
-      const date = dayjs(punch.startTime).format('YYYY-MM-DD');
-      if (!dict[date]) {
-        dict[date] = [];
-      }
-      dict[date]?.push(punch);
-    })
-    return dict;
-  }, [punches?.data.listPunches.history]);
+  const active = useMemo(() => punches?.data.listPunches.active[0], [punches?.data.listPunches.active]);
+  const history = useMemo(() => punches?.data.listPunches.history, [punches?.data.listPunches.history]);
 
   if (!loaderData) {
     return (
@@ -59,14 +46,14 @@ const PunchPage: FC = () => {
           mb: 2
         }}>
         <Toolbar sx={{ justifyContent: 'center' }}>
-          <Typography variant="body1" fontWeight="bold">{activePunch ? 'You are Clocked In' : 'Ready to Clock In?'}</Typography>
+          <Typography variant="body1" fontWeight="bold">{active ? 'You are Clocked In' : 'Ready to Clock In?'}</Typography>
         </Toolbar>
         <Form method="post">
           <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
-            {activePunch
+            {active
               ? (
                 <>
-                  <Timer timer={activePunch} fabProps={{ color: 'success' }} />
+                  <Timer timer={active} fabProps={{ color: 'success' }} />
                   <Button type="submit" variant="contained" color="info" sx={{ mt: 1 }}>Clock Out</Button>
                 </>
               )
@@ -86,19 +73,9 @@ const PunchPage: FC = () => {
           <Typography variant="h6" fontWeight="bold">History</Typography>
         </Toolbar>
         <Paper variant="outlined">
-          <List dense>
-            {seggregatedHistory && Object.keys(seggregatedHistory).map((date, index) => (
-              <Fragment key={index}>
-                <ListSubheader>{date}</ListSubheader>
-                {seggregatedHistory[date]?.map((punch) => (
-                  <ListItem key={punch.id}>
-                    <ListItemText
-                      primary={`${dayjs(punch.startTime).format('h:mm A')} - ${dayjs(punch.endTime).format('h:mm A')}`}
-                      secondary={`Lasted ${dayjs.duration(dayjs(punch.endTime).diff(dayjs(punch.startTime))).humanize()}`}
-                    />
-                  </ListItem>
-                ))}
-              </Fragment>
+          <List dense disablePadding>
+            {history.map((historyItem, index) => (
+              <PunchHistoryListItem key={index}  punchHistory={historyItem} />
             ))}
           </List>
         </Paper>
@@ -112,13 +89,11 @@ export default PunchPage;
 const LIST_PUNCHES = gql(`
   query ListPunches($filter: ListPunchesFilter) {
     listPunches (filter: $filter) {
-      activePunch {
+      active {
         ...Timer
       }
       history {
-        id
-        startTime
-        endTime
+        ...PunchHistory
       }
     }
   }

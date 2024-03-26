@@ -1,5 +1,6 @@
 import { ApolloQueryResult } from '@apollo/client';
 import ReplayIcon from '@mui/icons-material/Replay';
+import { Avatar } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
@@ -16,10 +17,9 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import { useModal } from 'mui-modal-provider';
 import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, useActionData } from 'react-router-dom';
-import UserAvatar from '../components/UserAvatar';
 import { apolloClient } from '../lib/apollo';
 import dayjs from '../lib/dayjs';
-import { CreateScheduleMutation, ScheduleInput, User } from '../lib/gql-codegen/graphql';
+import { CreateScheduleMutation, PickUserDialogQuery, ScheduleInput } from '../lib/gql-codegen/graphql';
 import { CREATE_SCHEDULE } from '../lib/gql-queries';
 import AlertDialog from '../shared/AlertDialog';
 import PickUserDialog from '../shared/PickUserDialog';
@@ -33,7 +33,7 @@ const initialFormData: ScheduleInput = {
 
 const ScheduleEditorPage: FC = () => {
   const [formData, setFormData] = useState<ScheduleInput>({ ...initialFormData });
-  const [users, setUsers] = useState<Array<User>>([]);
+  const [users, setUsers] = useState<PickUserDialogQuery['users']>([]);
   const [errors, setErrors] = useState<ScheduleInput>({ ...initialFormData });
   const actionData = useActionData() as ScheduleEditorAction;
   const { showModal } = useModal();
@@ -79,7 +79,7 @@ const ScheduleEditorPage: FC = () => {
       maxWidth: 'xs',
       fullWidth: true,
       onPick(user) {
-        setUsers(current => [user, ...current]);
+        setUsers(current => [...current, user]);
         picker.hide();
       },
     });
@@ -164,11 +164,11 @@ const ScheduleEditorPage: FC = () => {
             <ListItem key={index}>
               <ListItemButton>
                 <ListItemIcon>
-                  <UserAvatar user={user} />
+                  <Avatar />
                 </ListItemIcon>
                 <ListItemText primary={user?.firstName + " " + user?.lastName} secondary={user?.email} />
-                <input type='hidden' name='assignees' value={JSON.stringify({ userId: user.id, positionId: 1 })} />
               </ListItemButton>
+              <input type='hidden' name='assignees' key={index} value={user?.id} />
             </ListItem>
           ))}
         </List>
@@ -206,7 +206,7 @@ export const scheduleEditorAction: ActionFunction = async ({ params, request }) 
         notes: formData.get('notes')!.toString(),
         dateTimeStart: formData.get('dateTimeStart')!.toString(),
         dateTimeEnd: formData.get('dateTimeEnd')!.toString(),
-        assignees: formData.getAll('assignees').map((assignee: any) => JSON.parse(assignee)),
+        assignees: formData.getAll('assignees').map(value => ({ userId: parseInt(value.valueOf().toString(), 10) })),
       }
     }
   });

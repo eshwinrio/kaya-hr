@@ -1,14 +1,21 @@
 import Avatar, { AvatarProps } from "@mui/material/Avatar";
 import { FC } from "react";
-import { User } from "../lib/gql-codegen/graphql";
+import { FragmentType, gql, useFragment } from "../lib/gql-codegen";
+
+export const AvatarFragment = gql(/* GraphQL */`
+  fragment Avatar on User {
+    profileIconUrl
+    firstName
+  }
+`);
 
 export interface UserAvatarProps extends AvatarProps {
-  readonly user: User;
-  src?: never;
+  readonly user: FragmentType<typeof AvatarFragment>;
 }
 
 const UserAvatar: FC<UserAvatarProps> = ({ user, ...props }) => {
-  return <Avatar {...props} src={user.profileIconUrl ?? undefined} alt={`${user.firstName}'s profile picture`} />;
+  const avatarFragment = useFragment(AvatarFragment, user);
+  return <Avatar {...props} src={avatarFragment.profileIconUrl ?? undefined} alt={`${avatarFragment.firstName}'s profile picture`} />;
 };
 
 export default UserAvatar;
