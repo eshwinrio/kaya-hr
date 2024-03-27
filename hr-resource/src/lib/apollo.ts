@@ -9,7 +9,7 @@ import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
 import { mResolverAssignUserToSchedule, mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverRegisterPunch, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
 import prisma from "./prisma.js";
-import { qResolverCurrentUser, qResolverPunches, qResolverPayrolls, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverPunches, qResolverPayrolls, qResolverScheduledShifts, qResolverUser, qResolverUsers, qResolverSchedules, qResolverSchedule } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
 
 export interface ApolloServerContext extends BaseContext {
@@ -66,6 +66,8 @@ const resolvers: Resolvers<ApolloServerContext> = {
     currentUser: qResolverCurrentUser,
     users: qResolverUsers,
     user: qResolverUser,
+    schedule: qResolverSchedule,
+    schedules: qResolverSchedules,
     scheduledShifts: qResolverScheduledShifts,
     punches: qResolverPunches,
     payrolls: qResolverPayrolls,

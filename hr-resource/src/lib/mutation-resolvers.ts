@@ -302,9 +302,11 @@ export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = asyn
     .create({
       data: {
         title: input.title ?? undefined,
+        description: input.description,
         dateTimeStart: input.dateTimeStart,
         dateTimeEnd: input.dateTimeEnd,
         organizationId: organization?.id,
+        notes: input.notes,
         createdByUserId: user?.id,
         createdAt: new Date(),
       },

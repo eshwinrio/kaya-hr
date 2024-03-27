@@ -47,6 +47,7 @@ model Organization {
   logoUrl   String?
   Users     User[]
   Schedule  Schedule[]
+  Payroll   Payroll[]
 }
 
 // Higher-level models
@@ -77,16 +78,18 @@ model User {
   UserRoleMap     UserRoleMap[]
   UserScheduleMap UserScheduleMap[]
   ClockTime       ClockTime[]
-  Payroll         Payroll[]
+  Payslip         Payslip[]
 }
 
 model Schedule {
   id              Int               @id @default(autoincrement())
   title           String            @default("Untitled")
+  description     String?           @db.VarChar(255)
   dateTimeStart   DateTime
   dateTimeEnd     DateTime
   organizationId  Int
   createdByUserId Int?
+  notes           String?           @db.VarChar(255)
   createdAt       DateTime
   createdBy       User?             @relation(fields: [createdByUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -100,12 +103,12 @@ model ClockTime {
   endTime       DateTime?
   hourlyWage    Decimal
   paymentStatus PaymentStatus @default(PENDING)
-  payrollId     Int?
+  payslipId     Int?
   user          User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  payroll       Payroll?      @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payslip       Payslip?      @relation(fields: [payslipId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
-model Payroll {
+model Payslip {
   id            Int         @id @default(autoincrement())
   employeeId    Int
   periodStart   DateTime
@@ -114,9 +117,20 @@ model Payroll {
   dispensedOn   DateTime?
   deductions    Decimal?
   netPay        Decimal
+  payrollId     Int
   paymentMethod String?
   employee      User        @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payroll       Payroll     @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   ClockTime     ClockTime[]
+}
+
+model Payroll {
+  id             Int          @id @default(autoincrement())
+  organizationId Int
+  generatedOn    DateTime
+  netOutstanding Decimal
+  organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  Payslip        Payslip[]
 }
 
 // Mapping models

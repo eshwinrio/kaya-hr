@@ -6,14 +6,27 @@ import Typography from "@mui/material/Typography";
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import dayjs from "dayjs";
 import { useEffect, useState } from 'react';
-import { Schedule } from "../lib/gql-codegen/graphql";
+import { FragmentType, gql, useFragment } from '../lib/gql-codegen';
 import BorderLinearProgress from './BorderLinearProgress';
+
+const fragment = gql(`
+  fragment ScheduleListItem on Schedule {
+    id
+    title
+    description
+    dateTimeStart
+    dateTimeEnd
+    employees { firstName }
+    createdBy { ...Avatar }
+    createdAt
+  }
+`);
 
 export interface ScheduleListItemProps extends ListItemProps {
   children?: never;
   readonly listItemButtonProps?: ListItemButtonProps;
   readonly listItemTextProps?: ListItemTextProps;
-  readonly schedule: Schedule;
+  readonly schedule: FragmentType<typeof fragment>;
 }
 
 export default function ScheduleListItem({
@@ -23,8 +36,9 @@ export default function ScheduleListItem({
   schedule,
   ...props
 }: ScheduleListItemProps) {
-  const dayjsStart = dayjs(schedule.dateTimeStart);
-  const dayjsEnd = dayjs(schedule.dateTimeEnd);
+  const fragmentData = useFragment(fragment, schedule);
+  const dayjsStart = dayjs(fragmentData.dateTimeStart);
+  const dayjsEnd = dayjs(fragmentData.dateTimeEnd);
   const [dayjsNow, setDayjsNow] = useState(dayjs());
   const isShiftInProgress = dayjsStart.isBefore(dayjsNow) && dayjsEnd.isAfter(dayjsNow);
   const shiftProgress = Math.round((dayjsNow.diff(dayjsStart, 'milliseconds') / dayjsEnd.diff(dayjsStart, 'milliseconds')) * 100);
@@ -41,8 +55,8 @@ export default function ScheduleListItem({
           <Grid2 xs={12} sm='auto'>
             <ListItemText
               {...listItemTextProps}
-              primary={schedule.title}
-              secondary={schedule.id}
+              primary={fragmentData.title}
+              secondary={fragmentData.description}
             />
           </Grid2>
           <Grid2 container direction='row' alignItems='center'>

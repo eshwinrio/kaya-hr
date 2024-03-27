@@ -113,6 +113,106 @@ export const qResolverUsers: QueryResolvers['users'] = async (
   }));
 }
 
+export const qResolverSchedule: QueryResolvers['schedule'] = async (
+  _root,
+  { id },
+  { roles, organization }
+) => {
+  const mixedSchedule = await prisma.schedule
+    .findUnique({
+      include: {
+        createdBy: true,
+        organization: true,
+        UserScheduleMap: {
+          include: {
+            user: true,
+            position: true,
+          },
+        }
+      },
+      where: {
+        id,
+        organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') { throw new GraphQLError(`Schedule with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } }) }
+      }
+      throw error
+    });
+
+  if (!mixedSchedule) {
+    throw new GraphQLError(`Schedule with id ${id} not found`, { extensions: { code: 'NOT_FOUND' } });
+  };
+
+  const { UserScheduleMap, createdBy, ...schedule } = mixedSchedule;
+  return {
+    ...schedule,
+    ...(createdBy && { createdBy: { ...createdBy, syncStatus: createdBy.syncStatus as SyncStatus } }),
+    employees: UserScheduleMap.map(({ user, position }) => ({
+      ...user,
+      position: position ?? null,
+      syncStatus: user.syncStatus as SyncStatus
+    }))
+  };
+}
+
+export const qResolverSchedules: QueryResolvers['schedules'] = async (
+  _root,
+  { filters },
+  { roles, organization }
+) => {
+  const schedules = await prisma.schedule
+    .findMany({
+      include: {
+        createdBy: true,
+        organization: true,
+        UserScheduleMap: {
+          include: {
+            user: true,
+            position: true,
+          },
+        }
+      },
+      where: {
+        organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+        ...(filters?.title
+          ? {
+            OR: [
+              { title: { contains: filters.title } },
+            ]
+          }
+          : {}
+        ),
+        dateTimeStart: { gte: filters?.from, lte: filters?.to },
+        dateTimeEnd: { gte: filters?.from, lte: filters?.to },
+      },
+      take: filters?.pagination?.take ?? undefined,
+      skip: filters?.pagination?.skip ?? undefined,
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError('Certain records missing', { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      logSystem.error(error);
+      throw new GraphQLError('Could not query schedules', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+    });
+
+  return schedules.map(({ UserScheduleMap, createdBy, ...schedule }) => ({
+    ...schedule,
+    ...(createdBy && { createdBy: { ...createdBy, syncStatus: createdBy.syncStatus as SyncStatus } }),
+    employees: UserScheduleMap.map(({ user, position }) => ({
+      ...user,
+      position: position ?? null,
+      syncStatus: user.syncStatus as SyncStatus
+    }))
+  }));
+}
+
 export const qResolverScheduledShifts: QueryResolvers['scheduledShifts'] = async (
   _root,
   { filters },
@@ -254,36 +354,31 @@ export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
 ) => {
   const payrolls = await prisma.payroll.findMany({
     include: {
-      employee: {
+      organization: true,
+      Payslip: {
         include: {
-          position: true,
-          UserRoleMap: true,
-        },
-      },
-      ClockTime: true,
+          ClockTime: true,
+          employee: {
+            include: {
+              position: true,
+            }
+          },
+        }
+      }
     },
     where: {
-      employee: {
-        organizationId: roles.includes("SUPER") ? undefined : organization?.id
-      }
+      organizationId: roles.includes("SUPER") ? undefined : organization?.id,
     },
   });
 
-  return payrolls.map(({ employee, ClockTime, ...payroll }) => ({
+  return payrolls.map(({ Payslip, ...payroll }) => ({
     ...payroll,
-    clockTimes: ClockTime.map(clockTime => ({
-      ...clockTime,
-      user: {
-        ...employee,
-        syncStatus: employee.syncStatus as SyncStatus,
+    payslips: Payslip.map(({ ClockTime, ...payslip }) => ({
+      ...payslip,
+      employee: {
+        ...payslip.employee,
+        syncStatus: payslip.employee.syncStatus as SyncStatus,
       },
-      earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
-      paymentStatus: clockTime.paymentStatus as PaymentStatus,
-    })),
-    totalHours: ClockTime.reduce((acc, clockTime) => acc + dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour'), 0),
-    employee: {
-      ...employee,
-      syncStatus: employee.syncStatus as SyncStatus,
-    },
+    }))
   }));
 }

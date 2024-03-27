@@ -79,7 +79,7 @@ export default function DashboardLayout() {
       children: [
         {
           title: 'Payrolls',
-          path: '/financial/payroll',
+          path: '/financial/payrolls',
           icon: <CurrencyExchangeIcon />,
         },
       ]

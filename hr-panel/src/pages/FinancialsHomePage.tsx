@@ -9,11 +9,9 @@ import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { FC } from "react";
 import { LoaderFunction } from "react-router-dom";
-import { apolloClient } from "../lib/apollo";
-import { gql } from "../lib/gql-codegen";
 
-const PayrollsPage: FC = () => {
 
+const FinancialsHomePage: FC = () => {
   return (
     <Container>
       <Toolbar disableGutters>
@@ -132,28 +130,8 @@ const PayrollsPage: FC = () => {
   );
 };
 
-export default PayrollsPage;
+export default FinancialsHomePage;
 
-export const LOAD_ALL_PAYROLLS = gql(`
-  query LoadAllPayrolls {
-    payrolls {
-      id
-      employee {
-        id
-        firstName
-        lastName
-      }
-      periodStart
-      periodEnd
-      generatedOn
-      dispensedOn
-      deductions
-      netPay
-      paymentMethod
-    }
-  }
-`);
-
-export const payrollsPageLoader: LoaderFunction = async () => {
-  return apolloClient.query({ query: LOAD_ALL_PAYROLLS });
+export const financialHomePageLoader: LoaderFunction = async () => {
+  return null;
 };

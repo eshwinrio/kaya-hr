@@ -8,11 +8,13 @@ import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
 import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './pages/EmployeeEditorPage';
 import EmployeeList, { employeeListLoader } from './pages/EmployeeList';
+import FinancialsHomePage, { financialHomePageLoader } from './pages/FinancialsHomePage';
 import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
 import HomePage, { homeLoader } from './pages/HomePage';
 import Login, { loginAction } from './pages/Login';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
-import PayrollsPage from './pages/PayrollsPage';
+import PayrollsIndex, { payrollsPageLoader } from './pages/PayrollsIndex';
+import PayrollViewerPage from './pages/PayrollViewerPage';
 import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
@@ -80,7 +82,23 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                Component: PayrollsPage
+                Component: FinancialsHomePage,
+                loader: financialHomePageLoader,
+              },
+              {
+                id: 'payroll',
+                path: "payrolls",
+                children: [
+                  {
+                    index: true,
+                    Component: PayrollsIndex,
+                    loader: payrollsPageLoader,
+                  },
+                  {
+                    path: ":id",
+                    Component: PayrollViewerPage
+                  }
+                ]
               }
             ]
           },

@@ -21,6 +21,13 @@ enum PaymentStatus {
   COMPLETED
 }
 
+# <Interfaces>
+input Pagination {
+  take: Int
+  skip: Int
+}
+# </Interfaces>
+
 
 # <Primitive types>
 type ClockTime {
@@ -54,23 +61,31 @@ type Position {
   schedules: [Schedule!]
 }
 
-type Payroll {
+type Payslip {
   id: Int!
   periodStart: ISODate!
   periodEnd: ISODate!
   generatedOn: ISODate!
   dispensedOn: ISODate
-  totalHours: Decimal!
   deductions: Decimal
   netPay: Decimal!
   paymentMethod: String
   employee: User!
-  clockTimes: [ClockTime!]!
+  clockTimes: [ClockTime!]
+}
+
+type Payroll {
+  id: Int!
+  generatedOn: ISODate!
+  netOutstanding: Decimal!
+  organization: Organization!
+  payslips: [Payslip!]!
 }
 
 type Schedule {
   id: Int!
   title: String!
+  description: String
   notes: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
@@ -198,6 +213,7 @@ input ScheduleAssigneeInput {
 
 input ScheduleInput {
   title: String
+  description: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
   assignees: [ScheduleAssigneeInput!]
@@ -210,6 +226,7 @@ input ListScheduleFilter {
   title: String
   from: ISODate
   to: ISODate
+  pagination: Pagination
 }
 
 input ViewUserOptions {
@@ -248,6 +265,7 @@ type Query {
 
   # Shift scheduling
   schedule(id: Int!): Schedule!
+  schedules(filters: ListScheduleFilter): [Schedule!]!
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 
   # Timesheet
