@@ -111,8 +111,6 @@ model ClockTime {
 model Payslip {
   id            Int         @id @default(autoincrement())
   employeeId    Int
-  periodStart   DateTime
-  periodEnd     DateTime
   generatedOn   DateTime
   dispensedOn   DateTime?
   deductions    Decimal?
@@ -127,6 +125,8 @@ model Payslip {
 model Payroll {
   id             Int          @id @default(autoincrement())
   organizationId Int
+  periodStart    DateTime
+  periodEnd      DateTime
   generatedOn    DateTime
   netOutstanding Decimal
   organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)

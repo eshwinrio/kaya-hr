@@ -69,17 +69,13 @@ export type GeneratePayrollOptions = {
   periodStart: Scalars['ISODate']['input'];
 };
 
-export type ListPunches = {
-  __typename?: 'ListPunches';
-  active: Array<ClockTime>;
-  history: Array<ClockTime>;
-};
-
 export type ListPunchesFilter = {
+  activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  from?: InputMaybe<Scalars['ISODate']['input']>;
   organizationId?: InputMaybe<Scalars['Int']['input']>;
-  pageNumber?: InputMaybe<Scalars['Int']['input']>;
-  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  pagination?: InputMaybe<Pagination>;
   paymentStatus?: InputMaybe<Array<PaymentStatus>>;
+  to?: InputMaybe<Scalars['ISODate']['input']>;
   userId?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -204,6 +200,8 @@ export type Payroll = {
   netOutstanding: Scalars['Decimal']['output'];
   organization: Organization;
   payslips: Array<Payslip>;
+  periodEnd: Scalars['ISODate']['output'];
+  periodStart: Scalars['ISODate']['output'];
 };
 
 export type Payslip = {
@@ -216,8 +214,6 @@ export type Payslip = {
   id: Scalars['Int']['output'];
   netPay: Scalars['Decimal']['output'];
   paymentMethod?: Maybe<Scalars['String']['output']>;
-  periodEnd: Scalars['ISODate']['output'];
-  periodStart: Scalars['ISODate']['output'];
 };
 
 export type Position = {
@@ -240,7 +236,7 @@ export type Query = {
   __typename?: 'Query';
   currentUser: User;
   payrolls: Array<Payroll>;
-  punches: ListPunches;
+  punches: Array<ClockTime>;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
   schedules: Array<Schedule>;
@@ -476,7 +472,6 @@ export type ResolversTypes = ResolversObject<{
   GeneratePayrollOptions: GeneratePayrollOptions;
   ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  ListPunches: ResolverTypeWrapper<ListPunches>;
   ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
   ListUsersFilter: ListUsersFilter;
@@ -513,7 +508,6 @@ export type ResolversParentTypes = ResolversObject<{
   GeneratePayrollOptions: GeneratePayrollOptions;
   ISODate: Scalars['ISODate']['output'];
   Int: Scalars['Int']['output'];
-  ListPunches: ListPunches;
   ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
   ListUsersFilter: ListUsersFilter;
@@ -558,12 +552,6 @@ export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
   name: 'ISODate';
 }
 
-export type ListPunchesResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ListPunches'] = ResolversParentTypes['ListPunches']> = ResolversObject<{
-  active?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType>;
-  history?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   assignUserToSchedule?: Resolver<ResolversTypes['ScheduleAssignment'], ParentType, ContextType, RequireFields<MutationAssignUserToScheduleArgs, 'positionId' | 'scheduleId' | 'userId'>>;
   createOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationCreateOrganizationArgs, 'input'>>;
@@ -596,6 +584,8 @@ export type PayrollResolvers<ContextType = ApolloServerContext, ParentType exten
   netOutstanding?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   organization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType>;
   payslips?: Resolver<Array<ResolversTypes['Payslip']>, ParentType, ContextType>;
+  periodEnd?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  periodStart?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -608,8 +598,6 @@ export type PayslipResolvers<ContextType = ApolloServerContext, ParentType exten
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   netPay?: Resolver<ResolversTypes['Decimal'], ParentType, ContextType>;
   paymentMethod?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  periodEnd?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
-  periodStart?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -626,7 +614,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
   payrolls?: Resolver<Array<ResolversTypes['Payroll']>, ParentType, ContextType>;
-  punches?: Resolver<ResolversTypes['ListPunches'], ParentType, ContextType, Partial<QueryPunchesArgs>>;
+  punches?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType, Partial<QueryPunchesArgs>>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
   schedules?: Resolver<Array<ResolversTypes['Schedule']>, ParentType, ContextType, Partial<QuerySchedulesArgs>>;
@@ -691,7 +679,6 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
   ISODate?: GraphQLScalarType;
-  ListPunches?: ListPunchesResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Payroll?: PayrollResolvers<ContextType>;

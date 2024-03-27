@@ -79,8 +79,6 @@ CREATE TABLE `ClockTime` (
 CREATE TABLE `Payslip` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `employeeId` INTEGER NOT NULL,
-    `periodStart` DATETIME(3) NOT NULL,
-    `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
     `dispensedOn` DATETIME(3) NULL,
     `deductions` DECIMAL(65, 30) NULL,
@@ -95,6 +93,8 @@ CREATE TABLE `Payslip` (
 CREATE TABLE `Payroll` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `organizationId` INTEGER NOT NULL,
+    `periodStart` DATETIME(3) NOT NULL,
+    `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
     `netOutstanding` DECIMAL(65, 30) NOT NULL,
 

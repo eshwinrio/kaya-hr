@@ -1,26 +1,28 @@
+import { ApolloQueryResult } from '@apollo/client';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LaunchIcon from '@mui/icons-material/Launch';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { FC, useMemo } from 'react';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import DashCard from '../components/DashCard';
-import UserList from '../components/UserList';
+import UserListItem from '../components/UserListItem';
 import WeatherWidget from '../components/WeatherWidget';
 import { apolloClient } from '../lib/apollo';
-import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
-import { LOAD_USERS } from '../lib/gql-queries';
+import { gql } from '../lib/gql-codegen';
+import { ActiveUsersQuery } from '../lib/gql-codegen/graphql';
 import { useWhoAmI } from '../lib/whoami-provider';
-import { FC } from 'react';
 
 const HomePage: FC = () => {
   const whoAmI = useWhoAmI();
-  const data = useLoaderData() as LoadAllUsersQuery;
+  const loaderData = useLoaderData() as HomePageLoader;
+  const activeUsers = useMemo(() => loaderData.activeUsers.data?.punches ?? [], [loaderData.activeUsers.data?.punches]);
 
   return (
     <Container>
@@ -44,7 +46,7 @@ const HomePage: FC = () => {
               {
                 title: 'Total employees',
                 icon: <AssignmentIndIcon />,
-                value: data.users.length,
+                value: loaderData.activeUsers.data.punches.length,
                 backgroundColor: "#CAB7EBD7",
                 color: "#482880"
               },
@@ -89,14 +91,34 @@ const HomePage: FC = () => {
           <Paper variant='outlined' elevation={0} sx={{ height: '100%', overflowY: 'auto' }}>
             <Toolbar sx={{ justifyContent: 'space-between' }}>
               <Typography>Active</Typography>
-              <Button size='small' startIcon={<LaunchIcon fontSize='inherit' />} component={Link} to='/employees/list'>View all</Button>
+              <IconButton size='small' edge='end' component={Link} to='/employees'>
+                <LaunchIcon fontSize='inherit' />
+              </IconButton>
             </Toolbar>
-            <UserList
-              disablePadding dense
-              listItemProps={{ disableGutters: true, disablePadding: true, divider: true }}
-              users={data.users}
-              sx={{ height: 273, overflowY: 'auto' }}
-            />
+            {activeUsers.length > 0
+              ? (
+                <List dense disablePadding>
+                  {activeUsers.map(user => (
+                    <UserListItem
+                      key={user.id}
+                      user={user.user}
+                      disableGutters
+                      disablePadding
+                    />
+                  ))}
+                </List>
+              )
+              : (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'center' }}>No active employees</Typography>
+                </Box>
+              )
+            }
+            {/* //   disablePadding dense
+            //   listItemProps={{ disableGutters: true, disablePadding: true, divider: true }}
+            //   users={data.users}
+            //   sx={{ height: 273, overflowY: 'auto' }}
+            // /> */}
           </Paper>
         </Grid2>
       </Grid2 >
@@ -106,6 +128,21 @@ const HomePage: FC = () => {
 
 export default HomePage;
 
+const activeEmployeesQuery = gql(`
+  query ActiveUsers {
+    punches(filter: { activeOnly: true }) {
+      id
+      user { ...UserListItem }
+    }
+  }
+`);
+
+interface HomePageLoader {
+  readonly activeUsers: Awaited<ApolloQueryResult<ActiveUsersQuery>>;
+}
+
 export const homeLoader: LoaderFunction = async () => {
-  return (await apolloClient.query({ query: LOAD_USERS })).data;
+  return {
+    activeUsers: await apolloClient.query({ query: activeEmployeesQuery })
+  };
 }

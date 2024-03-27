@@ -8,7 +8,7 @@ import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
 import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './pages/EmployeeEditorPage';
 import EmployeeList, { employeeListLoader } from './pages/EmployeeList';
-import FinancialsHomePage, { financialHomePageLoader } from './pages/FinancialsHomePage';
+import FinancialsIndex, { financialHomePageLoader } from './pages/FinancialsIndex';
 import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
 import HomePage, { homeLoader } from './pages/HomePage';
 import Login, { loginAction } from './pages/Login';
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                Component: FinancialsHomePage,
+                Component: FinancialsIndex,
                 loader: financialHomePageLoader,
               },
               {

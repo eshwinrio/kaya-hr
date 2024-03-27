@@ -63,8 +63,6 @@ type Position {
 
 type Payslip {
   id: Int!
-  periodStart: ISODate!
-  periodEnd: ISODate!
   generatedOn: ISODate!
   dispensedOn: ISODate
   deductions: Decimal
@@ -76,6 +74,8 @@ type Payslip {
 
 type Payroll {
   id: Int!
+  periodStart: ISODate!
+  periodEnd: ISODate!
   generatedOn: ISODate!
   netOutstanding: Decimal!
   organization: Organization!
@@ -132,11 +132,6 @@ type User {
 type UserSyncResult {
   accepted: Int!
   rejected: Int!
-}
-
-type ListPunches {
-  active: [ClockTime!]!
-  history: [ClockTime!]!
 }
 # </Output types>
 
@@ -244,8 +239,10 @@ input ListPunchesFilter {
   userId: Int
   organizationId: Int
   paymentStatus: [PaymentStatus!]
-  pageSize: Int
-  pageNumber: Int
+  from: ISODate
+  to: ISODate
+  activeOnly: Boolean
+  pagination: Pagination
 }
 
 input GeneratePayrollOptions {
@@ -269,7 +266,7 @@ type Query {
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 
   # Timesheet
-  punches(filter: ListPunchesFilter): ListPunches!
+  punches(filter: ListPunchesFilter): [ClockTime!]!
   payrolls: [Payroll!]!
 }
 

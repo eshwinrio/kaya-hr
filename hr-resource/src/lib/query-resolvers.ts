@@ -265,7 +265,7 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
   { filter },
   { user, roles, organization },
 ) => {
-  const active = await prisma.clockTime
+  const clocktimes = await prisma.clockTime
     .findMany({
       include: {
         user: {
@@ -277,74 +277,33 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
       },
       where: {
         user: {
+          id: roles.some((role) => role === "SUPER" || role === "ADMIN" || role === "MANAGER" || role === "LEAD")
+            ? undefined
+            : user.id,
           organizationId: roles.includes("SUPER")
             ? undefined
             : organization?.id
         },
-        userId: roles.every(role => role !== "EMPLOYEE")
-          ? user?.id
-          : filter?.userId ?? undefined,
-        AND: {
-          startTime: { lte: dayjs().toISOString() },
-          endTime: null
-        },
-      },
-      take: filter?.pageSize ?? undefined,
-      skip: filter?.pageNumber ?? undefined,
-    });
-
-  const history = await prisma.clockTime
-    .findMany({
-      include: {
-        user: {
-          include: {
-            position: true,
-            UserRoleMap: true,
-          },
-        },
-      },
-      where: {
-        userId: (
-          roles.includes("SUPER") ||
-          roles.includes("ADMIN") ||
-          roles.includes("MANAGER") ||
-          roles.includes("LEAD")
-        ) ? undefined : user.id,
-        user: {
-          organizationId: roles.includes("SUPER")
-            ? undefined
-            : organization?.id
-        },
-        id: {
-          notIn: active.map(({ id }) => id)
-        },
+        startTime: { gte: filter?.from ?? undefined, lte: filter?.to ?? undefined },
+        endTime: filter?.activeOnly
+          ? null
+          : { gte: filter?.from ?? undefined, lte: filter?.to ?? undefined },
         paymentStatus: { in: filter?.paymentStatus ?? undefined },
       },
-      take: filter?.pageSize ?? undefined,
-      skip: filter?.pageNumber ?? undefined,
+      take: filter?.pagination?.take ?? undefined,
+      skip: filter?.pagination?.skip ?? undefined,
     });
 
-  return {
-    active: active.map(({ user, ...clockTime }) => ({
-      ...clockTime,
-      earning: new Decimal(dayjs().diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
-      paymentStatus: clockTime.paymentStatus as PaymentStatus,
-      user: {
-        ...user,
-        syncStatus: user.syncStatus as SyncStatus,
-      },
-    })),
-    history: history.map(({ user, ...clockTime }) => ({
-      ...clockTime,
-      earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
-      netHours: dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour'),
-      paymentStatus: clockTime.paymentStatus as PaymentStatus,
-      user: {
-        ...user,
-        syncStatus: user.syncStatus as SyncStatus,
-      },
-    }))
-  };
+  return clocktimes.map(({ user, ...clockTime }) => ({
+    ...clockTime,
+    earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+    netHours: dayjs(clockTime.endTime ?? dayjs()).diff(clockTime.startTime, 'hour'),
+    paymentStatus: clockTime.paymentStatus as PaymentStatus,
+    user: {
+      ...user,
+      syncStatus: user.syncStatus as SyncStatus,
+    },
+  }));
 }
 
 export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
