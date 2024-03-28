@@ -72,8 +72,8 @@ CREATE TABLE `ClockTime` (
     `startTime` DATETIME(3) NOT NULL,
     `endTime` DATETIME(3) NULL,
     `hourlyWage` DECIMAL(65, 30) NOT NULL,
-    `paymentStatus` ENUM('CANCELED', 'PENDING', 'COMPLETED') NOT NULL DEFAULT 'PENDING',
     `payslipId` INTEGER NULL,
+    `approvalStatus` ENUM('REJECTED', 'PENDING', 'APPROVED') NOT NULL DEFAULT 'PENDING',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -87,7 +87,7 @@ CREATE TABLE `Payslip` (
     `generatedOn` DATETIME(3) NOT NULL,
     `dispensedOn` DATETIME(3) NULL,
     `deductions` DECIMAL(65, 30) NOT NULL DEFAULT 0,
-    `netPay` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `paymentStatus` ENUM('CANCELED', 'PENDING', 'COMPLETED') NOT NULL DEFAULT 'PENDING',
     `payrollId` INTEGER NULL,
     `paymentMethod` VARCHAR(191) NULL,
 
@@ -102,7 +102,6 @@ CREATE TABLE `Payroll` (
     `periodStart` DATETIME(3) NOT NULL,
     `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
-    `netOutstanding` DECIMAL(65, 30) NOT NULL,
 
     UNIQUE INDEX `Payroll_organizationId_periodStart_periodEnd_key`(`organizationId`, `periodStart`, `periodEnd`),
     PRIMARY KEY (`id`)

@@ -21,6 +21,12 @@ enum PaymentStatus {
   COMPLETED
 }
 
+enum PunchApprovalStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
 # <Interfaces>
 input Pagination {
   take: Int
@@ -37,9 +43,9 @@ type ClockTime {
   netHours: Int
   hourlyWage: Decimal!
   earning: Decimal
-  paymentStatus: PaymentStatus!
   user: User
   payroll: Payroll
+  approvalStatus: PunchApprovalStatus!
 }
 
 type Organization {
@@ -68,6 +74,7 @@ type Payslip {
   deductions: Decimal
   netPay: Decimal!
   paymentMethod: String
+  paymentStatus: PaymentStatus!
   employee: User!
   clockTimes: [ClockTime!]
 }
@@ -78,8 +85,8 @@ type Payroll {
   periodEnd: ISODate!
   generatedOn: ISODate!
   netOutstanding: Decimal!
-  organization: Organization!
-  payslips: [Payslip!]!
+  organization: Organization
+  payslips: [Payslip!]
 }
 
 type Schedule {
@@ -263,6 +270,31 @@ input GeneratePayrollOptions {
 }
 # </Input types>
 
+# <ComponentSpecificQueries>
+type PayrollSummary {
+  payrollId: Int!
+  periodStart: ISODate!
+  periodEnd: ISODate!
+  totalTasks: Int!
+  pendingTasks: Int!
+  completedTasks: Int!
+  rejectedTasks: Int!
+}
+# </ComponentSpecificQueries>
+
+# <PageSpecificQueries>
+type PayrollsIndex {
+  week: Int!
+  year: Int!
+  currentCycleStart: ISODate!
+  currentCycleEnd: ISODate!
+  amountOutstanding: Decimal!
+  previousPayrolls: [Payroll!]!
+  activePayslips: [Payslip!]!
+  currentPayrollSummary: PayrollSummary
+}
+# </PageSpecificQueries>
+
 
 # Root types
 type Query {
@@ -281,6 +313,9 @@ type Query {
   payrollPeriods: PayrollPeriod
   payrolls: [Payroll!]!
   payslips(filter: PayslipsFilter): [Payslip!]!
+
+  # PageSpecificQueries
+  payrollsIndex: PayrollsIndex!
 }
 
 type Mutation {

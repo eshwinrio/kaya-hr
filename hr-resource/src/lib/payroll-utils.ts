@@ -7,7 +7,7 @@ import prisma from "./prisma.js";
 
 
 /**
- * Generates a payslip for each employee, for the current payroll period.
+ * Generates a payslip for each employee, at the beginning of current payroll period.
  * @param {Organization} organization 
  */
 export async function generatePayslips(organization: Organization) {
@@ -42,7 +42,7 @@ export async function generatePayslips(organization: Organization) {
         where: {
           AND: [
             { endTime: { lte: period.next().toDate() } },
-            { paymentStatus: 'PENDING' },
+            { approvalStatus: 'PENDING' },
             { payslipId: null },
           ]
         }
@@ -62,10 +62,10 @@ export async function generatePayslips(organization: Organization) {
           periodStart: period.prev().toDate(),
           periodEnd: period.next().toDate(),
           generatedOn: new Date(),
-          ClockTime: { connect: orphanedClockTimes?.map(orphan => ({ id: orphan.id }))}
+          ClockTime: { connect: orphanedClockTimes?.map(orphan => ({ id: orphan.id })) }
         },
         update: {
-          ClockTime: { connect: orphanedClockTimes?.map(orphan => ({ id: orphan.id }))}
+          ClockTime: { connect: orphanedClockTimes?.map(orphan => ({ id: orphan.id })) }
         }
       })
       .catch(err => {
@@ -78,4 +78,67 @@ export async function generatePayslips(organization: Organization) {
         }
       });
   }
+}
+
+/**
+ * Generates the payroll at the end of the current cycle.
+ * @param {Organization} organization 
+ */
+export async function generatePayroll(organization: Organization) {
+  // Estimate the period based on the cron expression
+  const period = cronParser.parseExpression(
+    organization.payrollCron!,
+    {
+      utc: true,
+      startDate: organization.payrollStart ?? dayjs().startOf('month').toDate(),
+    }
+  );
+
+  // Gather all the payslips
+  const payslips = await prisma.payslip.findMany({
+    where: {
+      AND: [
+        { periodStart: { lte: period.prev().toDate() } },
+        { periodEnd: { gte: period.next().toDate() } },
+        { employee: { organizationId: organization.id } },
+      ]
+    },
+    include: {
+      employee: true,
+      ClockTime: true
+    }
+  });
+
+  // Upsert the payroll
+  const payrollUpsertResult = await prisma.payroll
+    .upsert({
+      where: {
+        organizationId_periodStart_periodEnd: {
+          organizationId: organization.id,
+          periodStart: period.prev().toDate(),
+          periodEnd: period.next().toDate(),
+        }
+      },
+      create: {
+        organizationId: organization.id,
+        periodStart: period.prev().toDate(),
+        periodEnd: period.next().toDate(),
+        generatedOn: new Date(),
+        Payslip: { connect: payslips.map(payslip => ({ id: payslip.id })) }
+      },
+      update: {
+        Payslip: { connect: payslips.map(payslip => ({ id: payslip.id })) }
+      }
+    })
+    .catch(err => {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          logSystem.warn(`Payroll already exists for ${organization.name}`);
+        }
+      } else {
+        logSystem.error(err);
+      }
+    });
+
+  return payrollUpsertResult;
 }

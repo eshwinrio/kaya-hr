@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import cronParser from "cron-parser";
-import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
-import { PaymentStatus, QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import dayjs from "./dayjs.js";
+import { PaymentStatus, Payroll, PayrollSummary, Payslip, PunchApprovalStatus, QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
+import { clocktimeEarningReducer } from "./utilities.js";
 
 
 export const qResolverUser: QueryResolvers['user'] = async (
@@ -289,7 +290,6 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
         endTime: filter?.activeOnly
           ? null
           : { gte: filter?.from ?? undefined, lte: filter?.to ?? undefined },
-        paymentStatus: { in: filter?.paymentStatus ?? undefined },
       },
       take: filter?.pagination?.take ?? undefined,
       skip: filter?.pagination?.skip ?? undefined,
@@ -297,9 +297,9 @@ export const qResolverPunches: QueryResolvers['punches'] = async (
 
   return clocktimes.map(({ user, ...clockTime }) => ({
     ...clockTime,
+    approvalStatus: clockTime.approvalStatus as PunchApprovalStatus,
     earning: new Decimal(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
     netHours: dayjs(clockTime.endTime ?? dayjs()).diff(clockTime.startTime, 'hour'),
-    paymentStatus: clockTime.paymentStatus as PaymentStatus,
     user: {
       ...user,
       syncStatus: user.syncStatus as SyncStatus,
@@ -333,8 +333,11 @@ export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
 
   return payrolls.map(({ Payslip, ...payroll }) => ({
     ...payroll,
-    payslips: Payslip.map(({ ClockTime, ...payslip }) => ({
+    netOutstanding: 0,
+    payslips: Payslip.map(({ ClockTime, paymentStatus, ...payslip }) => ({
       ...payslip,
+      netPay: 0,
+      paymentStatus: paymentStatus as PaymentStatus,
       employee: {
         ...payslip.employee,
         syncStatus: payslip.employee.syncStatus as SyncStatus,
@@ -378,29 +381,29 @@ export const qResolverPayslips: QueryResolvers['payslips'] = async (
 
   const payslips = await prisma.payslip
     .findMany({
-        include: {
-          employee: {
-            include: {
-              position: true,
-            }
-          },
-          ClockTime: true
+      include: {
+        employee: {
+          include: {
+            position: true,
+          }
         },
+        ClockTime: true
+      },
       where: {
         employeeId: roles.every((role) => role !== "EMPLOYEE") ? filter?.employeeId ?? undefined : user.id,
         ...(filter?.onlyCurrentPeriod
-            ? {
-              periodStart: {
-                gte: currentPayrollPeriod.prev().toDate(),
-                lte: currentPayrollPeriod.next().toDate()
-              },
-              periodEnd: {
-                gte: currentPayrollPeriod.prev().toDate(),
-                lte: currentPayrollPeriod.next().toDate()
-              },
-            }
-            : {}  
-          ),
+          ? {
+            periodStart: {
+              gte: currentPayrollPeriod.prev().toDate(),
+              lte: currentPayrollPeriod.next().toDate()
+            },
+            periodEnd: {
+              gte: currentPayrollPeriod.prev().toDate(),
+              lte: currentPayrollPeriod.next().toDate()
+            },
+          }
+          : {}
+        ),
       },
     })
     .catch(error => {
@@ -414,15 +417,175 @@ export const qResolverPayslips: QueryResolvers['payslips'] = async (
       throw new GraphQLError('Could not query payslips', { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
     });
 
-  return payslips.map(({ ClockTime, ...payslip }) => ({
+  return payslips.map(({ ClockTime, paymentStatus, ...payslip }) => ({
     ...payslip,
-    clockTimes: ClockTime.map(({ paymentStatus, ...clockTime }) => ({
+    netPay: 0,
+    paymentStatus: paymentStatus as PaymentStatus,
+    clockTimes: ClockTime.map(clockTime => ({
       ...clockTime,
-      paymentStatus: paymentStatus as PaymentStatus
+      approvalStatus: clockTime.approvalStatus as PunchApprovalStatus
     })),
     employee: {
       ...payslip.employee,
       syncStatus: payslip.employee.syncStatus as SyncStatus,
     },
   }));
+}
+
+export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
+  _root,
+  _args,
+  { roles, organization },
+) => {
+
+  if (!roles.some(role => role === "MANAGER" || role === "LEAD")) {
+    throw new GraphQLError(`User does not have permission to access this resource`, { extensions: { code: 'FORBIDDEN' } })
+  }
+
+  const currentCycle = cronParser.parseExpression(organization.payrollCron, {
+    startDate: organization.payrollStart ?? dayjs().startOf('month').toDate(),
+    currentDate: dayjs().toDate(),
+    tz: 'UTC',
+  });
+
+  const amountOutstanding = await prisma.payslip
+    .findMany({
+      where: {
+        employee: { organizationId: organization.id },
+        periodStart: { gte: currentCycle.prev().toDate(), lte: currentCycle.next().toDate() },
+        periodEnd: { gte: currentCycle.prev().toDate(), lte: currentCycle.next().toDate() },
+      },
+      include: {
+        ClockTime: true
+      }
+    })
+    .then(payslips => {
+      return payslips.reduce(
+        (payslipAmountAccumulator, { ClockTime }) => payslipAmountAccumulator.add(
+          ClockTime.reduce(clocktimeEarningReducer, new Decimal(0).toDecimalPlaces(2, Decimal.ROUND_HALF_UP))
+        ),
+        new Decimal(0).toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+      )
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError(``, { extensions: { code: 'NOT_FOUND' } })
+        }
+        logSystem.error(error.stack);
+      }
+      logSystem.error(error);
+      throw new GraphQLError('Could not query payrolls', { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
+    });
+
+  const previousPayrolls: Array<Payroll> = await prisma.payroll.findMany({
+    where: {
+      periodEnd: {
+        lt: currentCycle.prev().toDate()
+      },
+      organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+    },
+    include: {
+      Payslip: {
+        include: {
+          ClockTime: true
+        }
+      }
+    },
+    orderBy: {
+      periodEnd: 'desc'
+    },
+    take: 7
+  }).then(payrolls => payrolls.map(payroll => ({
+    ...payroll,
+    netOutstanding: payroll.Payslip.reduce(
+      (acc, { ClockTime }) => acc.add(ClockTime.reduce(
+        (acc, clockTime) => acc + (dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+        0
+      )),
+      new Decimal(0).toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+    ),
+  })));
+
+  const activePayslips: Array<Payslip> = await prisma.payslip.findMany({
+    where: {
+      periodStart: {
+        gte: currentCycle.prev().toDate(),
+        lte: currentCycle.next().toDate()
+      },
+      periodEnd: {
+        gte: currentCycle.prev().toDate(),
+        lte: currentCycle.next().toDate()
+      },
+      employee: {
+        organizationId: roles.includes("SUPER") ? undefined : organization?.id,
+      }
+    },
+    include: {
+      employee: true,
+      ClockTime: true
+    }
+  })
+    .then(payslips => payslips.map(({ ClockTime, employee, paymentStatus, ...payslip }) => ({
+      ...payslip,
+      netPay: ClockTime.reduce(
+        (acc, clockTime) => acc.add(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+        new Decimal(0).toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+      ),
+      employee: {
+        ...employee,
+        syncStatus: employee.syncStatus as SyncStatus
+      },
+      paymentStatus: paymentStatus as PaymentStatus,
+    })))
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError(``, { extensions: { code: 'NOT_FOUND' } });
+        }
+        logSystem.error(error.stack);
+      }
+      logSystem.error(error);
+      throw new GraphQLError('Could not query payrolls', { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
+    });
+
+  const currentPayrollSummary: PayrollSummary | null = await prisma.payroll.findUnique({
+    where: {
+      organizationId_periodStart_periodEnd: {
+        organizationId: organization.id,
+        periodStart: currentCycle.prev().toDate(),
+        periodEnd: currentCycle.next().toDate()
+      }
+    },
+    include: {
+      Payslip: {
+        include: {
+          ClockTime: true
+        }
+      }
+    }
+  }).then(payroll => {
+    if (!payroll) return null;
+    const { Payslip } = payroll;
+    return {
+      payrollId: payroll.id,
+      periodStart: payroll.periodStart,
+      periodEnd: payroll.periodEnd,
+      totalTasks: payroll.Payslip.length,
+      pendingTasks: Payslip.filter(({ paymentStatus }) => paymentStatus === 'PENDING').length,
+      completedTasks: Payslip.filter(({ paymentStatus }) => paymentStatus === 'COMPLETED').length,
+      rejectedTasks: Payslip.filter(({ paymentStatus }) => paymentStatus === 'CANCELED').length,
+    }
+  });
+
+  return {
+    week: dayjs().week(),
+    year: dayjs().year(),
+    currentCycleStart: currentCycle.prev().toDate(),
+    currentCycleEnd: currentCycle.next().toDate(),
+    amountOutstanding,
+    previousPayrolls,
+    activePayslips,
+    currentPayrollSummary,
+  }
 }

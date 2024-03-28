@@ -28,6 +28,12 @@ enum PaymentStatus {
   COMPLETED
 }
 
+enum PunchApprovalStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
 // Primitive models
 model Position {
   id              Int               @id @default(autoincrement())
@@ -100,30 +106,30 @@ model Schedule {
 }
 
 model ClockTime {
-  id            Int           @id @default(autoincrement())
-  userId        Int
-  startTime     DateTime
-  endTime       DateTime?
-  hourlyWage    Decimal
-  paymentStatus PaymentStatus @default(PENDING)
-  payslipId     Int?
-  user          User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  payslip       Payslip?      @relation(fields: [payslipId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id             Int                 @id @default(autoincrement())
+  userId         Int
+  startTime      DateTime
+  endTime        DateTime?
+  hourlyWage     Decimal
+  payslipId      Int?
+  approvalStatus PunchApprovalStatus @default(PENDING)
+  user           User                @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payslip        Payslip?            @relation(fields: [payslipId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model Payslip {
-  id            Int         @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   employeeId    Int
   periodStart   DateTime
   periodEnd     DateTime
   generatedOn   DateTime
   dispensedOn   DateTime?
-  deductions    Decimal     @default(0)
-  netPay        Decimal     @default(0)
+  deductions    Decimal       @default(0)
+  paymentStatus PaymentStatus @default(PENDING)
   payrollId     Int?
   paymentMethod String?
-  employee      User        @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  payroll       Payroll?    @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  employee      User          @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payroll       Payroll?      @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   ClockTime     ClockTime[]
 
   @@unique([employeeId, periodStart, periodEnd])
@@ -135,7 +141,6 @@ model Payroll {
   periodStart    DateTime
   periodEnd      DateTime
   generatedOn    DateTime
-  netOutstanding Decimal
   organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   Payslip        Payslip[]
 

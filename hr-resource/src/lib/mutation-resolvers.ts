@@ -1,11 +1,10 @@
 import { Prisma, Role as PrismaRole } from "@prisma/client";
-import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
 import { Seed } from "../config/environment.js";
 import { syncUsers } from "./fetch-requests.js";
-import { MutationResolvers, PaymentStatus, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import { MutationResolvers, PunchApprovalStatus, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp, logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
@@ -523,7 +522,7 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
 
   return {
     ...clockTime,
-    paymentStatus: clockTime?.paymentStatus as PaymentStatus,
+    approvalStatus: clockTime.approvalStatus as PunchApprovalStatus,
     user: {
       ...user,
       syncStatus: user?.syncStatus as SyncStatus

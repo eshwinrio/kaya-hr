@@ -1,8 +1,12 @@
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import IconButton from "@mui/material/IconButton";
 import ListItem, { ListItemProps } from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemButton, { ListItemButtonProps } from "@mui/material/ListItemButton";
 import ListItemText, { ListItemTextProps } from "@mui/material/ListItemText";
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import Typography from "@mui/material/Typography";
 import { FragmentType, gql, useFragment } from '../lib/gql-codegen';
+import UserAvatar from "./UserAvatar";
 
 const fragment = gql(`
   fragment PayslipListItem on Payslip {
@@ -16,6 +20,7 @@ const fragment = gql(`
       firstName
       lastName
       email
+      ...Avatar
     }
   }
 `);
@@ -36,24 +41,21 @@ export default function PayslipListItem({
   const fragmentData = useFragment(fragment, payslip);
 
   return (
-    <ListItem {...props}>
+    <ListItem {...props} secondaryAction={(
+      <IconButton edge="end" aria-label="receipt">
+        <ReceiptIcon />
+      </IconButton>
+    )}>
       <ListItemButton>
-        <Grid2 container direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
-          <Grid2 xs='auto'>
-            <ListItemText
-              {...listItemTextProps}
-              primary={fragmentData.employee.firstName + " " + fragmentData.employee.lastName}
-              secondary={fragmentData.employee.email}
-            />
-          </Grid2>
-          <Grid2 xs='auto'>
-            <ListItemText
-              {...listItemTextProps}
-              primary={fragmentData.employee.firstName + " " + fragmentData.employee.lastName}
-              secondary={fragmentData.employee.email}
-            />
-          </Grid2>
-        </Grid2>
+        <ListItemAvatar>
+          <UserAvatar user={fragmentData.employee} />
+        </ListItemAvatar>
+        <ListItemText
+          {...listItemTextProps}
+          primary={fragmentData.employee.firstName + " " + fragmentData.employee.lastName}
+          secondary={fragmentData.employee.email}
+        />
+        <Typography variant="subtitle1" fontWeight="bold">${fragmentData.netPay}</Typography>
       </ListItemButton>
     </ListItem>
   );
