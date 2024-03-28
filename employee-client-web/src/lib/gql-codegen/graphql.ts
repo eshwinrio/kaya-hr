@@ -28,7 +28,7 @@ export type ClockTime = {
   paymentStatus: PaymentStatus;
   payroll?: Maybe<Payroll>;
   startTime: Scalars['ISODate']['output'];
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type CreateOrganizationInput = {
@@ -203,6 +203,12 @@ export type Payroll = {
   periodStart: Scalars['ISODate']['output'];
 };
 
+export type PayrollPeriod = {
+  __typename?: 'PayrollPeriod';
+  endsOn: Scalars['ISODate']['output'];
+  startsOn: Scalars['ISODate']['output'];
+};
+
 export type Payslip = {
   __typename?: 'Payslip';
   clockTimes?: Maybe<Array<ClockTime>>;
@@ -213,6 +219,12 @@ export type Payslip = {
   id: Scalars['Int']['output'];
   netPay: Scalars['Decimal']['output'];
   paymentMethod?: Maybe<Scalars['String']['output']>;
+};
+
+export type PayslipsFilter = {
+  employeeId?: InputMaybe<Scalars['Int']['input']>;
+  onlyCurrentPeriod?: InputMaybe<Scalars['Boolean']['input']>;
+  onlyPending?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Position = {
@@ -234,7 +246,9 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
+  payrollPeriods?: Maybe<PayrollPeriod>;
   payrolls: Array<Payroll>;
+  payslips: Array<Payslip>;
   punches: Array<ClockTime>;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
@@ -246,6 +260,11 @@ export type Query = {
 
 export type QueryCurrentUserArgs = {
   options?: InputMaybe<ViewUserOptions>;
+};
+
+
+export type QueryPayslipsArgs = {
+  filter?: InputMaybe<PayslipsFilter>;
 };
 
 

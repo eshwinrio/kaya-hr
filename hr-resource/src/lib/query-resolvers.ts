@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import cronParser from "cron-parser";
 import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
 import { PaymentStatus, QueryResolvers, Role, SyncStatus } from "./gql-codegen/graphql.js";
@@ -339,5 +340,89 @@ export const qResolverPayrolls: QueryResolvers['payrolls'] = async (
         syncStatus: payslip.employee.syncStatus as SyncStatus,
       },
     }))
+  }));
+}
+
+export const qResolverPayrollPeriods: QueryResolvers['payrollPeriods'] = async (
+  _root,
+  _args,
+  { roles, organization },
+) => {
+  if (!organization.payrollCron) {
+    return null;
+  }
+  const payrollPeriods = cronParser.parseExpression(
+    organization.payrollCron,
+    {
+      startDate: dayjs().startOf('month').toDate(),
+      currentDate: dayjs().toDate(),
+      tz: 'UTC',
+    }
+  );
+  return {
+    startsOn: payrollPeriods.prev().toDate(),
+    endsOn: payrollPeriods.next().toDate(),
+  }
+}
+
+export const qResolverPayslips: QueryResolvers['payslips'] = async (
+  _root,
+  { filter },
+  { user, roles, organization },
+) => {
+  const currentPayrollPeriod = cronParser.parseExpression(organization.payrollCron, {
+    startDate: organization.payrollStart ?? dayjs().startOf('month').toDate(),
+    currentDate: dayjs().toDate(),
+    tz: 'UTC',
+  });
+
+  const payslips = await prisma.payslip
+    .findMany({
+        include: {
+          employee: {
+            include: {
+              position: true,
+            }
+          },
+          ClockTime: true
+        },
+      where: {
+        employeeId: roles.every((role) => role !== "EMPLOYEE") ? filter?.employeeId ?? undefined : user.id,
+        ...(filter?.onlyCurrentPeriod
+            ? {
+              periodStart: {
+                gte: currentPayrollPeriod.prev().toDate(),
+                lte: currentPayrollPeriod.next().toDate()
+              },
+              periodEnd: {
+                gte: currentPayrollPeriod.prev().toDate(),
+                lte: currentPayrollPeriod.next().toDate()
+              },
+            }
+            : {}  
+          ),
+      },
+    })
+    .catch(error => {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new GraphQLError(``, { extensions: { code: 'NOT_FOUND' } })
+        }
+        logSystem.error(error.stack);
+      }
+      logSystem.error(error);
+      throw new GraphQLError('Could not query payslips', { extensions: { code: 'INTERNAL_SERVER_ERROR' } })
+    });
+
+  return payslips.map(({ ClockTime, ...payslip }) => ({
+    ...payslip,
+    clockTimes: ClockTime.map(({ paymentStatus, ...clockTime }) => ({
+      ...clockTime,
+      paymentStatus: paymentStatus as PaymentStatus
+    })),
+    employee: {
+      ...payslip.employee,
+      syncStatus: payslip.employee.syncStatus as SyncStatus,
+    },
   }));
 }

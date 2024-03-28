@@ -16,6 +16,9 @@ CREATE TABLE `Organization` (
     `webUrl` VARCHAR(191) NULL,
     `bannerUrl` VARCHAR(191) NULL,
     `logoUrl` VARCHAR(191) NULL,
+    `payrollCron` VARCHAR(191) NOT NULL DEFAULT '0 0 0 * * 4/2',
+    `payrollStart` DATETIME(3) NULL,
+    `enablePayrollJob` BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -79,13 +82,16 @@ CREATE TABLE `ClockTime` (
 CREATE TABLE `Payslip` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `employeeId` INTEGER NOT NULL,
+    `periodStart` DATETIME(3) NOT NULL,
+    `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
     `dispensedOn` DATETIME(3) NULL,
-    `deductions` DECIMAL(65, 30) NULL,
-    `netPay` DECIMAL(65, 30) NOT NULL,
-    `payrollId` INTEGER NOT NULL,
+    `deductions` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `netPay` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `payrollId` INTEGER NULL,
     `paymentMethod` VARCHAR(191) NULL,
 
+    UNIQUE INDEX `Payslip_employeeId_periodStart_periodEnd_key`(`employeeId`, `periodStart`, `periodEnd`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -98,6 +104,7 @@ CREATE TABLE `Payroll` (
     `generatedOn` DATETIME(3) NOT NULL,
     `netOutstanding` DECIMAL(65, 30) NOT NULL,
 
+    UNIQUE INDEX `Payroll_organizationId_periodStart_periodEnd_key`(`organizationId`, `periodStart`, `periodEnd`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

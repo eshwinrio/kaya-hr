@@ -4,6 +4,7 @@ import { Server as HttpsServer } from "https";
 import app, { bindErrorHandler, bindExpressMiddleware } from "../../app.js";
 import { Http } from "../../config/environment.js";
 import apolloServer from "../../lib/apollo.js";
+import { initPayrollCron } from "../../lib/cron-scheduler.js";
 import { logSystem } from "../../lib/logger.js";
 import prisma from "../../lib/prisma.js";
 
@@ -21,6 +22,9 @@ async function init() {
     bindExpressMiddleware();
     bindErrorHandler();
     await new Promise<void>((resolve) => server?.listen(Http.port, resolve));
+
+    logSystem.info("Starting cron schedulers...");
+    await initPayrollCron();
 
     process.on('beforeExit', async (code) => {
       try {

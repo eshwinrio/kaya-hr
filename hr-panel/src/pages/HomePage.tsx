@@ -98,19 +98,22 @@ const HomePage: FC = () => {
             {activeUsers.length > 0
               ? (
                 <List dense disablePadding>
-                  {activeUsers.map(user => (
+                  {activeUsers.filter(user => user.user).map(user => (
                     <UserListItem
                       key={user.id}
-                      user={user.user}
+                      user={user.user!}
                       disableGutters
                       disablePadding
+                      divider
                     />
                   ))}
                 </List>
               )
               : (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'center' }}>No active employees</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pb: 2 }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ textAlign: 'center' }}>
+                    No active employees
+                  </Typography>
                 </Box>
               )
             }

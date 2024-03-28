@@ -39,15 +39,18 @@ model Position {
 }
 
 model Organization {
-  id        Int        @id @default(autoincrement())
-  name      String
-  summary   String?    @db.VarChar(1000)
-  webUrl    String?
-  bannerUrl String?
-  logoUrl   String?
-  Users     User[]
-  Schedule  Schedule[]
-  Payroll   Payroll[]
+  id               Int        @id @default(autoincrement())
+  name             String
+  summary          String?    @db.VarChar(1000)
+  webUrl           String?
+  bannerUrl        String?
+  logoUrl          String?
+  payrollCron      String     @default("0 0 0 * * 4/2")
+  payrollStart     DateTime?
+  enablePayrollJob Boolean    @default(false)
+  Users            User[]
+  Schedule         Schedule[]
+  Payroll          Payroll[]
 }
 
 // Higher-level models
@@ -111,15 +114,19 @@ model ClockTime {
 model Payslip {
   id            Int         @id @default(autoincrement())
   employeeId    Int
+  periodStart   DateTime
+  periodEnd     DateTime
   generatedOn   DateTime
   dispensedOn   DateTime?
-  deductions    Decimal?
-  netPay        Decimal
-  payrollId     Int
+  deductions    Decimal     @default(0)
+  netPay        Decimal     @default(0)
+  payrollId     Int?
   paymentMethod String?
   employee      User        @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  payroll       Payroll     @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payroll       Payroll?    @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   ClockTime     ClockTime[]
+
+  @@unique([employeeId, periodStart, periodEnd])
 }
 
 model Payroll {
@@ -131,6 +138,8 @@ model Payroll {
   netOutstanding Decimal
   organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   Payslip        Payslip[]
+
+  @@unique([organizationId, periodStart, periodEnd])
 }
 
 // Mapping models

@@ -38,7 +38,7 @@ type ClockTime {
   hourlyWage: Decimal!
   earning: Decimal
   paymentStatus: PaymentStatus!
-  user: User!
+  user: User
   payroll: Payroll
 }
 
@@ -132,6 +132,11 @@ type User {
 type UserSyncResult {
   accepted: Int!
   rejected: Int!
+}
+
+type PayrollPeriod {
+  startsOn: ISODate!
+  endsOn: ISODate!
 }
 # </Output types>
 
@@ -245,6 +250,12 @@ input ListPunchesFilter {
   pagination: Pagination
 }
 
+input PayslipsFilter {
+  employeeId: Int
+  onlyPending: Boolean
+  onlyCurrentPeriod: Boolean
+}
+
 input GeneratePayrollOptions {
   employeeIds: [Int!]
   periodStart: ISODate!
@@ -267,7 +278,9 @@ type Query {
 
   # Timesheet
   punches(filter: ListPunchesFilter): [ClockTime!]!
+  payrollPeriods: PayrollPeriod
   payrolls: [Payroll!]!
+  payslips(filter: PayslipsFilter): [Payslip!]!
 }
 
 type Mutation {

@@ -29,7 +29,7 @@ export type ClockTime = {
   paymentStatus: PaymentStatus;
   payroll?: Maybe<Payroll>;
   startTime: Scalars['ISODate']['output'];
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type CreateOrganizationInput = {
@@ -204,6 +204,12 @@ export type Payroll = {
   periodStart: Scalars['ISODate']['output'];
 };
 
+export type PayrollPeriod = {
+  __typename?: 'PayrollPeriod';
+  endsOn: Scalars['ISODate']['output'];
+  startsOn: Scalars['ISODate']['output'];
+};
+
 export type Payslip = {
   __typename?: 'Payslip';
   clockTimes?: Maybe<Array<ClockTime>>;
@@ -214,6 +220,12 @@ export type Payslip = {
   id: Scalars['Int']['output'];
   netPay: Scalars['Decimal']['output'];
   paymentMethod?: Maybe<Scalars['String']['output']>;
+};
+
+export type PayslipsFilter = {
+  employeeId?: InputMaybe<Scalars['Int']['input']>;
+  onlyCurrentPeriod?: InputMaybe<Scalars['Boolean']['input']>;
+  onlyPending?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Position = {
@@ -235,7 +247,9 @@ export type PositionInput = {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
+  payrollPeriods?: Maybe<PayrollPeriod>;
   payrolls: Array<Payroll>;
+  payslips: Array<Payslip>;
   punches: Array<ClockTime>;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
@@ -247,6 +261,11 @@ export type Query = {
 
 export type QueryCurrentUserArgs = {
   options?: InputMaybe<ViewUserOptions>;
+};
+
+
+export type QueryPayslipsArgs = {
+  filter?: InputMaybe<PayslipsFilter>;
 };
 
 
@@ -480,7 +499,9 @@ export type ResolversTypes = ResolversObject<{
   Pagination: Pagination;
   PaymentStatus: PaymentStatus;
   Payroll: ResolverTypeWrapper<Payroll>;
+  PayrollPeriod: ResolverTypeWrapper<PayrollPeriod>;
   Payslip: ResolverTypeWrapper<Payslip>;
+  PayslipsFilter: PayslipsFilter;
   Position: ResolverTypeWrapper<Position>;
   PositionInput: PositionInput;
   Query: ResolverTypeWrapper<{}>;
@@ -515,7 +536,9 @@ export type ResolversParentTypes = ResolversObject<{
   Organization: Organization;
   Pagination: Pagination;
   Payroll: Payroll;
+  PayrollPeriod: PayrollPeriod;
   Payslip: Payslip;
+  PayslipsFilter: PayslipsFilter;
   Position: Position;
   PositionInput: PositionInput;
   Query: {};
@@ -540,7 +563,7 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
   paymentStatus?: Resolver<ResolversTypes['PaymentStatus'], ParentType, ContextType>;
   payroll?: Resolver<Maybe<ResolversTypes['Payroll']>, ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -589,6 +612,12 @@ export type PayrollResolvers<ContextType = ApolloServerContext, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PayrollPeriodResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['PayrollPeriod'] = ResolversParentTypes['PayrollPeriod']> = ResolversObject<{
+  endsOn?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  startsOn?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PayslipResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Payslip'] = ResolversParentTypes['Payslip']> = ResolversObject<{
   clockTimes?: Resolver<Maybe<Array<ResolversTypes['ClockTime']>>, ParentType, ContextType>;
   deductions?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
@@ -613,7 +642,9 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
+  payrollPeriods?: Resolver<Maybe<ResolversTypes['PayrollPeriod']>, ParentType, ContextType>;
   payrolls?: Resolver<Array<ResolversTypes['Payroll']>, ParentType, ContextType>;
+  payslips?: Resolver<Array<ResolversTypes['Payslip']>, ParentType, ContextType, Partial<QueryPayslipsArgs>>;
   punches?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType, Partial<QueryPunchesArgs>>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;
@@ -682,6 +713,7 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Payroll?: PayrollResolvers<ContextType>;
+  PayrollPeriod?: PayrollPeriodResolvers<ContextType>;
   Payslip?: PayslipResolvers<ContextType>;
   Position?: PositionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

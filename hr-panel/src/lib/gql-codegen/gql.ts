@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  fragment PayslipListItem on Payslip {\n    id\n    netPay\n    deductions\n    paymentMethod\n    generatedOn\n    employee {\n      id\n      firstName\n      lastName\n      email\n    }\n  }\n": types.PayslipListItemFragmentDoc,
     "\n  fragment ScheduleListItem on Schedule {\n    id\n    title\n    description\n    dateTimeStart\n    dateTimeEnd\n    employees { firstName }\n    createdBy { ...Avatar }\n    createdAt\n  }\n": types.ScheduleListItemFragmentDoc,
     "\n  fragment Avatar on User {\n    profileIconUrl\n    firstName\n  }\n": types.AvatarFragmentDoc,
     "\n  fragment UserListItem on User {\n    id\n    firstName\n    lastName\n    email\n    ...Avatar\n  }\n": types.UserListItemFragmentDoc,
@@ -28,6 +29,7 @@ const documents = {
     "\n  mutation CreateSchedule($input: ScheduleInput!) {\n    createSchedule(input: $input) {\n      id\n      title\n      dateTimeStart\n      dateTimeEnd\n      employees {\n        id\n        email\n        positions {\n          title\n        }\n      }\n    }\n  }\n": types.CreateScheduleDocument,
     "\n  query ActiveUsers {\n    punches(filter: { activeOnly: true }) {\n      id\n      user { ...UserListItem }\n    }\n  }\n": types.ActiveUsersDocument,
     "\n  query LoadAllPayrolls {\n    payrolls {\n      id\n      netOutstanding\n      generatedOn\n      organization {\n        name\n        logoUrl\n      }\n      payslips {\n        dispensedOn\n      }\n    }\n  }\n": types.LoadAllPayrollsDocument,
+    "\n  query CurrentPayrollPeriod {\n    payrollPeriods {\n      startsOn\n      endsOn\n    }\n  }\n": types.CurrentPayrollPeriodDocument,
     "\n  query SchedulesViewer($filters: ListScheduleFilter) {\n    schedules(filters: $filters) {\n      id\n      ...ScheduleListItem\n    }\n  }\n": types.SchedulesViewerDocument,
     "\n  query ViewEmployee ($userId: Int!) {\n    user(id: $userId) {\n      id\n      firstName\n      middleName\n      lastName\n      email\n      phone\n      city\n      country\n      province\n      roles\n      ...Avatar\n      bannerUrl\n      schedules {\n        id\n        position {\n          id\n          title\n          description\n          hourlyWage\n        }\n        schedule {\n          id\n          title\n          dateTimeStart\n          dateTimeEnd\n          createdBy {\n            id\n            email\n            firstName\n            lastName\n            streetName\n            city\n            country\n            province\n            pincode\n            dateOfBirth\n            dateJoined\n            phone\n          }\n          createdAt\n        }\n        user {\n          id\n          email\n          firstName\n          lastName\n          streetName\n          city\n          country\n          province\n          pincode\n          dateOfBirth\n          dateJoined\n          phone\n        }\n      }\n    }\n  }\n": types.ViewEmployeeDocument,
     "\n  query PickUserDialog($options: ListUsersFilter!) {\n    users(options: $options) {\n      id\n      firstName\n      lastName\n      email\n      ...Avatar\n    }\n  }\n": types.PickUserDialogDocument,
@@ -47,6 +49,10 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment PayslipListItem on Payslip {\n    id\n    netPay\n    deductions\n    paymentMethod\n    generatedOn\n    employee {\n      id\n      firstName\n      lastName\n      email\n    }\n  }\n"): (typeof documents)["\n  fragment PayslipListItem on Payslip {\n    id\n    netPay\n    deductions\n    paymentMethod\n    generatedOn\n    employee {\n      id\n      firstName\n      lastName\n      email\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -107,6 +113,10 @@ export function gql(source: "\n  query ActiveUsers {\n    punches(filter: { acti
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query LoadAllPayrolls {\n    payrolls {\n      id\n      netOutstanding\n      generatedOn\n      organization {\n        name\n        logoUrl\n      }\n      payslips {\n        dispensedOn\n      }\n    }\n  }\n"): (typeof documents)["\n  query LoadAllPayrolls {\n    payrolls {\n      id\n      netOutstanding\n      generatedOn\n      organization {\n        name\n        logoUrl\n      }\n      payslips {\n        dispensedOn\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query CurrentPayrollPeriod {\n    payrollPeriods {\n      startsOn\n      endsOn\n    }\n  }\n"): (typeof documents)["\n  query CurrentPayrollPeriod {\n    payrollPeriods {\n      startsOn\n      endsOn\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
