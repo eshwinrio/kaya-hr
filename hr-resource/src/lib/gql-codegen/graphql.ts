@@ -257,6 +257,7 @@ export type Position = {
   description?: Maybe<Scalars['String']['output']>;
   hourlyWage?: Maybe<Scalars['Decimal']['output']>;
   id: Scalars['Int']['output'];
+  organization?: Maybe<Organization>;
   schedules?: Maybe<Array<Schedule>>;
   title: Scalars['String']['output'];
   users?: Maybe<Array<User>>;
@@ -281,6 +282,7 @@ export type Query = {
   payrolls: Array<Payroll>;
   payrollsIndex: PayrollsIndex;
   payslips: Array<Payslip>;
+  positionPicker: Array<Position>;
   punches: Array<ClockTime>;
   schedule: Schedule;
   scheduledShifts: Array<ScheduleAssignment>;
@@ -694,6 +696,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hourlyWage?: Resolver<Maybe<ResolversTypes['Decimal']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  organization?: Resolver<Maybe<ResolversTypes['Organization']>, ParentType, ContextType>;
   schedules?: Resolver<Maybe<Array<ResolversTypes['Schedule']>>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
@@ -706,6 +709,7 @@ export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends
   payrolls?: Resolver<Array<ResolversTypes['Payroll']>, ParentType, ContextType>;
   payrollsIndex?: Resolver<ResolversTypes['PayrollsIndex'], ParentType, ContextType>;
   payslips?: Resolver<Array<ResolversTypes['Payslip']>, ParentType, ContextType, Partial<QueryPayslipsArgs>>;
+  positionPicker?: Resolver<Array<ResolversTypes['Position']>, ParentType, ContextType>;
   punches?: Resolver<Array<ResolversTypes['ClockTime']>, ParentType, ContextType, Partial<QueryPunchesArgs>>;
   schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
   scheduledShifts?: Resolver<Array<ResolversTypes['ScheduleAssignment']>, ParentType, ContextType, Partial<QueryScheduledShiftsArgs>>;

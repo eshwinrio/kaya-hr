@@ -1,25 +1,26 @@
+import { ApolloQueryResult } from '@apollo/client';
 import ReplayIcon from '@mui/icons-material/Replay';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
-import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
-import InputLabel from '@mui/material/InputLabel';
+import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { GraphQLError } from 'graphql';
-import { useState } from 'react';
-import { ActionFunction, Form, LoaderFunction, useLoaderData } from 'react-router-dom';
+import { useModal } from 'mui-modal-provider';
+import { useEffect, useState } from 'react';
+import { ActionFunction, Form, LoaderFunction, useActionData, useLoaderData } from 'react-router-dom';
 import validator from 'validator';
 import InputPassword from '../components/InputPassword';
-import SelectRole from '../components/SelectRole';
 import { apolloClient } from '../lib/apollo';
-import { CreateUserMutation, Role, UpdateUserMutation, User, ViewUserQuery } from '../lib/gql-codegen/graphql';
-import { CREATE_USER, UPDATE_USER, VIEW_USER } from '../lib/gql-queries';
+import { PositionPickerQuery, UpdateUserMutation, User, ViewUserQuery } from '../lib/gql-codegen/graphql';
+import { UPDATE_USER, VIEW_USER } from '../lib/gql-queries';
+import PositionPicker from '../shared/PositionPicker';
 
 type FormKeys =
   | 'firstName'
@@ -42,13 +43,28 @@ const initialFormData: EmployeeAddFormData = {
   firstName: '', middleName: '', lastName: '', dateOfBirth: '',
   email: '', phone: '', streetName: '', addressL2: '', city: '', pincode: '', province: '', country: '',
   password: '',
-  dateJoined: ''
+  dateJoined: '',
 };
 
-export default function EmployeeEditor() {
-  const existingData = useLoaderData() as ViewUserQuery;
+export default function UpdateEmployee() {
+  const loaderData = useLoaderData() as Awaited<ApolloQueryResult<ViewUserQuery>>;
+  const actionData = useActionData() as Awaited<ApolloQueryResult<UpdateUserMutation>> | undefined;
+  const existingData = loaderData.data;
   const [formData, setFormData] = useState<User | EmployeeAddFormData>(existingData ? existingData.user : { ...initialFormData });
+  const [position, setPosition] = useState<PositionPickerQuery['positionPicker'][number] | null>(null);
   const [errors, setErrors] = useState<EmployeeAddFormData>({ ...initialFormData });
+  const { showModal } = useModal();
+
+  useEffect(() => {
+    if (actionData?.data?.updateUser) {
+      setFormData({ ...formData, ...actionData.data.updateUser });
+    }
+  }, [actionData, formData]);
+  
+  const onReset = () => {
+    setFormData({ ...formData, ...initialFormData });
+    setErrors({ ...errors, ...initialFormData });
+  }
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -106,10 +122,23 @@ export default function EmployeeEditor() {
     }
   }
 
+  const onOpenPositionPicker: React.FocusEventHandler<HTMLInputElement> = event => {
+    event.target.blur();
+    const modal = showModal(PositionPicker, {
+      maxWidth: 'xs',
+      fullWidth: true,
+      listItemProps: { disablePadding: true },
+      onPick: (position) => {
+        setPosition(position);
+        modal.hide();
+      }
+    });
+  };
+
   return (
     <Container maxWidth='xl'>
-      <Typography variant='h5' fontWeight='bold' sx={{ mb: 3 }}>Add employee</Typography>
-      <Form method='post' autoComplete='on'>
+      <Typography variant='h5' fontWeight='bold' sx={{ mb: 3 }}>Update employee</Typography>
+      <Form method='post' autoComplete='on' onReset={onReset}>
 
         {/* Section 1: Employee identity */}
         <Typography variant='h6' fontWeight='bold' sx={{ mb: 3 }}>Employee Identity</Typography>
@@ -200,7 +229,7 @@ export default function EmployeeEditor() {
               variant='outlined' fullWidth
               autoFocus
               defaultValue={formData.addressL2}
-              value={formData.addressL2} onChange={onChange}
+              onChange={onChange}
               error={!!errors.addressL2} helperText={errors.addressL2}
             />
           </Grid2>
@@ -277,10 +306,14 @@ export default function EmployeeEditor() {
               sx={{ width: '100%' }} />
           </Grid2>
           <Grid2 xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel id='inputLabel-role-select'>Role</InputLabel>
-              <SelectRole name='role' label='Role' labelId='inputLabel-role-select' />
-            </FormControl>
+            <Input type='hidden' required name='positionId' value={position?.id} />
+            <TextField
+              fullWidth
+              required
+              label="Position"
+              onFocus={onOpenPositionPicker}
+              value={position?.title}
+            />
           </Grid2>
         </Grid2>
 
@@ -308,81 +341,39 @@ export default function EmployeeEditor() {
   );
 }
 
-export const employeeEditorLoader: LoaderFunction = async ({ params }) => {
-  const id = params['id'];
-  if (id && id !== 'new') {
-    const userId = parseInt(id, 10);
-    if (!userId) {
-      throw new GraphQLError("Invalid user ID");
-    }
-    const existingUserData = await apolloClient.query({ query: VIEW_USER, variables: { userId } });
-    return existingUserData.data;
+export const updateEmployeeLoader: LoaderFunction = async ({ params }) => {
+  const userId = parseInt(params['id']!, 10);
+  if (!userId) {
+    throw new GraphQLError("Invalid user ID");
   }
-  return null;
+  return await apolloClient.query({ query: VIEW_USER, variables: { userId } });
 }
 
-export const employeeEditorAction: ActionFunction = async ({ params, request }) => {
+export const updateEmployeeAction: ActionFunction = async ({ params, request }) => {
   const formData = await request.formData();
-  let response: UpdateUserMutation | CreateUserMutation | null = null;
-  const id = params['id'];
-  if (id && id !== 'new') {
-    const userId = parseInt(id, 10);
-    if (!userId) {
-      throw new GraphQLError("Invalid user ID");
-    }
-    const updateUserMutation = await apolloClient.mutate({
-      mutation: UPDATE_USER,
-      variables: {
-        userId,
-        input: {
-          firstName: formData.get('firstName')!.toString(),
-          middleName: formData.get('middleName')?.toString(),
-          lastName: formData.get('lastName')!.toString(),
-          dateOfBirth: formData.get('dateOfBirth')!.toString(),
-          phone: formData.get('phone')!.toString(),
-          streetName: formData.get('streetName')!.toString(),
-          addressL2: formData.get('addressL2')!.toString(),
-          city: formData.get('city')!.toString(),
-          province: formData.get('province')!.toString(),
-          pincode: formData.get('pincode')!.toString(),
-          country: formData.get('country')!.toString(),
-          dateJoined: formData.get('dateJoined')!.toString(),
-          roles: formData.get('role')!.toString().split(',') as Array<Role>,
-          positionId: 1
-        }
-      }
-    });
-    if (updateUserMutation.data) {
-      response = updateUserMutation.data;
-    }
-  } else {
-    const createUserMutation = await apolloClient.mutate({
-      mutation: CREATE_USER,
-      variables: {
-        input: {
-          firstName: formData.get('firstName')!.toString(),
-          middleName: formData.get('middleName')?.toString(),
-          lastName: formData.get('lastName')!.toString(),
-          dateOfBirth: formData.get('dateOfBirth')!.toString(),
-          email: formData.get('email')!.toString(),
-          phone: formData.get('phone')!.toString(),
-          streetName: formData.get('streetName')!.toString(),
-          addressL2: formData.get('addressL2')!.toString(),
-          city: formData.get('city')!.toString(),
-          province: formData.get('province')!.toString(),
-          pincode: formData.get('pincode')!.toString(),
-          country: formData.get('country')!.toString(),
-          password: formData.get('password')!.toString(),
-          dateJoined: formData.get('dateJoined')!.toString(),
-          roles: formData.get('role')!.toString().split(',') as Array<Role>,
-          positionId: 1
-        }
-      }
-    });
-    if (createUserMutation.data) {
-      response = createUserMutation.data;
-    }
+  const userId = parseInt(params['id']!, 10);
+  if (!userId) {
+    throw new GraphQLError("Invalid user ID");
   }
-
-  return response;
+  return await apolloClient.mutate({
+    mutation: UPDATE_USER,
+    variables: {
+      userId,
+      input: {
+        firstName: formData.get('firstName')!.toString(),
+        middleName: formData.get('middleName')?.toString(),
+        lastName: formData.get('lastName')!.toString(),
+        dateOfBirth: formData.get('dateOfBirth')!.toString(),
+        phone: formData.get('phone')!.toString(),
+        streetName: formData.get('streetName')!.toString(),
+        addressL2: formData.get('addressL2')!.toString(),
+        city: formData.get('city')!.toString(),
+        province: formData.get('province')!.toString(),
+        pincode: formData.get('pincode')!.toString(),
+        country: formData.get('country')!.toString(),
+        dateJoined: formData.get('dateJoined')!.toString(),
+        positionId: parseInt(formData.get('positionId')!.toString(), 10),
+      }
+    }
+  });
 }

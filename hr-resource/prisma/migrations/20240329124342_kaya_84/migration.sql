@@ -1,14 +1,4 @@
 -- CreateTable
-CREATE TABLE `Position` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
-    `hourlyWage` DECIMAL(65, 30) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Organization` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
@@ -19,6 +9,17 @@ CREATE TABLE `Organization` (
     `payrollCron` VARCHAR(191) NOT NULL DEFAULT '0 0 0 * * 4/2',
     `payrollStart` DATETIME(3) NULL,
     `enablePayrollJob` BOOLEAN NOT NULL DEFAULT false,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Position` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `hourlyWage` DECIMAL(65, 30) NOT NULL,
+    `organizationId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -127,6 +128,9 @@ CREATE TABLE `UserScheduleMap` (
     UNIQUE INDEX `UserScheduleMap_userId_scheduleId_key`(`userId`, `scheduleId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Position` ADD CONSTRAINT `Position_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

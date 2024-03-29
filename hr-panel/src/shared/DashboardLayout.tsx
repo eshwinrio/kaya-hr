@@ -57,7 +57,7 @@ export default function DashboardLayout() {
       children: [
         {
           title: 'Editor',
-          path: '/employees/editor/new',
+          path: '/employees/editor',
           icon: <GroupAddIcon />,
         },
       ]

@@ -34,16 +34,6 @@ enum PunchApprovalStatus {
   APPROVED
 }
 
-// Primitive models
-model Position {
-  id              Int               @id @default(autoincrement())
-  title           String
-  description     String?
-  hourlyWage      Decimal
-  UserScheduleMap UserScheduleMap[]
-  User            User[]
-}
-
 model Organization {
   id               Int        @id @default(autoincrement())
   name             String
@@ -57,9 +47,20 @@ model Organization {
   Users            User[]
   Schedule         Schedule[]
   Payroll          Payroll[]
+  Position         Position[]
 }
 
-// Higher-level models
+model Position {
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?
+  hourlyWage      Decimal
+  organizationId  Int
+  organization    Organization      @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  UserScheduleMap UserScheduleMap[]
+  User            User[]
+}
+
 model User {
   id              Int               @id @default(autoincrement())
   firstName       String

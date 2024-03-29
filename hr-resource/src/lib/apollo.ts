@@ -4,6 +4,7 @@ import { Organization, Role, User } from "@prisma/client";
 import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
+import { qResolverPositionPicker } from "./component-query-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
@@ -73,6 +74,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     payrollPeriods: qResolverPayrollPeriods,
     payrolls: qResolverPayrolls,
     payrollsIndex: qResolverPayrollsIndex,
+    positionPicker: qResolverPositionPicker,
   },
   Mutation: {
     createUser: mResolverCreateUser,

@@ -35,6 +35,7 @@ const documents = {
     "\n  query SchedulesViewer($filters: ListScheduleFilter) {\n    schedules(filters: $filters) {\n      id\n      ...ScheduleListItem\n    }\n  }\n": types.SchedulesViewerDocument,
     "\n  query ViewEmployee ($userId: Int!) {\n    user(id: $userId) {\n      id\n      firstName\n      middleName\n      lastName\n      email\n      phone\n      city\n      country\n      province\n      roles\n      ...Avatar\n      bannerUrl\n      schedules {\n        id\n        position {\n          id\n          title\n          description\n          hourlyWage\n        }\n        schedule {\n          id\n          title\n          dateTimeStart\n          dateTimeEnd\n          createdBy {\n            id\n            email\n            firstName\n            lastName\n            streetName\n            city\n            country\n            province\n            pincode\n            dateOfBirth\n            dateJoined\n            phone\n          }\n          createdAt\n        }\n        user {\n          id\n          email\n          firstName\n          lastName\n          streetName\n          city\n          country\n          province\n          pincode\n          dateOfBirth\n          dateJoined\n          phone\n        }\n      }\n    }\n  }\n": types.ViewEmployeeDocument,
     "\n  query PickUserDialog($options: ListUsersFilter!) {\n    users(options: $options) {\n      id\n      firstName\n      lastName\n      email\n      ...Avatar\n    }\n  }\n": types.PickUserDialogDocument,
+    "\n  query PositionPicker {\n    positionPicker {\n      id\n      title\n      description\n      hourlyWage\n      users {\n        ...Avatar\n      }\n    }\n  }\n": types.PositionPickerDocument,
 };
 
 /**
@@ -139,6 +140,10 @@ export function gql(source: "\n  query ViewEmployee ($userId: Int!) {\n    user(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query PickUserDialog($options: ListUsersFilter!) {\n    users(options: $options) {\n      id\n      firstName\n      lastName\n      email\n      ...Avatar\n    }\n  }\n"): (typeof documents)["\n  query PickUserDialog($options: ListUsersFilter!) {\n    users(options: $options) {\n      id\n      firstName\n      lastName\n      email\n      ...Avatar\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query PositionPicker {\n    positionPicker {\n      id\n      title\n      description\n      hourlyWage\n      users {\n        ...Avatar\n      }\n    }\n  }\n"): (typeof documents)["\n  query PositionPicker {\n    positionPicker {\n      id\n      title\n      description\n      hourlyWage\n      users {\n        ...Avatar\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

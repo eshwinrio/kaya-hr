@@ -63,6 +63,7 @@ type Position {
   title: String!
   description: String
   hourlyWage: Decimal
+  organization: Organization
   users: [User!]
   schedules: [Schedule!]
 }
@@ -316,14 +317,15 @@ type Query {
 
   # PageSpecificQueries
   payrollsIndex: PayrollsIndex!
+
+  # ComponentSpecificQueries
+  positionPicker: [Position!]!
 }
 
 type Mutation {
   # Users
   createPosition(input: PositionInput!): Position!
   createOrganization(input: CreateOrganizationInput!): Organization!
-  createUser(input: CreateUserInput!): User!
-  updateUser(userId: Int!, input: UpdateUserInput!): User!
   updateOrganization(id: Int!, input: UpdateOrganizationInput!): Organization!
   syncUsers(force: Boolean): UserSyncResult!
 
@@ -336,4 +338,8 @@ type Mutation {
   # Timesheet actions
   registerPunch: ClockTime!
   generatePayroll(options: GeneratePayrollOptions!): Int!
+
+  # PageSpecificActions
+  createUser(input: CreateUserInput!): User!
+  updateUser(userId: Int!, input: UpdateUserInput!): User!
 }
