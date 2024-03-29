@@ -104,6 +104,7 @@ export type Mutation = {
   createUser: User;
   deleteSchedule: Schedule;
   generatePayroll: Scalars['Int']['output'];
+  generatePayslips?: Maybe<Scalars['Boolean']['output']>;
   registerPunch: ClockTime;
   syncUsers: UserSyncResult;
   updateOrganization: Organization;
@@ -621,6 +622,7 @@ export type MutationResolvers<ContextType = ApolloServerContext, ParentType exte
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   deleteSchedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<MutationDeleteScheduleArgs, 'scheduleId'>>;
   generatePayroll?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationGeneratePayrollArgs, 'options'>>;
+  generatePayslips?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   registerPunch?: Resolver<ResolversTypes['ClockTime'], ParentType, ContextType>;
   syncUsers?: Resolver<ResolversTypes['UserSyncResult'], ParentType, ContextType, Partial<MutationSyncUsersArgs>>;
   updateOrganization?: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationUpdateOrganizationArgs, 'id' | 'input'>>;

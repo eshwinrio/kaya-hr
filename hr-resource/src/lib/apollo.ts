@@ -4,6 +4,7 @@ import { Organization, Role, User } from "@prisma/client";
 import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
+import { mResolverGeneratePayslips } from "./component-mutation-resolvers.js";
 import { qResolverPositionPicker } from "./component-query-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import { Resolvers } from "./gql-codegen/graphql.js";
@@ -87,6 +88,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     deleteSchedule: mResolverDeleteSchedule,
     registerPunch: mResolverRegisterPunch,
     assignUserToSchedule: mResolverAssignUserToSchedule,
+    generatePayslips: mResolverGeneratePayslips,
   },
   Decimal: Decimal,
   ISODate: ISODate,

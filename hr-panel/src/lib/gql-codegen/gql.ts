@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  fragment ActivePayslipsCard on PayrollsIndex {\n    activePayslips {\n      id\n      ...PayslipListItem\n    }\n  }\n": types.ActivePayslipsCardFragmentDoc,
+    "\n  mutation ActivePayslipsActionGenerate {\n    generatePayslips\n  }\n": types.ActivePayslipsActionGenerateDocument,
     "\n  fragment OutstandingAmountCard on PayrollsIndex {\n    amountOutstanding\n    previousPayrolls {\n      id\n      generatedOn\n      netOutstanding\n    }\n  }\n": types.OutstandingAmountCardFragmentDoc,
     "\n  fragment PayrollSummaryCard on PayrollSummary {\n    payrollId\n    periodStart\n    periodEnd\n    totalTasks\n    pendingTasks\n    completedTasks\n    rejectedTasks\n  }\n": types.PayrollSummaryCardFragmentDoc,
     "\n  fragment PayslipListItem on Payslip {\n    id\n    netPay\n    deductions\n    paymentMethod\n    generatedOn\n    employee {\n      id\n      firstName\n      lastName\n      email\n      ...Avatar\n    }\n  }\n": types.PayslipListItemFragmentDoc,
@@ -56,6 +57,10 @@ export function gql(source: string): unknown;
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  fragment ActivePayslipsCard on PayrollsIndex {\n    activePayslips {\n      id\n      ...PayslipListItem\n    }\n  }\n"): (typeof documents)["\n  fragment ActivePayslipsCard on PayrollsIndex {\n    activePayslips {\n      id\n      ...PayslipListItem\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ActivePayslipsActionGenerate {\n    generatePayslips\n  }\n"): (typeof documents)["\n  mutation ActivePayslipsActionGenerate {\n    generatePayslips\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

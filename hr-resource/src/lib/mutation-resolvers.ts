@@ -53,9 +53,7 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
           connect: { id: organization?.id }
         },
         UserRoleMap: {
-          createMany: {
-            data: input.roles?.map(role => ({ role })) ?? []
-          }
+          create: { role: "EMPLOYEE" }
         },
       },
       include: {

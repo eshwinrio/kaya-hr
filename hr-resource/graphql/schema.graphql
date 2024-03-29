@@ -342,4 +342,7 @@ type Mutation {
   # PageSpecificActions
   createUser(input: CreateUserInput!): User!
   updateUser(userId: Int!, input: UpdateUserInput!): User!
+
+  # ComponentSpecificActions
+  generatePayslips: Boolean
 }

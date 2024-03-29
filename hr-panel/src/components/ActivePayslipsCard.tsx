@@ -1,3 +1,4 @@
+import { useMutation } from "@apollo/client";
 import Button from "@mui/material/Button";
 import Card, { CardProps } from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -16,6 +17,12 @@ const fragment = gql(`
   }
 `);
 
+const actionGenerate = gql(`
+  mutation ActivePayslipsActionGenerate {
+    generatePayslips
+  }
+`);
+
 interface ActivePayslipsCardProps extends CardProps {
   children?: never;
   readonly data: FragmentType<typeof fragment>;
@@ -23,6 +30,7 @@ interface ActivePayslipsCardProps extends CardProps {
 
 const ActivePayslipsCard: FC<ActivePayslipsCardProps> = ({ data, ...props }) => {
   const fragmentData = useFragment(fragment, data);
+  const [generatePayslips] = useMutation(actionGenerate);
   return (
     <Card {...props}>
       <CardHeader
@@ -33,7 +41,7 @@ const ActivePayslipsCard: FC<ActivePayslipsCardProps> = ({ data, ...props }) => 
         {fragmentData.activePayslips.map((payslip) => <PayslipListItem key={payslip.id} disablePadding payslip={payslip} />)}
       </List>
       <CardActions>
-        <Button startIcon="✨" title="Generate payroll">Generate</Button>
+        <Button startIcon="✨" title="Generate" onClick={() => generatePayslips()}>Generate</Button>
       </CardActions>
     </Card>
   );

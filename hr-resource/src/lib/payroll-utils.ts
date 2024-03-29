@@ -16,7 +16,7 @@ export async function generatePayslips(organization: Organization) {
     organization.payrollCron!,
     {
       utc: true,
-      startDate: organization.payrollStart ?? dayjs().startOf('month').toDate(),
+      startDate: organization.payrollStart ?? undefined,
     }
   );
 

@@ -379,6 +379,9 @@ export const qResolverPayslips: QueryResolvers['payslips'] = async (
     tz: 'UTC',
   });
 
+  const payrollPeriodStart = currentPayrollPeriod.prev().toDate();
+  const payrollPeriodEnd = currentPayrollPeriod.next().toDate();
+
   const payslips = await prisma.payslip
     .findMany({
       include: {
@@ -393,14 +396,8 @@ export const qResolverPayslips: QueryResolvers['payslips'] = async (
         employeeId: roles.every((role) => role !== "EMPLOYEE") ? filter?.employeeId ?? undefined : user.id,
         ...(filter?.onlyCurrentPeriod
           ? {
-            periodStart: {
-              gte: currentPayrollPeriod.prev().toDate(),
-              lte: currentPayrollPeriod.next().toDate()
-            },
-            periodEnd: {
-              gte: currentPayrollPeriod.prev().toDate(),
-              lte: currentPayrollPeriod.next().toDate()
-            },
+          periodStart: { gte: payrollPeriodStart, lte: payrollPeriodEnd },
+          periodEnd: { gte: payrollPeriodStart, lte: payrollPeriodEnd },
           }
           : {}
         ),
@@ -448,12 +445,15 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
     tz: 'UTC',
   });
 
+  const currentCycleStart = currentCycle.prev().toDate();
+  const currentCycleEnd = currentCycle.next().toDate();
+
   const amountOutstanding = await prisma.payslip
     .findMany({
       where: {
         employee: { organizationId: organization.id },
-        periodStart: { gte: currentCycle.prev().toDate(), lte: currentCycle.next().toDate() },
-        periodEnd: { gte: currentCycle.prev().toDate(), lte: currentCycle.next().toDate() },
+        periodStart: { gte: currentCycleStart, lte: currentCycleEnd },
+        periodEnd: { gte: currentCycleStart, lte: currentCycleEnd },
       },
       include: {
         ClockTime: true
@@ -481,7 +481,7 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
   const previousPayrolls: Array<Payroll> = await prisma.payroll.findMany({
     where: {
       periodEnd: {
-        lt: currentCycle.prev().toDate()
+        lt: currentCycleStart
       },
       organizationId: roles.includes("SUPER") ? undefined : organization?.id,
     },
@@ -510,12 +510,12 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
   const activePayslips: Array<Payslip> = await prisma.payslip.findMany({
     where: {
       periodStart: {
-        gte: currentCycle.prev().toDate(),
-        lte: currentCycle.next().toDate()
+        gte: currentCycleStart,
+        lte: currentCycleEnd
       },
       periodEnd: {
-        gte: currentCycle.prev().toDate(),
-        lte: currentCycle.next().toDate()
+        gte: currentCycleStart,
+        lte: currentCycleEnd
       },
       employee: {
         organizationId: roles.includes("SUPER") ? undefined : organization?.id,
@@ -529,7 +529,7 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
     .then(payslips => payslips.map(({ ClockTime, employee, paymentStatus, ...payslip }) => ({
       ...payslip,
       netPay: ClockTime.reduce(
-        (acc, clockTime) => acc.add(dayjs(clockTime.endTime).diff(clockTime.startTime, 'hour') * clockTime.hourlyWage.toNumber()),
+        clocktimeEarningReducer,
         new Decimal(0).toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
       ),
       employee: {
@@ -553,8 +553,8 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
     where: {
       organizationId_periodStart_periodEnd: {
         organizationId: organization.id,
-        periodStart: currentCycle.prev().toDate(),
-        periodEnd: currentCycle.next().toDate()
+        periodStart: currentCycleStart,
+        periodEnd: currentCycleEnd
       }
     },
     include: {
@@ -581,8 +581,8 @@ export const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
   return {
     week: dayjs().week(),
     year: dayjs().year(),
-    currentCycleStart: currentCycle.prev().toDate(),
-    currentCycleEnd: currentCycle.next().toDate(),
+    currentCycleStart: currentCycleStart,
+    currentCycleEnd: currentCycleEnd,
     amountOutstanding,
     previousPayrolls,
     activePayslips,
