@@ -214,7 +214,7 @@ export default function OnboardEmployee() {
               variant='outlined' fullWidth
               autoFocus
               defaultValue={formData.addressL2}
-              value={formData.addressL2} onChange={onChange}
+              onChange={onChange}
               error={!!errors.addressL2} helperText={errors.addressL2}
             />
           </Grid2>
@@ -291,13 +291,13 @@ export default function OnboardEmployee() {
               sx={{ width: '100%' }} />
           </Grid2>
           <Grid2 xs={12} sm={6}>
-            <Input type='hidden' name='positionId' value={position} />
+            <Input type='hidden' name='positionId' value={position?.id || ''} />
             <TextField
               fullWidth
               required
               label="Position"
               onFocus={onOpenPositionPicker}
-              value={position?.title}
+              value={position?.title || ''}
             />
           </Grid2>
         </Grid2>

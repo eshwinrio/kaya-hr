@@ -306,13 +306,13 @@ export default function UpdateEmployee() {
               sx={{ width: '100%' }} />
           </Grid2>
           <Grid2 xs={12} sm={6}>
-            <Input type='hidden' required name='positionId' value={position?.id} />
+            <Input type='hidden' required name='positionId' value={position?.id || ''} />
             <TextField
               fullWidth
               required
               label="Position"
               onFocus={onOpenPositionPicker}
-              value={position?.title}
+              value={position?.title || ''}
             />
           </Grid2>
         </Grid2>

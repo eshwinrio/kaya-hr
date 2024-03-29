@@ -511,11 +511,29 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
       },
     });
   } else {
+    let hourlyWage = activeSchedule?.position.hourlyWage;
+    if (!activeSchedule) {
+      hourlyWage = await prisma.user.findUnique({
+        where: {
+          id: user?.id
+        },
+        select: {
+          position: {
+            select: {
+              hourlyWage: true
+            }
+          }
+        }
+      }).then(result => result?.position?.hourlyWage);
+    }
+    if (!hourlyWage) {
+      throw new GraphQLError('Hourly wage not defined', { extensions: { code: 'BAD_REQUEST' } });
+    }
     clockTime = await prisma.clockTime.create({
       data: {
         userId: user?.id,
         startTime: currentTime,
-        hourlyWage: activeSchedule?.position.hourlyWage ?? 0,
+        hourlyWage,
       },
     });
   }

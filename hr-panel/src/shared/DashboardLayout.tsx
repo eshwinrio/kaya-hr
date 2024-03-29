@@ -56,7 +56,7 @@ export default function DashboardLayout() {
       icon: <GroupsIcon />,
       children: [
         {
-          title: 'Editor',
+          title: 'Onboard',
           path: '/employees/editor',
           icon: <GroupAddIcon />,
         },

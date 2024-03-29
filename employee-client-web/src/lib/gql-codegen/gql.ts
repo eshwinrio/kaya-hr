@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  fragment Profile on User {\n    email\n    firstName\n    middleName\n    lastName\n    ...Avatar\n  }\n": types.ProfileFragmentDoc,
-    "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n": types.PunchHistoryFragmentDoc,
+    "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n": types.PunchHistoryFragmentDoc,
     "\n  fragment PunchTiming on ClockTime {\n    startTime\n    endTime\n    netHours\n  }\n": types.PunchTimingFragmentDoc,
     "\n  fragment ScheduleAssignment on ScheduleAssignment {\n    id\n    schedule {\n      id\n      title\n      ...ScheduleTiming\n    }\n    position {\n      id\n      title\n    }\n    user {\n      id\n      firstName\n      lastName\n    }\n  }\n": types.ScheduleAssignmentFragmentDoc,
     "\n  fragment ScheduleTiming on Schedule {\n    dateTimeStart\n    dateTimeEnd\n  }\n": types.ScheduleTimingFragmentDoc,
@@ -49,7 +49,7 @@ export function gql(source: "\n  fragment Profile on User {\n    email\n    firs
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n"): (typeof documents)["\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n"];
+export function gql(source: "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n"): (typeof documents)["\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
