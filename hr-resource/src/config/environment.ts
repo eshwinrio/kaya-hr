@@ -26,6 +26,7 @@ export namespace Seed {
   export const defaultOrganizationBannerUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_BANNER_URL']!);
   export const defaultOrganizationLogoUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_LOGO_URL']!);
   export const defaultOrganizationName = process.env['SEED_DEFAULT_ORGANIZATION_NAME']!;
+  export const defaultOrganizationPayrollCycleCron = process.env['SEED_DEFAULT_ORGANIZATION_PAYROLL_CYCLE_CRON']!;
   export const defaultOrganizationSummary = process.env['SEED_DEFAULT_ORGANIZATION_SUMMARY']!;
   export const defaultOrganizationWebsiteUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_WEBSITE_URL']!);
   export const defaultRoleCode = process.env['SEED_DEFAULT_ROLE_CODE']!;

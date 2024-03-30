@@ -1,5 +1,7 @@
 import { expect } from "chai";
 import validator from 'validator';
+import nodeCron from 'node-cron';
+import cronParser from 'cron-parser';
 
 describe('API configurations', () => {
   it('API_AUTH_DOMAIN', (done) => {
@@ -89,6 +91,14 @@ describe('Seed configurations', () => {
     expect(value).not.to.be.undefined;
     done();
   });
+
+  it('SEED_DEFAULT_ORGANIZATION_PAYROLL_CYCLE_CRON', (done) => {
+    const value = process.env['SEED_DEFAULT_ORGANIZATION_PAYROLL_CYCLE_CRON'];
+    expect(value).not.to.be.undefined;
+    expect(cronParser.parseExpression(value!)).not.to.have.property('errors');
+    expect(nodeCron.validate(value!), `${value} is not a valid cron expression`).to.be.true;
+    done();
+  })
 
   it('SEED_DEFAULT_ORGANIZATION_SUMMARY', (done) => {
     const value = process.env['SEED_DEFAULT_ORGANIZATION_SUMMARY'];
