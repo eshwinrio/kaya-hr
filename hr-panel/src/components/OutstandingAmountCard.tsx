@@ -4,7 +4,7 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import { alpha } from "@mui/material/styles";
-import { ResponsiveChartContainer } from "@mui/x-charts";
+import { ChartsXAxis, ChartsYAxis, ResponsiveChartContainer } from "@mui/x-charts";
 import { AreaPlot, LinePlot, MarkPlot } from "@mui/x-charts/LineChart";
 import { FC } from "react";
 import dayjs from "../lib/dayjs";
@@ -30,7 +30,7 @@ interface OutstandingAmountCardProps extends CardProps {
 const OutstandingAmountCard: FC<OutstandingAmountCardProps> = ({ data, ...props }) => {
   const fragmentData = useFragment(fragment, data);
   const theme = useMaterialTheme();
-  const topColor = alpha(theme.palette.primary.main, 1);
+  const topColor = alpha(theme.palette.primary.main, 0.6);
   const bottomColor = alpha(theme.palette.primary.main, 0);
 
   return (
@@ -39,8 +39,9 @@ const OutstandingAmountCard: FC<OutstandingAmountCardProps> = ({ data, ...props 
         title={`$${fragmentData.amountOutstanding}`}
         subheader={fragmentData.amountOutstanding === 0 ? "No outstanding payments" : "Total outstanding"}
       />
-      <CardContent sx={{ maxHeight: 300, height: "100%", overflow: "auto" }}>
+      <CardContent sx={{ minHeight: 300, height: "100%", overflow: "auto" }}>
         <ResponsiveChartContainer
+          height={300}
           series={[
             {
               type: 'line',
@@ -52,15 +53,16 @@ const OutstandingAmountCard: FC<OutstandingAmountCardProps> = ({ data, ...props 
             {
               scaleType: 'utc',
               data: fragmentData.previousPayrolls.map(p => dayjs(p.generatedOn).toDate()),
+              label: 'Payroll date',
             },
           ]}
           sx={{
             '.MuiAreaElement-root': {
-              fill: 'url(#gradient)',
+              fill: 'url(#area-gradient)',
             },
             '.MuiLineElement-root': {
-              stroke: 'url(#gradient)',
-              strokeWidth: 2,
+              stroke: 'url(#line-gradient)',
+              strokeWidth: 4,
             },
             '.MuiMarkElement-root': {
               stroke: theme.palette.secondary.main,
@@ -70,7 +72,11 @@ const OutstandingAmountCard: FC<OutstandingAmountCardProps> = ({ data, ...props 
             },
           }}>
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id="area-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={topColor} />
+              <stop offset="100%" stopColor={bottomColor} />
+            </linearGradient>
+            <linearGradient id="line-gradient" x1="100%" y1="0%" x2="0%" y2="0%">
               <stop offset="0%" stopColor={topColor} />
               <stop offset="100%" stopColor={bottomColor} />
             </linearGradient>
@@ -78,6 +84,14 @@ const OutstandingAmountCard: FC<OutstandingAmountCardProps> = ({ data, ...props 
           <LinePlot />
           <AreaPlot />
           <MarkPlot />
+          <ChartsXAxis
+            disableLine
+            disableTicks
+            labelStyle={{ fill: 'rgba(0, 0, 0, 0.4)' }} />
+          <ChartsYAxis
+            disableLine
+            disableTicks
+            labelStyle={{ fill: 'rgba(0, 0, 0, 0.4)' }} />
         </ResponsiveChartContainer>
       </CardContent>
       <CardActions>
