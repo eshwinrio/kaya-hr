@@ -63,7 +63,6 @@ const DashboardMenu: FC<DashboardMenuProps> = ({ menus, ...props }) => {
             <ListItemButton
               component={Link}
               to={menu.path}
-              onClick={() => handleCollapse(menu.path)}
             >
               <ListItemIcon>{menu.icon}</ListItemIcon>
               <ListItemText primary={menu.title} secondary={menu.description} />
@@ -71,7 +70,7 @@ const DashboardMenu: FC<DashboardMenuProps> = ({ menus, ...props }) => {
           </ListItem>
           {menu.children && (
             <Collapse in={collapsedItems.includes(menu.path)} timeout="auto" unmountOnExit>
-              <DashboardMenu component="div" disablePadding menus={menu.children} />
+              <DashboardMenu component="div" dense disablePadding menus={menu.children} />
             </Collapse>
           )}
         </Fragment>

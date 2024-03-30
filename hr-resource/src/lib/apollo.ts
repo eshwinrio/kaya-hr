@@ -4,12 +4,15 @@ import { Organization, Role, User } from "@prisma/client";
 import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
+import { mResolverGeneratePayslips } from "./component-mutation-resolvers.js";
+import { qResolverPositionPicker } from "./component-query-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import { Resolvers } from "./gql-codegen/graphql.js";
 import { logHttp } from "./logger.js";
 import { mResolverAssignUserToSchedule, mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverRegisterPunch, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
+import qResolverPayrollsIndex from "./payrolls-index-resolver.js";
 import prisma from "./prisma.js";
-import { qResolverCurrentUser, qResolverPunches, qResolverPayrolls, qResolverScheduledShifts, qResolverUser, qResolverUsers } from "./query-resolvers.js";
+import { qResolverCurrentUser, qResolverPayrollPeriods, qResolverPayrolls, qResolverPunches, qResolverSchedule, qResolverScheduledShifts, qResolverSchedules, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
 
 export interface ApolloServerContext extends BaseContext {
@@ -66,9 +69,14 @@ const resolvers: Resolvers<ApolloServerContext> = {
     currentUser: qResolverCurrentUser,
     users: qResolverUsers,
     user: qResolverUser,
+    schedule: qResolverSchedule,
+    schedules: qResolverSchedules,
     scheduledShifts: qResolverScheduledShifts,
     punches: qResolverPunches,
+    payrollPeriods: qResolverPayrollPeriods,
     payrolls: qResolverPayrolls,
+    payrollsIndex: qResolverPayrollsIndex,
+    positionPicker: qResolverPositionPicker,
   },
   Mutation: {
     createUser: mResolverCreateUser,
@@ -81,6 +89,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     deleteSchedule: mResolverDeleteSchedule,
     registerPunch: mResolverRegisterPunch,
     assignUserToSchedule: mResolverAssignUserToSchedule,
+    generatePayslips: mResolverGeneratePayslips,
   },
   Decimal: Decimal,
   ISODate: ISODate,

@@ -77,7 +77,7 @@ const columns: GridColDef[] = [
   }
 ];
 
-export default function EmployeeList() {
+export default function EmployeesIndex() {
   const navigate = useNavigate();
   const [syncMutate, { loading }] = useMutation(SYNC_USERS);
   const materialTheme = useMaterialTheme();
@@ -121,7 +121,7 @@ export default function EmployeeList() {
         {/* Add employee redirect */}
         <Button
           component={Link}
-          to="./editor/new"
+          to="editor"
           startIcon={<PersonAddAltIcon />}>
           Add
         </Button>
@@ -143,7 +143,7 @@ export default function EmployeeList() {
               },
             },
           }}
-          onRowClick={params => navigate(`/employees/view/${params.id}`)}
+          onRowClick={params => navigate(`${params.id}`)}
           columnVisibilityModel={{
             streetName: isLgScreen,
             pincode: isLgScreen
@@ -163,7 +163,7 @@ export default function EmployeeList() {
   );
 }
 
-export const employeeListLoader: LoaderFunction = async ({ request }) => {
+export const employeesIndexLoader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const searchTerm = url.searchParams.get('searchTerm');
   const loadUsersQuery = await apolloClient.query({

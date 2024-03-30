@@ -8,22 +8,22 @@ import List from "@mui/material/List";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
 import { FC, useMemo } from "react";
 import { ActionFunction, Form, LoaderFunction, useLoaderData } from "react-router-dom";
 import PunchHistoryListItem from "../components/PunchHistoryItem";
 import Timer from "../components/Timer";
 import { apolloClient } from "../lib/apollo";
 import { gql } from "../lib/gql-codegen";
-import { ListPunchesQuery } from "../lib/gql-codegen/graphql";
+import { ActivePunchesQuery, ClosedPunchesQuery } from "../lib/gql-codegen/graphql";
 import { useMaterialTheme } from "../lib/material-theme";
 
 
 const PunchPage: FC = () => {
   const theme = useMaterialTheme();
   const loaderData = useLoaderData() as Awaited<PunchPageLoader>;
-  const punches = useMemo(() => loaderData?.punches, [loaderData?.punches]);
-  const active = useMemo(() => punches?.data.punches.active[0], [punches?.data.punches.active]);
-  const history = useMemo(() => punches?.data.punches.history, [punches?.data.punches.history]);
+  const active = useMemo(() => loaderData?.active?.data?.punches, [loaderData?.active?.data?.punches]);
+  const history = useMemo(() => loaderData?.closed?.data?.punches, [loaderData?.closed?.data?.punches]);
 
   if (!loaderData) {
     return (
@@ -46,14 +46,14 @@ const PunchPage: FC = () => {
           mb: 2
         }}>
         <Toolbar sx={{ justifyContent: 'center' }}>
-          <Typography variant="body1" fontWeight="bold">{active ? 'You are Clocked In' : 'Ready to Clock In?'}</Typography>
+          <Typography variant="body1" fontWeight="bold">{active.length ? 'You are Clocked In' : 'Ready to Clock In?'}</Typography>
         </Toolbar>
         <Form method="post">
           <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
-            {active
+            {active.length > 0
               ? (
                 <>
-                  <Timer timer={active} fabProps={{ color: 'success' }} />
+                  <Timer timer={active[0]} fabProps={{ color: 'success' }} />
                   <Button type="submit" variant="contained" color="info" sx={{ mt: 1 }}>Clock Out</Button>
                 </>
               )
@@ -86,28 +86,31 @@ const PunchPage: FC = () => {
 
 export default PunchPage;
 
-const LIST_PUNCHES = gql(`
-  query ListPunches($filter: ListPunchesFilter) {
+const activePunchesQuery = gql(`
+  query ActivePunches {
+    punches(filter: { activeOnly: true }) {
+      ...Timer
+    }
+  }
+`);
+
+const closedPunchesQuery = gql(`
+  query ClosedPunches($filter: ListPunchesFilter) {
     punches (filter: $filter) {
-      active {
-        ...Timer
-      }
-      history {
-        ...PunchHistory
-      }
+      ...PunchHistory
     }
   }
 `);
 
 interface PunchPageLoader {
-  readonly punches: Awaited<ApolloQueryResult<ListPunchesQuery>>;
+  readonly active: Awaited<ApolloQueryResult<ActivePunchesQuery>>;
+  readonly closed: Awaited<ApolloQueryResult<ClosedPunchesQuery>>;
 }
 
 export const punchPageLoader: LoaderFunction = async () => {
   return {
-    punches: await apolloClient.query({
-      query: LIST_PUNCHES
-    }),
+    active: await apolloClient.query({ query: activePunchesQuery }),
+    closed: await apolloClient.query({ query: closedPunchesQuery, variables: { filter: { to: dayjs().toISOString() } } })
   };
 }
 

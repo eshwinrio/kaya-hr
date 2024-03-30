@@ -6,17 +6,20 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
 import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
-import EmployeeEditor, { employeeEditorAction, employeeEditorLoader } from './pages/EmployeeEditorPage';
-import EmployeeList, { employeeListLoader } from './pages/EmployeeList';
+import EmployeesIndex, { employeesIndexLoader } from './pages/EmployeesIndex';
+import FinancialsIndex, { financialHomePageLoader } from './pages/FinancialsIndex';
 import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
 import HomePage, { homeLoader } from './pages/HomePage';
 import Login, { loginAction } from './pages/Login';
+import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
-import PayrollsPage from './pages/PayrollsPage';
+import PayrollsIndex, { payrollsPageLoader } from './pages/PayrollsIndex';
+import PayrollViewerPage from './pages/PayrollViewerPage';
 import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
 import SettingsPage from './pages/SettingsPage';
+import UpdateEmployee, { updateEmployeeAction, updateEmployeeLoader } from './pages/UpdateEmployee';
 import ViewEmployee, { viewEmployeeLoader } from './pages/ViewEmployee';
 import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
 import Layout from './shared/Layout';
@@ -28,7 +31,7 @@ const router = createBrowserRouter([
     Component: Layout,
     children: [
       {
-        id: 'dash-layout',
+        id: 'dashboard',
         Component: DashboardLayout,
         loader: dashboardLayoutLoader,
         children: [
@@ -42,20 +45,30 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                Component: EmployeeList,
-                loader: employeeListLoader,
+                Component: EmployeesIndex,
+                loader: employeesIndexLoader,
               },
               {
-                path: "editor/:id",
-                Component: EmployeeEditor,
-                action: employeeEditorAction,
-                loader: employeeEditorLoader,
-              },
-              {
-                path: "view/:id",
+                path: ":id",
                 Component: ViewEmployee,
                 loader: viewEmployeeLoader,
-              }
+              },
+              {
+                path: "editor",
+                children: [
+                  {
+                    index: true,
+                    Component: OnboardEmployee,
+                    action: onboardEmployeeAction,
+                  },
+                  {
+                    path: ":id",
+                    Component: UpdateEmployee,
+                    action: updateEmployeeAction,
+                    loader: updateEmployeeLoader,
+                  }
+                ]
+              },
             ]
           },
           {
@@ -80,7 +93,23 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                Component: PayrollsPage
+                Component: FinancialsIndex,
+                loader: financialHomePageLoader,
+              },
+              {
+                id: 'payroll',
+                path: "payrolls",
+                children: [
+                  {
+                    index: true,
+                    Component: PayrollsIndex,
+                    loader: payrollsPageLoader,
+                  },
+                  {
+                    path: ":id",
+                    Component: PayrollViewerPage
+                  }
+                ]
               }
             ]
           },

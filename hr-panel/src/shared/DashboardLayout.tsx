@@ -56,13 +56,8 @@ export default function DashboardLayout() {
       icon: <GroupsIcon />,
       children: [
         {
-          title: 'List',
-          path: '/employees/list',
-          icon: <GroupAddIcon />,
-        },
-        {
-          title: 'Editor',
-          path: '/employees/editor/new',
+          title: 'Onboard',
+          path: '/employees/editor',
           icon: <GroupAddIcon />,
         },
       ]
@@ -79,7 +74,7 @@ export default function DashboardLayout() {
       children: [
         {
           title: 'Payrolls',
-          path: '/financial/payroll',
+          path: '/financial/payrolls',
           icon: <CurrencyExchangeIcon />,
         },
       ]

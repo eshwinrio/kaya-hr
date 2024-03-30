@@ -21,6 +21,19 @@ enum PaymentStatus {
   COMPLETED
 }
 
+enum PunchApprovalStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
+# <Interfaces>
+input Pagination {
+  take: Int
+  skip: Int
+}
+# </Interfaces>
+
 
 # <Primitive types>
 type ClockTime {
@@ -30,9 +43,9 @@ type ClockTime {
   netHours: Int
   hourlyWage: Decimal!
   earning: Decimal
-  paymentStatus: PaymentStatus!
-  user: User!
+  user: User
   payroll: Payroll
+  approvalStatus: PunchApprovalStatus!
 }
 
 type Organization {
@@ -50,8 +63,21 @@ type Position {
   title: String!
   description: String
   hourlyWage: Decimal
+  organization: Organization
   users: [User!]
   schedules: [Schedule!]
+}
+
+type Payslip {
+  id: Int!
+  generatedOn: ISODate!
+  dispensedOn: ISODate
+  deductions: Decimal
+  netPay: Decimal!
+  paymentMethod: String
+  paymentStatus: PaymentStatus!
+  employee: User!
+  clockTimes: [ClockTime!]
 }
 
 type Payroll {
@@ -59,18 +85,15 @@ type Payroll {
   periodStart: ISODate!
   periodEnd: ISODate!
   generatedOn: ISODate!
-  dispensedOn: ISODate
-  totalHours: Decimal!
-  deductions: Decimal
-  netPay: Decimal!
-  paymentMethod: String
-  employee: User!
-  clockTimes: [ClockTime!]!
+  netOutstanding: Decimal!
+  organization: Organization
+  payslips: [Payslip!]
 }
 
 type Schedule {
   id: Int!
   title: String!
+  description: String
   notes: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
@@ -119,9 +142,9 @@ type UserSyncResult {
   rejected: Int!
 }
 
-type ListPunches {
-  active: [ClockTime!]!
-  history: [ClockTime!]!
+type PayrollPeriod {
+  startsOn: ISODate!
+  endsOn: ISODate!
 }
 # </Output types>
 
@@ -198,6 +221,7 @@ input ScheduleAssigneeInput {
 
 input ScheduleInput {
   title: String
+  description: String
   dateTimeStart: ISODate!
   dateTimeEnd: ISODate!
   assignees: [ScheduleAssigneeInput!]
@@ -210,6 +234,7 @@ input ListScheduleFilter {
   title: String
   from: ISODate
   to: ISODate
+  pagination: Pagination
 }
 
 input ViewUserOptions {
@@ -227,8 +252,16 @@ input ListPunchesFilter {
   userId: Int
   organizationId: Int
   paymentStatus: [PaymentStatus!]
-  pageSize: Int
-  pageNumber: Int
+  from: ISODate
+  to: ISODate
+  activeOnly: Boolean
+  pagination: Pagination
+}
+
+input PayslipsFilter {
+  employeeId: Int
+  onlyPending: Boolean
+  onlyCurrentPeriod: Boolean
 }
 
 input GeneratePayrollOptions {
@@ -237,6 +270,31 @@ input GeneratePayrollOptions {
   periodEnd: ISODate!
 }
 # </Input types>
+
+# <ComponentSpecificQueries>
+type PayrollSummary {
+  payrollId: Int!
+  periodStart: ISODate!
+  periodEnd: ISODate!
+  totalTasks: Int!
+  pendingTasks: Int!
+  completedTasks: Int!
+  rejectedTasks: Int!
+}
+# </ComponentSpecificQueries>
+
+# <PageSpecificQueries>
+type PayrollsIndex {
+  week: Int!
+  year: Int!
+  currentCycleStart: ISODate!
+  currentCycleEnd: ISODate!
+  amountOutstanding: Decimal!
+  previousPayrolls: [Payroll!]!
+  activePayslips: [Payslip!]!
+  currentPayrollSummary: PayrollSummary
+}
+# </PageSpecificQueries>
 
 
 # Root types
@@ -248,19 +306,26 @@ type Query {
 
   # Shift scheduling
   schedule(id: Int!): Schedule!
+  schedules(filters: ListScheduleFilter): [Schedule!]!
   scheduledShifts(filters: ListScheduleFilter): [ScheduleAssignment!]!
 
   # Timesheet
-  punches(filter: ListPunchesFilter): ListPunches!
+  punches(filter: ListPunchesFilter): [ClockTime!]!
+  payrollPeriods: PayrollPeriod
   payrolls: [Payroll!]!
+  payslips(filter: PayslipsFilter): [Payslip!]!
+
+  # PageSpecificQueries
+  payrollsIndex: PayrollsIndex!
+
+  # ComponentSpecificQueries
+  positionPicker: [Position!]!
 }
 
 type Mutation {
   # Users
   createPosition(input: PositionInput!): Position!
   createOrganization(input: CreateOrganizationInput!): Organization!
-  createUser(input: CreateUserInput!): User!
-  updateUser(userId: Int!, input: UpdateUserInput!): User!
   updateOrganization(id: Int!, input: UpdateOrganizationInput!): Organization!
   syncUsers(force: Boolean): UserSyncResult!
 
@@ -273,4 +338,11 @@ type Mutation {
   # Timesheet actions
   registerPunch: ClockTime!
   generatePayroll(options: GeneratePayrollOptions!): Int!
+
+  # PageSpecificActions
+  createUser(input: CreateUserInput!): User!
+  updateUser(userId: Int!, input: UpdateUserInput!): User!
+
+  # ComponentSpecificActions
+  generatePayslips: Boolean
 }

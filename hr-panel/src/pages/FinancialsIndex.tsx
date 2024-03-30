@@ -1,3 +1,4 @@
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import { Avatar, IconButton, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -8,12 +9,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { FC } from "react";
-import { LoaderFunction } from "react-router-dom";
-import { apolloClient } from "../lib/apollo";
-import { gql } from "../lib/gql-codegen";
+import { Link, LoaderFunction } from "react-router-dom";
+import PayrollSummary from '../components/PayrollSummary';
 
-const PayrollsPage: FC = () => {
 
+const FinancialsIndex: FC = () => {
   return (
     <Container>
       <Toolbar disableGutters>
@@ -29,35 +29,17 @@ const PayrollsPage: FC = () => {
           </Paper>
         </Grid2>
         <Grid2 xs={12} sm={6} lg={4}>
-          <Paper variant="outlined" sx={{ height: "100%" }}>
-            <Toolbar>
+        <Paper variant="outlined" sx={{ height: "100%" }}>
+            <Toolbar sx={{ justifyContent: "space-between" }}>
               <Box>
                 <Typography variant="body2" fontWeight={700}>Payroll Summary</Typography>
                 <Typography variant="caption">Last generated 2 days ago</Typography>
               </Box>
+              <IconButton size="small" component={Link} to="payrolls">
+                <OpenInNewIcon fontSize='inherit' />
+              </IconButton>
             </Toolbar>
-            <Box sx={{ px: 3, py: 2 }}>
-              <Grid2 container spacing={2}>
-                <Grid2 xs={4}>
-                  <Box sx={{ display: "flex", flexDirection: "column", borderLeft: "3px solid #e0e0e0", pl: 1 }}>
-                    <Typography variant="caption">Payment</Typography>
-                    <Typography variant="subtitle2">$9870.00</Typography>
-                  </Box>
-                </Grid2>
-                <Grid2 xs={4}>
-                  <Box sx={{ display: "flex", flexDirection: "column", borderLeft: "3px solid #ff9800", pl: 1 }}>
-                    <Typography variant="caption">Pending</Typography>
-                    <Typography variant="subtitle2">$9870.00</Typography>
-                  </Box>
-                </Grid2>
-                <Grid2 xs={4}>
-                  <Box sx={{ display: "flex", flexDirection: "column", borderLeft: "3px solid #4caf50", pl: 1 }}>
-                    <Typography variant="caption">Paid</Typography>
-                    <Typography variant="subtitle2">$0.00</Typography>
-                  </Box>
-                </Grid2>
-              </Grid2>
-            </Box>
+            <PayrollSummary sx={{ px: 3, py: 2 }} />
           </Paper>
         </Grid2>
         <Grid2 xs={12} lg={8}>
@@ -132,28 +114,8 @@ const PayrollsPage: FC = () => {
   );
 };
 
-export default PayrollsPage;
+export default FinancialsIndex;
 
-export const LOAD_ALL_PAYROLLS = gql(`
-  query LoadAllPayrolls {
-    payrolls {
-      id
-      employee {
-        id
-        firstName
-        lastName
-      }
-      periodStart
-      periodEnd
-      generatedOn
-      dispensedOn
-      deductions
-      netPay
-      paymentMethod
-    }
-  }
-`);
-
-export const payrollsPageLoader: LoaderFunction = async () => {
-  return apolloClient.query({ query: LOAD_ALL_PAYROLLS });
+export const financialHomePageLoader: LoaderFunction = async () => {
+  return null;
 };

@@ -107,8 +107,8 @@ const ScheduleEditorPage: FC = () => {
           <Grid2 xs={12}>
             <TextField
               type='text'
-              name='notes' label='Note'
-              variant='outlined' multiline rows={4} fullWidth
+              name='description' label='Description'
+              variant='outlined' multiline rows={2} fullWidth
               defaultValue={formData.notes}
               onChange={onChange}
               helperText="Helps assignees to understand the purpose of the schedule"
@@ -152,6 +152,16 @@ const ScheduleEditorPage: FC = () => {
               Schedule will last for {dayjs.duration(dayjs(formData.dateTimeEnd).diff(dayjs(formData.dateTimeStart))).humanize()}
             </Typography>
           </Grid2>}
+          <Grid2 xs={12}>
+            <TextField
+              type='text'
+              name='notes' label='Additonal notes'
+              variant='outlined' multiline rows={4} fullWidth
+              defaultValue={formData.notes}
+              onChange={onChange}
+              helperText="Optional extra information about the schedule"
+            />
+          </Grid2>
         </Grid2>
 
         {/* Section 4: Choose assignees */}
@@ -203,6 +213,7 @@ export const scheduleEditorAction: ActionFunction = async ({ params, request }) 
     variables: {
       input: {
         title: formData.get('title')!.toString(),
+        description: formData.get('description')!.toString(),
         notes: formData.get('notes')!.toString(),
         dateTimeStart: formData.get('dateTimeStart')!.toString(),
         dateTimeEnd: formData.get('dateTimeEnd')!.toString(),

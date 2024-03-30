@@ -102,14 +102,16 @@ export default function HomePage() {
     </Paper>
   );
 
-  const grossEarningsView = grossEarnings && (
+  const grossEarningsView = grossEarnings.data && (
     <Paper component='section' variant='outlined' sx={{ height: '100%' }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="body1" fontWeight="bold">Balance</Typography>
       </Toolbar>
       <Box sx={{ px: 3, py: 1 }}>
         <Typography variant="body1">Gross earnings</Typography>
-        <Typography variant="h5" fontWeight="bold">${grossEarnings.data.punches.history.reduce((acc, cur) => acc + cur.earning, 0)}</Typography>
+        <Typography variant="h5" fontWeight="bold">
+          ${grossEarnings.data.punches.reduce((acc, cur) => acc + cur.earning, 0)}
+        </Typography>
       </Box>
     </Paper>
   );
@@ -143,9 +145,7 @@ export const LIST_MY_SCHEDULES = gql(`
 export const grossEarningsQuery = gql(`
   query GrossEarnings {
     punches(filter: { paymentStatus: [PENDING] }) {
-      history {
-        earning
-      }
+      earning
     }
   }
 `);

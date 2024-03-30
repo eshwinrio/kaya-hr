@@ -10,7 +10,8 @@ async function main() {
       summary: Seed.defaultOrganizationSummary,
       webUrl: Seed.defaultOrganizationWebsiteUrl.href,
       logoUrl: Seed.defaultOrganizationLogoUrl,
-      bannerUrl: Seed.defaultOrganizationBannerUrl
+      bannerUrl: Seed.defaultOrganizationBannerUrl,
+      payrollCron: Seed.defaultOrganizationPayrollCycleCron,
     },
     update: {}
   });

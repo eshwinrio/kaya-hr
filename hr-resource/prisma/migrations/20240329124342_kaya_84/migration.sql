@@ -1,14 +1,4 @@
 -- CreateTable
-CREATE TABLE `Position` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
-    `hourlyWage` DECIMAL(65, 30) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Organization` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
@@ -16,6 +6,20 @@ CREATE TABLE `Organization` (
     `webUrl` VARCHAR(191) NULL,
     `bannerUrl` VARCHAR(191) NULL,
     `logoUrl` VARCHAR(191) NULL,
+    `payrollCron` VARCHAR(191) NOT NULL DEFAULT '0 0 0 * * 4/2',
+    `payrollStart` DATETIME(3) NULL,
+    `enablePayrollJob` BOOLEAN NOT NULL DEFAULT false,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Position` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `hourlyWage` DECIMAL(65, 30) NOT NULL,
+    `organizationId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -51,10 +55,12 @@ CREATE TABLE `User` (
 CREATE TABLE `Schedule` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL DEFAULT 'Untitled',
+    `description` VARCHAR(255) NULL,
     `dateTimeStart` DATETIME(3) NOT NULL,
     `dateTimeEnd` DATETIME(3) NOT NULL,
     `organizationId` INTEGER NOT NULL,
     `createdByUserId` INTEGER NULL,
+    `notes` VARCHAR(255) NULL,
     `createdAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -67,24 +73,38 @@ CREATE TABLE `ClockTime` (
     `startTime` DATETIME(3) NOT NULL,
     `endTime` DATETIME(3) NULL,
     `hourlyWage` DECIMAL(65, 30) NOT NULL,
+    `payslipId` INTEGER NULL,
+    `approvalStatus` ENUM('REJECTED', 'PENDING', 'APPROVED') NOT NULL DEFAULT 'PENDING',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Payroll` (
+CREATE TABLE `Payslip` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `employeeId` INTEGER NOT NULL,
     `periodStart` DATETIME(3) NOT NULL,
     `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
     `dispensedOn` DATETIME(3) NULL,
-    `hours` DECIMAL(65, 30) NOT NULL,
-    `hourlyWage` DECIMAL(65, 30) NOT NULL,
-    `deductions` DECIMAL(65, 30) NULL,
-    `netPay` DECIMAL(65, 30) NOT NULL,
+    `deductions` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `paymentStatus` ENUM('CANCELED', 'PENDING', 'COMPLETED') NOT NULL DEFAULT 'PENDING',
+    `payrollId` INTEGER NULL,
     `paymentMethod` VARCHAR(191) NULL,
 
+    UNIQUE INDEX `Payslip_employeeId_periodStart_periodEnd_key`(`employeeId`, `periodStart`, `periodEnd`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Payroll` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `organizationId` INTEGER NOT NULL,
+    `periodStart` DATETIME(3) NOT NULL,
+    `periodEnd` DATETIME(3) NOT NULL,
+    `generatedOn` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Payroll_organizationId_periodStart_periodEnd_key`(`organizationId`, `periodStart`, `periodEnd`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -110,6 +130,9 @@ CREATE TABLE `UserScheduleMap` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
+ALTER TABLE `Position` ADD CONSTRAINT `Position_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -125,7 +148,16 @@ ALTER TABLE `Schedule` ADD CONSTRAINT `Schedule_organizationId_fkey` FOREIGN KEY
 ALTER TABLE `ClockTime` ADD CONSTRAINT `ClockTime_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Payroll` ADD CONSTRAINT `Payroll_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `ClockTime` ADD CONSTRAINT `ClockTime_payslipId_fkey` FOREIGN KEY (`payslipId`) REFERENCES `Payslip`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Payslip` ADD CONSTRAINT `Payslip_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Payslip` ADD CONSTRAINT `Payslip_payrollId_fkey` FOREIGN KEY (`payrollId`) REFERENCES `Payroll`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Payroll` ADD CONSTRAINT `Payroll_organizationId_fkey` FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserRoleMap` ADD CONSTRAINT `UserRoleMap_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

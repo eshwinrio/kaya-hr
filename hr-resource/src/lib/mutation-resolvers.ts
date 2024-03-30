@@ -1,11 +1,10 @@
 import { Prisma, Role as PrismaRole } from "@prisma/client";
-import dayjs from "dayjs";
 import { GraphQLError } from "graphql";
 import createHttpError from "http-errors";
 import validator from "validator";
 import { Seed } from "../config/environment.js";
 import { syncUsers } from "./fetch-requests.js";
-import { MutationResolvers, PaymentStatus, Role, SyncStatus } from "./gql-codegen/graphql.js";
+import { MutationResolvers, PunchApprovalStatus, Role, SyncStatus } from "./gql-codegen/graphql.js";
 import { logHttp, logSystem } from "./logger.js";
 import prisma from "./prisma.js";
 
@@ -54,9 +53,7 @@ export const mResolverCreateUser: MutationResolvers['createUser'] = async (
           connect: { id: organization?.id }
         },
         UserRoleMap: {
-          createMany: {
-            data: input.roles?.map(role => ({ role })) ?? []
-          }
+          create: { role: "EMPLOYEE" }
         },
       },
       include: {
@@ -302,9 +299,11 @@ export const mResolverCreateSchedule: MutationResolvers['createSchedule'] = asyn
     .create({
       data: {
         title: input.title ?? undefined,
+        description: input.description,
         dateTimeStart: input.dateTimeStart,
         dateTimeEnd: input.dateTimeEnd,
         organizationId: organization?.id,
+        notes: input.notes,
         createdByUserId: user?.id,
         createdAt: new Date(),
       },
@@ -510,18 +509,36 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
       },
     });
   } else {
+    let hourlyWage = activeSchedule?.position.hourlyWage;
+    if (!activeSchedule) {
+      hourlyWage = await prisma.user.findUnique({
+        where: {
+          id: user?.id
+        },
+        select: {
+          position: {
+            select: {
+              hourlyWage: true
+            }
+          }
+        }
+      }).then(result => result?.position?.hourlyWage);
+    }
+    if (!hourlyWage) {
+      throw new GraphQLError('Hourly wage not defined', { extensions: { code: 'BAD_REQUEST' } });
+    }
     clockTime = await prisma.clockTime.create({
       data: {
         userId: user?.id,
         startTime: currentTime,
-        hourlyWage: activeSchedule?.position.hourlyWage ?? 0,
+        hourlyWage,
       },
     });
   }
 
   return {
     ...clockTime,
-    paymentStatus: clockTime?.paymentStatus as PaymentStatus,
+    approvalStatus: clockTime.approvalStatus as PunchApprovalStatus,
     user: {
       ...user,
       syncStatus: user?.syncStatus as SyncStatus

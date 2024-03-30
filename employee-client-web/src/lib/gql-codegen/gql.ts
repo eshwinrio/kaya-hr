@@ -14,15 +14,16 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  fragment Profile on User {\n    email\n    firstName\n    middleName\n    lastName\n    ...Avatar\n  }\n": types.ProfileFragmentDoc,
-    "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n": types.PunchHistoryFragmentDoc,
+    "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n": types.PunchHistoryFragmentDoc,
     "\n  fragment PunchTiming on ClockTime {\n    startTime\n    endTime\n    netHours\n  }\n": types.PunchTimingFragmentDoc,
     "\n  fragment ScheduleAssignment on ScheduleAssignment {\n    id\n    schedule {\n      id\n      title\n      ...ScheduleTiming\n    }\n    position {\n      id\n      title\n    }\n    user {\n      id\n      firstName\n      lastName\n    }\n  }\n": types.ScheduleAssignmentFragmentDoc,
     "\n  fragment ScheduleTiming on Schedule {\n    dateTimeStart\n    dateTimeEnd\n  }\n": types.ScheduleTimingFragmentDoc,
     "\n  fragment Timer on ClockTime {\n    startTime\n  }\n": types.TimerFragmentDoc,
     "\n  fragment Avatar on User {\n    profileIconUrl\n    firstName\n  }\n": types.AvatarFragmentDoc,
     "\n  query ListMySchedules ($options: ViewUserOptions) {\n    currentUser(options: $options) {\n      schedules {\n        ...ScheduleAssignment\n      }\n    }\n  }\n": types.ListMySchedulesDocument,
-    "\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      history {\n        earning\n      }\n    }\n  }\n": types.GrossEarningsDocument,
-    "\n  query ListPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      active {\n        ...Timer\n      }\n      history {\n        ...PunchHistory\n      }\n    }\n  }\n": types.ListPunchesDocument,
+    "\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      earning\n    }\n  }\n": types.GrossEarningsDocument,
+    "\n  query ActivePunches {\n    punches(filter: { activeOnly: true }) {\n      ...Timer\n    }\n  }\n": types.ActivePunchesDocument,
+    "\n  query ClosedPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      ...PunchHistory\n    }\n  }\n": types.ClosedPunchesDocument,
     "\n  mutation RegisterPunch {\n    registerPunch {\n      id\n      startTime\n      endTime\n    }\n  }\n": types.RegisterPunchDocument,
     "\n  query WhoAmI {\n    currentUser {\n      id\n      ...Profile\n      ...Avatar\n      organization {\n        id\n        name\n        summary\n        webUrl\n        logoUrl\n        bannerUrl\n      }\n    }\n  }\n": types.WhoAmIDocument,
 };
@@ -48,7 +49,7 @@ export function gql(source: "\n  fragment Profile on User {\n    email\n    firs
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n"): (typeof documents)["\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    paymentStatus\n    ...PunchTiming\n  }\n"];
+export function gql(source: "\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n"): (typeof documents)["\n  fragment PunchHistory on ClockTime {\n    id\n    netHours\n    hourlyWage\n    earning\n    ...PunchTiming\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -76,11 +77,15 @@ export function gql(source: "\n  query ListMySchedules ($options: ViewUserOption
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      history {\n        earning\n      }\n    }\n  }\n"): (typeof documents)["\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      history {\n        earning\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      earning\n    }\n  }\n"): (typeof documents)["\n  query GrossEarnings {\n    punches(filter: { paymentStatus: [PENDING] }) {\n      earning\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query ListPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      active {\n        ...Timer\n      }\n      history {\n        ...PunchHistory\n      }\n    }\n  }\n"): (typeof documents)["\n  query ListPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      active {\n        ...Timer\n      }\n      history {\n        ...PunchHistory\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query ActivePunches {\n    punches(filter: { activeOnly: true }) {\n      ...Timer\n    }\n  }\n"): (typeof documents)["\n  query ActivePunches {\n    punches(filter: { activeOnly: true }) {\n      ...Timer\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query ClosedPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      ...PunchHistory\n    }\n  }\n"): (typeof documents)["\n  query ClosedPunches($filter: ListPunchesFilter) {\n    punches (filter: $filter) {\n      ...PunchHistory\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
