@@ -124,6 +124,7 @@ model Payslip {
   periodStart   DateTime
   periodEnd     DateTime
   generatedOn   DateTime
+  invoiceUuid   String?       @default(uuid())
   dispensedOn   DateTime?
   deductions    Decimal       @default(0)
   paymentStatus PaymentStatus @default(PENDING)
