@@ -23,6 +23,7 @@ import UpdateEmployee, { updateEmployeeAction, updateEmployeeLoader } from './pa
 import ViewEmployee, { viewEmployeeLoader } from './pages/ViewEmployee';
 import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
 import Layout from './shared/Layout';
+import ViewPayslip, { viewPayslipLoader } from './pages/ViewPayslip';
 
 const router = createBrowserRouter([
   {
@@ -109,7 +110,17 @@ const router = createBrowserRouter([
                     Component: PayrollViewerPage
                   }
                 ]
-              }
+              },
+              {
+                path: "payslips",
+                children: [
+                  {
+                    path: ":id",
+                    Component: ViewPayslip,
+                    loader: viewPayslipLoader,
+                  }
+                ]
+              } 
             ]
           },
           {
