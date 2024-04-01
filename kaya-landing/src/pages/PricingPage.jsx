@@ -7,8 +7,6 @@ import React from 'react';
 const theme = createTheme();
 const useStyles = makeStyles(() => ({
   root: {
-    minHeight: '100vh',
-    background: '#ccacf7',
     paddingTop: '100px',
     paddingBottom: '100px',
     display: 'flex',
@@ -16,15 +14,14 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
   box: {
-    height: '586px',
+    height: '556px',
     width: '300px',
     borderRadius: '20px',
-    // margin: '0 10px',
     margin: "auto",
     background: '#FFF',
     boxShadow: '0 1rem 2rem rgba(0, 0, 0, 20%)',
     [theme.breakpoints.down('md')]: {
-      height: '700px',
+      height: '600px',
       overflowY: 'auto',
     },
   },
@@ -67,18 +64,17 @@ const useStyles = makeStyles(() => ({
     fontSize: '0.7em',
     fontWeight: 'bold',
     lineHeight: '15px',
-    color: '#7D7C7C',
+    color: '#000',
   },
   description: {
     margin: '30px auto',
     fontSize: '0.8em',
-    color: '#7D7C7C',
+    color: '#000',
   },
   button: {
     margin: '0 auto 30px',
   },
   siteHeading: {
-    // marginBottom: "60px",
     overflow: "hidden",
     marginTop: "3%",
   },

@@ -7,21 +7,20 @@ import React from 'react';
 
 const useStyles = makeStyles(() => ({
   section: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    display: 'flex',
     textAlign: 'center',
-    width: '100%',
     position: 'relative',
     marginTop: '50px',
-    justifyItems: "center"
+    justifyContent:'space-around',
+    flexWrap:'wrap'
   },
   item: {
-    border: '5px solid black',
+    border: '1px solid black',
     padding: '50px 40px',
     backgroundColor: '#ffffff',
-    margin: '5px',
+    marginTop:'50px',
     marginBottom: '1.25rem',
-    width: '270px',
+    maxWidth: '270px',
     height: '20rem',
     borderRadius: '0.5rem',
     color: "black",

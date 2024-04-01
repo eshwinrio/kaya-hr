@@ -62,6 +62,7 @@ export default function Layout() {
               'aria-labelledby': 'basic-button',
             }}
           >
+          <MenuItem onClick={redirectAndClose.bind(null, '/')}>Home</MenuItem>
             <MenuItem onClick={redirectAndClose.bind(null, '/about')}>About</MenuItem>
             <MenuItem onClick={redirectAndClose.bind(null, '/pricing')}>Pricing</MenuItem>
             <MenuItem onClick={redirectAndClose.bind(null, '/features')}>Features</MenuItem>
