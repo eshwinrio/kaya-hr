@@ -2,7 +2,6 @@ import AddIcon from '@mui/icons-material/Add';
 import CallIcon from '@mui/icons-material/Call';
 import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
