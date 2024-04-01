@@ -79,6 +79,41 @@ services:
     networks:
       - private
 
+  kaya-web:
+    build:
+      args:
+        - NODE_ENV=production
+      context: kaya-landing
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    hostname: kaya-web
+    ports:
+      - 3000:80
+    networks:
+      - private
+
+  admin-panel:
+    build:
+      args:
+        - NODE_ENV=production
+      context: admin-panel
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - admin-panel/.env.production.local
+    hostname: admin-panel
+    ports:
+      - 3001:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
   hr-panel:
     build:
       args:
@@ -92,7 +127,27 @@ services:
       - hr-panel/.env.production.local
     hostname: hr-panel
     ports:
-      - 3000:80
+      - 3002:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
+  employee-client-web:
+    build:
+      args:
+        - NODE_ENV=production
+      context: employee-client-web
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - employee-client-web/.env.production.local
+    hostname: employee-client-web
+    ports:
+      - 3003:80
     depends_on:
       - auth-server
       - hr-resource

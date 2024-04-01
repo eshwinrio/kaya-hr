@@ -80,7 +80,9 @@ const router = createBrowserRouter([
       }
     ],
   },
-]);
+], {
+  basename: '/employee',
+});
 
 function App() {
   return (

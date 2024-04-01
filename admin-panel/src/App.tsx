@@ -52,9 +52,10 @@ const router = createBrowserRouter([
         Component: () => <div>404</div>
       }
     ],
-
   }
-]);
+], {
+  basename: '/admin',
+});
 
 function App() {
   return (
