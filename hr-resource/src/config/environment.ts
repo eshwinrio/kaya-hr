@@ -14,6 +14,10 @@ export namespace Express {
   export const routeVersion = process.env['EXPRESS_ROUTE_VERSION']!;
 }
 
+export namespace Fs {
+  export const outputDirectory = process.env['FS_OUTPUT_DIRECTORY']!;
+}
+
 export namespace Http {
   export const port = parseInt(process.env['HTTP_PORT']!);
 }
