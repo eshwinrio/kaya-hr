@@ -294,6 +294,19 @@ type PayrollsIndex {
   activePayslips: [Payslip!]!
   currentPayrollSummary: PayrollSummary
 }
+
+type PayslipPage {
+  id: Int!
+  generatedOn: ISODate!
+  dispensedOn: ISODate
+  deductions: Decimal
+  netPay: Decimal!
+  paymentMethod: String
+  paymentStatus: PaymentStatus!
+  invoiceUuid: String
+  employee: User
+  clockTimes: [ClockTime!]!
+}
 # </PageSpecificQueries>
 
 
@@ -317,6 +330,7 @@ type Query {
 
   # PageSpecificQueries
   payrollsIndex: PayrollsIndex!
+  viewPayslip(payslipId: Int!): PayslipPage
 
   # ComponentSpecificQueries
   positionPicker: [Position!]!
@@ -342,6 +356,7 @@ type Mutation {
   # PageSpecificActions
   createUser(input: CreateUserInput!): User!
   updateUser(userId: Int!, input: UpdateUserInput!): User!
+  generateInvoice(payslipId: Int!): String!
 
   # ComponentSpecificActions
   generatePayslips: Boolean
