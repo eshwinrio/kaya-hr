@@ -49,8 +49,6 @@ services:
     hostname: auth-server
     ports:
       - 8000:8000
-    volumes:
-      - ./auth-server:/app
     depends_on:
       - database-auth
     networks:
@@ -73,7 +71,7 @@ services:
     ports:
       - 8001:8001
     volumes:
-      - ./hr-resource:/app
+      - kaya-blob-storage:/app/uploads
     depends_on:
       - database-resource
     networks:
@@ -167,6 +165,8 @@ volumes:
   kaya-auth-production-mysql:
     driver: local
   kaya-resource-production-mysql:
+    driver: local
+  kaya-blob-storage:
     driver: local
 
 networks:
