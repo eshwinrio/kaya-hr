@@ -2,7 +2,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 import cookieParser from "cookie-parser";
 import cors, { CorsOptions } from "cors";
 import express from "express";
-import { Api, Cors, Express } from "./config/environment.js";
+import { Api, Cors, Express, Fs } from "./config/environment.js";
 import apolloServer, { ApolloServerContext, apolloServerContextFn } from "./lib/apollo.js";
 import { httpLogStream } from "./lib/logger.js";
 import errorHandler from "./middlewares/error-handler.js";
@@ -18,11 +18,11 @@ const corsOptions: CorsOptions = {
   maxAge: Cors.maxAge,
 }
 
-
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(httpLogStream);
+app.use(`${Express.routePrefix}${Api.routeMedia}`, express.static(Fs.outputDirectory));
 
 const bindExpressMiddleware = () => app.use(
   `${Express.routePrefix}/v${Express.routeVersion + Api.routeGraphQL}`,

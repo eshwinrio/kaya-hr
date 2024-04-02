@@ -47,7 +47,11 @@ const ViewPayslip: FC = () => {
   useEffect(() => {
     if (data?.generateInvoice) {
       const documentUuid = data.generateInvoice;
-      window.open(`/payslip/${documentUuid}.pdf`, "_blank");
+      const currentDomain = window.location.origin;
+      const apiDomain = process.env.REACT_APP_RESOURCE_API_DOMAIN || currentDomain;
+      const apiPrefix = process.env.REACT_APP_RESOURCE_API_PREFIX || "";
+      const mediaEndpoint = process.env.REACT_APP_RESOURCE_API_MEDIA_ENDPOINT || "";
+      window.open(`${apiDomain}${apiPrefix}${mediaEndpoint}/${documentUuid}.pdf`, "_blank");
     }
   }, [data]);
 

@@ -146,13 +146,14 @@ export async function generateInvoicePDF(organization: Organization, user: User,
   });
 
   // Deductions
+  const deductions = payslip.deductions.toFixed(2);
   page.drawText('Deductions', {
     x: margin,
     y: incomeTableYPos - 30,
     size: 10,
     font: helveticaBoldFont,
   });
-  page.drawText(`-$${payslip.deductions.toFixed(2)}`, {
+  page.drawText(`$${deductions}`, {
     x: (width / 4) * 3 - 10,
     y: incomeTableYPos - 30,
     size: 10,
@@ -160,13 +161,14 @@ export async function generateInvoicePDF(organization: Organization, user: User,
   });
 
   // Net Income
+  const netIncome = totalGrossPay.sub(payslip.deductions).toDecimalPlaces(2).toString();
   page.drawText('Current Net Income', {
     x: margin,
     y: incomeTableYPos - 50,
     size: 12,
     font: helveticaBoldFont,
   });
-  page.drawText(`2340`, {
+  page.drawText(`$${netIncome}`, {
     x: (width / 4) * 3 - 10,
     y: incomeTableYPos - 50,
     size: 12,

@@ -545,31 +545,3 @@ export const mResolverRegisterPunch: MutationResolvers['registerPunch'] = async 
     }
   }
 }
-
-export const mResolverGeneratePayroll: MutationResolvers['generatePayroll'] = async (
-  _root,
-  { options },
-  { user }
-) => {
-  const errors: Array<GraphQLError> = [];
-
-  const employees = await prisma.user
-    .findMany({
-      where: {
-        AND: [
-          { organizationId: user?.organizationId },
-          { id: { in: options.employeeIds ?? undefined } },
-          { position: { isNot: null } }
-        ]
-      },
-      include: {
-        position: true
-      }
-    });
-
-  if (employees.length !== options.employeeIds?.length) {
-    errors.push(new GraphQLError('One or more employees do not exist', { extensions: { code: 'NOT_FOUND' } }));
-  }
-
-  return 0;
-}

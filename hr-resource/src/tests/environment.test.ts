@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import validator from 'validator';
-import nodeCron from 'node-cron';
 import cronParser from 'cron-parser';
+import nodeCron from 'node-cron';
+import validator from 'validator';
 
 describe('API configurations', () => {
   it('API_AUTH_DOMAIN', (done) => {
@@ -13,6 +13,14 @@ describe('API configurations', () => {
 
   it('API_ROUTE_GRAPHQL', (done) => {
     const value = process.env['API_ROUTE_GRAPHQL'];
+    expect(value).not.to.be.undefined;
+    const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
+    expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
+    done();
+  });
+
+  it('API_ROUTE_MEDIA', (done) => {
+    const value = process.env['API_ROUTE_MEDIA'];
     expect(value).not.to.be.undefined;
     const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
     expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
