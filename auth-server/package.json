@@ -9,7 +9,7 @@
     "clean:build": "rimraf dist",
     "clean:logs": "rimraf logs/*.log",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset",
     "prisma:seed": "prisma db seed",
     "start:dev": "npm run build && npm run start",

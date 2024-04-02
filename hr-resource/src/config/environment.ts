@@ -1,6 +1,7 @@
 export namespace Api {
   export const authDomain = new URL(process.env['API_AUTH_DOMAIN']!);
   export const routeGraphQL = process.env['API_ROUTE_GRAPHQL']!;
+  export const routeMedia = process.env['API_ROUTE_MEDIA']!;
 }
 
 export namespace Cors {
