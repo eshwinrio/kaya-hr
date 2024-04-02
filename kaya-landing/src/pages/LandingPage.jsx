@@ -21,16 +21,16 @@ export default function LandingPage() {
       <Typography variant='h3' align='center' className='landing-header' mb={1} mt={20}>Collaborations</Typography>
       <div class="flex-container">
         <div class="grid-item">
-          <img src="https://southstreetburger.com/wp-content/uploads/2021/07/ssb-logo-white-1.png" alt="" srcset="" />
+          <img src="https://southstreetburger.com/wp-content/uploads/2021/07/ssb-logo-white-1.png" alt="south street burger" />
         </div>
         <div class="grid-item">
-          <img src="https://choiceindianrestaurant.ca/wp-content/uploads/2022/09/IMG-20220914-WA0000-removebg-preview.png" alt="" srcset="" />
+          <img src="https://choiceindianrestaurant.ca/wp-content/uploads/2022/09/IMG-20220914-WA0000-removebg-preview.png" alt="Choice indian restaurants" />
         </div>
         <div class="grid-item">
-          <img src="https://www.thegrandmehfil.com/wp-content/uploads/2021/02/Final-logo-01.png" alt="" srcset="" />
+          <img src="https://www.thegrandmehfil.com/wp-content/uploads/2021/02/Final-logo-01.png" alt="The Mehfil" />
         </div>
         <div class="grid-item">
-          <img src="https://mma.prnewswire.com/media/1688892/Clutch_Logo_Red__1.jpg?p=facebook" alt="" srcset="" />
+          <img src="https://mma.prnewswire.com/media/1688892/Clutch_Logo_Red__1.jpg?p=facebook" alt="Clutch" />
         </div>
 
       </div><hr></hr>

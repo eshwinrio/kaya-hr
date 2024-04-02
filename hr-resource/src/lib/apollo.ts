@@ -14,6 +14,8 @@ import qResolverPayrollsIndex from "./payrolls-index-resolver.js";
 import prisma from "./prisma.js";
 import { qResolverCurrentUser, qResolverPayrollPeriods, qResolverPayrolls, qResolverPunches, qResolverSchedule, qResolverScheduledShifts, qResolverSchedules, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
+import qResolverViewPayslip from "./view-payslip-resolver.js";
+import mGeneratePayslipResolver from "./page-mutation-resolvers.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
@@ -77,6 +79,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     payrolls: qResolverPayrolls,
     payrollsIndex: qResolverPayrollsIndex,
     positionPicker: qResolverPositionPicker,
+    viewPayslip: qResolverViewPayslip,
   },
   Mutation: {
     createUser: mResolverCreateUser,
@@ -90,6 +93,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     registerPunch: mResolverRegisterPunch,
     assignUserToSchedule: mResolverAssignUserToSchedule,
     generatePayslips: mResolverGeneratePayslips,
+    generateInvoice: mGeneratePayslipResolver,
   },
   Decimal: Decimal,
   ISODate: ISODate,

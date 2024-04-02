@@ -27,10 +27,7 @@
   text-decoration-color: rgba(170, 111, 248, 0.54);
 }
 
-.abt-content{
-  line-height: 20px;
-  letter-spacing: 10px;
-}
+
 .flex-container {
   display: flex;
   padding: 10px;
@@ -54,3 +51,8 @@
   text-decoration: underline;
   text-decoration-color: rgba(170, 111, 248, 0.54);
 }
+.abt-content{
+  line-height: 20px;
+  letter-spacing: 10px;
+}
+

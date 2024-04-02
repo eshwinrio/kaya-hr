@@ -1,7 +1,6 @@
 import React from 'react';
 import { Typography, Container, Box } from '@mui/material';
 import '../css/style.css';
-
 export default function AboutPage() {
   return (
     <Container>

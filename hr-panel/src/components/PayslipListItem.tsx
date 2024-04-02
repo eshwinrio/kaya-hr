@@ -7,6 +7,7 @@ import ListItemText, { ListItemTextProps } from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { FragmentType, gql, useFragment } from '../lib/gql-codegen';
 import UserAvatar from "./UserAvatar";
+import { Link } from 'react-router-dom';
 
 const fragment = gql(`
   fragment PayslipListItem on Payslip {
@@ -46,7 +47,7 @@ export default function PayslipListItem({
         <ReceiptIcon />
       </IconButton>
     )}>
-      <ListItemButton>
+      <ListItemButton component={Link} to={`../payslips/${fragmentData.id}`} {...listItemButtonProps}>
         <ListItemAvatar>
           <UserAvatar user={fragmentData.employee} />
         </ListItemAvatar>

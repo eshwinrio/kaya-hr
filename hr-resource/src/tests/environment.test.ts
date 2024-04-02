@@ -86,6 +86,13 @@ describe('HTTP configurations', () => {
   });
 });
 
+describe('File system output configurations', () => {
+  it('FS_OUTPUT_DIRECTORY', (done) => {
+    const value = process.env['FS_OUTPUT_DIRECTORY'];
+    expect(value).not.to.be.undefined;
+    done();
+  });
+});
 describe('Seed configurations', () => {
   it('SEED_DEFAULT_ORGANIZATION_BANNER_URL', (done) => {
     const url = new URL(process.env['SEED_DEFAULT_ORGANIZATION_BANNER_URL']!);

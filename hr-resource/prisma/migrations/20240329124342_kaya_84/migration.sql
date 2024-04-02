@@ -86,6 +86,7 @@ CREATE TABLE `Payslip` (
     `periodStart` DATETIME(3) NOT NULL,
     `periodEnd` DATETIME(3) NOT NULL,
     `generatedOn` DATETIME(3) NOT NULL,
+    `invoiceUuid` VARCHAR(191) NULL,
     `dispensedOn` DATETIME(3) NULL,
     `deductions` DECIMAL(65, 30) NOT NULL DEFAULT 0,
     `paymentStatus` ENUM('CANCELED', 'PENDING', 'COMPLETED') NOT NULL DEFAULT 'PENDING',

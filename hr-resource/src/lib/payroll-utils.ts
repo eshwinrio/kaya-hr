@@ -4,7 +4,10 @@ import cronParser from "cron-parser";
 import dayjs from "dayjs";
 import { logSystem } from "./logger.js";
 import prisma from "./prisma.js";
-
+import { generateInvoicePDF } from "./generate-payslip-document.js";
+import { writeFile } from "fs";
+import { Fs } from "../config/environment.js";
+import { join } from "path";
 
 /**
  * Generates a payslip for each employee, at the beginning of current payroll period.
@@ -48,7 +51,7 @@ export async function generatePayslips(organization: Organization) {
         }
       });
 
-    prisma.payslip
+    const payslip = await prisma.payslip
       .upsert({
         where: {
           employeeId_periodStart_periodEnd: {
@@ -66,6 +69,9 @@ export async function generatePayslips(organization: Organization) {
         },
         update: {
           ClockTime: { connect: orphanedClockTimes?.map(orphan => ({ id: orphan.id })) }
+        },
+        include: {
+          ClockTime: true
         }
       })
       .catch(err => {
@@ -77,6 +83,15 @@ export async function generatePayslips(organization: Organization) {
           logSystem.error(err);
         }
       });
+      
+    if (payslip) {
+      const pdfBytes = await generateInvoicePDF(organization, employee, payslip, payslip.ClockTime);
+      // Write pdf to disk with uuid as filename and update payslip table
+      const pdfPath = join(Fs.outputDirectory, `${payslip.invoiceUuid}.pdf`);
+      writeFile(pdfPath, pdfBytes, () => {
+        logSystem.info(`Generated payslip for ${employee.email}`);
+      });
+    }
   }
 }
 
