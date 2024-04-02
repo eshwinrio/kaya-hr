@@ -1,12 +1,17 @@
 export namespace Api {
   export const authDomain = new URL(process.env['API_AUTH_DOMAIN']!);
+  export const routeGraphQL = process.env['API_ROUTE_GRAPHQL']!;
 }
 
 export namespace Cors {
-  export const origins = process.env['CORS_ORIGINS']!.split(',').map((o) => o.trim());
   export const methods = process.env['CORS_METHODS']!.split(',').map((m) => m.trim());
   export const allowCredentials = process.env['CORS_ALLOW_CREDENTIALS'] === 'true';
   export const maxAge = parseInt(process.env['CORS_MAX_AGE']!);
+}
+
+export namespace Express {
+  export const routePrefix = process.env['EXPRESS_ROUTE_PREFIX']!;
+  export const routeVersion = process.env['EXPRESS_ROUTE_VERSION']!;
 }
 
 export namespace Http {

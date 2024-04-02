@@ -38,6 +38,30 @@ describe('Authentication API configurations', () => {
     expect(value).not.to.be.empty;
     done();
   });
+
+  it('API_ROUTE_APPLICATIONS', (done) => {
+    const value = process.env['API_ROUTE_APPLICATIONS'];
+    expect(value).not.to.be.undefined;
+    const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
+    expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
+    done();
+  });
+
+  it('API_ROUTE_AUTH', (done) => {
+    const value = process.env['API_ROUTE_AUTH'];
+    expect(value).not.to.be.undefined;
+    const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
+    expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
+    done();
+  });
+
+  it('API_ROUTE_USERS', (done) => {
+    const value = process.env['API_ROUTE_USERS'];
+    expect(value).not.to.be.undefined;
+    const pathnameRegex = /^\/[a-z0-9-._~%!$&'()*+,;=:@]+$/i;
+    expect(pathnameRegex.test(value!), `Invalid pathname: ${value}`).to.be.true;
+    done();
+  });
 });
 
 describe('Bcrypt configurations', () => {
@@ -52,17 +76,6 @@ describe('Bcrypt configurations', () => {
 });
 
 describe('CORS configurations', () => {
-  it('CORS origins', (done) => {
-    const origins = process.env['CORS_ORIGINS'];
-    expect(origins).not.to.be.undefined;
-    const originsArray = origins!.split(',').map((origin) => origin.trim());
-    expect(originsArray).to.have.lengthOf.above(0);
-    originsArray.forEach((origin) => {
-      expect(validator.isURL(origin, { require_tld: false }), `${origin} is not a valid URL`).to.be.true;
-    });
-    done();
-  });
-
   it('CORS methods', (done) => {
     const methods = process.env['CORS_METHODS'];
     expect(methods).not.to.be.undefined;
@@ -95,6 +108,24 @@ describe('Database configurations', () => {
   it('Database URL', (done) => {
     const value = process.env['DATABASE_URL'];
     expect(value).not.to.be.undefined;
+    done();
+  });
+});
+
+describe('Express configurations', () => {
+  it('EXPRESS_ROUTE_PREFIX', (done) => {
+    const routePrefix = process.env['EXPRESS_ROUTE_PREFIX'];
+    expect(routePrefix).not.to.be.undefined;
+    const pathnameRegex = /^(\/[a-z0-9-._~%!$&'()*+,;=:@]+)*\/?$/i;
+    expect(pathnameRegex.test(routePrefix!), `Invalid route prefix: ${routePrefix}`).to.be.true;
+    done();
+  });
+
+  it('EXPRESS_ROUTE_VERSION', (done) => {
+    const routeVersion = process.env['EXPRESS_ROUTE_VERSION'];
+    expect(routeVersion).not.to.be.undefined;
+    const versionRegex = /^\d+\.\d+$/;
+    expect(versionRegex.test(routeVersion!), `Invalid route version: ${routeVersion}`).to.be.true;
     done();
   });
 });

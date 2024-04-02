@@ -5,6 +5,9 @@ export namespace Api {
     export const forgotPasswordMailSubject = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_SUBJECT'] ?? 'Password Reset';
     export const forgotPasswordMailText = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_TEXT']!;
     export const forgotPasswordMailHtml = process.env['API_AUTH_FORGOT_PASSWORD_MAIL_HTML']!;
+    export const routeApplications = process.env['API_ROUTE_APPLICATIONS']!;
+    export const routeAuth = process.env['API_ROUTE_AUTH']!;
+    export const routeUsers = process.env['API_ROUTE_USERS']!;
   }
 }
 
@@ -13,10 +16,14 @@ export namespace Bcrypt {
 }
 
 export namespace Cors {
-  export const origins = process.env['CORS_ORIGINS']!.split(',').map((o) => o.trim());
   export const methods = process.env['CORS_METHODS']!.split(',').map((m) => m.trim());
   export const allowCredentials = process.env['CORS_ALLOW_CREDENTIALS'] === 'true';
   export const maxAge = parseInt(process.env['CORS_MAX_AGE']!);
+}
+
+export namespace Express {
+  export const routePrefix = process.env['EXPRESS_ROUTE_PREFIX']!;
+  export const routeVersion = process.env['EXPRESS_ROUTE_VERSION']!;
 }
 
 export namespace Http {
