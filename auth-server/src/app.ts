@@ -24,9 +24,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(httpLogStream);
-app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeApplications}`, applicationRouter);
-app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeAuth}`, authRouter);
-app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.routeUsers}`, userRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.Auth.routeApplications}`, applicationRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.Auth.routeAuth}`, authRouter);
+app.use(`${Express.routePrefix}/v${Express.routeVersion + Api.Auth.routeUsers}`, userRouter);
 app.use(errorHandler);
 
 export default app;

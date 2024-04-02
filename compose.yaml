@@ -79,21 +79,6 @@ services:
     networks:
       - private
 
-  kaya-web:
-    build:
-      args:
-        - NODE_ENV=production
-      context: kaya-landing
-      dockerfile: Dockerfile
-    restart: on-failure:2
-    environment:
-      NODE_ENV: production
-    hostname: kaya-web
-    ports:
-      - 3000:80
-    networks:
-      - private
-
   admin-panel:
     build:
       args:
@@ -172,6 +157,8 @@ services:
       - auth-server
       - hr-resource
       - hr-panel
+      - admin-panel
+      - employee-client-web
     networks:
       - public
       - private

@@ -15,6 +15,7 @@ RUN npm run build --omit=dev
 
 # Production stage
 FROM nginx:alpine
+COPY .nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 EXPOSE 80

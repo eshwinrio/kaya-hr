@@ -5,7 +5,7 @@ const currentDomain = window.location.origin;
 const apiDomain = process.env.REACT_APP_AUTH_API_DOMAIN || currentDomain;
 
 // Auth URI (prefixed)
-const authUri = `${apiDomain}${process.env.REACT_APP_RESOURCE_API_PREFIX}`;
+const authUri = `${apiDomain}${process.env.REACT_APP_AUTH_API_PREFIX}`;
 
 export const verifyIdentity = (requestInit?: RequestInit) => fetch(
   `${authUri}/auth/verify`,
@@ -46,7 +46,7 @@ export const signout = (requestInit?: RequestInit) => fetch(
 );
 
 export const forgotPassword = (email: string, requestInit?: RequestInit) => fetch(
-  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/reset-password?email=${email}`,
+  `${authUri}/auth/reset-password?email=${email}`,
   {
     method: 'GET',
     headers: {
@@ -57,7 +57,7 @@ export const forgotPassword = (email: string, requestInit?: RequestInit) => fetc
 );
 
 export const resetPassword = (resetToken: string, password: string, requestInit?: RequestInit) => fetch(
-  `${process.env['REACT_APP_AUTH_API_DOMAIN']}/auth/reset-password?token=${resetToken}`,
+  `${authUri}/auth/reset-password?token=${resetToken}`,
   {
     method: 'POST',
     body: JSON.stringify({ password }),
