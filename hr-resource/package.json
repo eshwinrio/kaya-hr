@@ -11,7 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset",
-    "prisma:seed": "prisma db seed",  
+    "prisma:seed": "prisma db seed",
     "codegen": "graphql-codegen --config codegen.ts",
     "start:dev": "npm run build && npm run start",
     "start:prod": "npm run test && npm run prisma:migrate && npm run prisma:seed && node .",
