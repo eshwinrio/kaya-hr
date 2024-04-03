@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { alpha } from '@mui/material/styles';
 import GraphicText from '../components/GraphicText';
-import '../css/style.css';
 import { useMaterialTheme } from '../lib/material-theme';
 
 
