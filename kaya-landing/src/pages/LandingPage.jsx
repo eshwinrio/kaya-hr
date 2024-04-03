@@ -1,13 +1,30 @@
 import React from 'react';
 import { Typography, Container } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import banner from '../assets/banner.svg';
 import '../css/style.css';
 
+const theme = createTheme();
 
+theme.typography.h3 = {
+  fontSize: '1.2rem',
+  '@media (min-width:600px)': {
+    fontSize: '1.5rem',
+  },
+  [theme.breakpoints.up('md')]: {
+    fontSize: '2.4rem',
+  },
+};
 export default function LandingPage() {
   return (
+    
     <div id='landing-page'>
-      <Container component="main" maxWidth="xlg" sx={{ height: `calc(100vh - 64px)`, padding: 5 }}>
+
+      <ThemeProvider theme={theme}>
+      <Container component="main" maxWidth="xlg" sx={{ height: {
+        xlg:`calc(100vh - 64px)`,
+        md: `calc(90vh - 64px)`,
+        sm: `calc(80vh - 64px)` }}}>
         <div id='banner-content'>
           <Typography variant="h3" component="h1" gutterBottom>
             Unlock the Potential of Your Workforce with <span className='khr'>KayaHR</span>.
@@ -16,7 +33,7 @@ export default function LandingPage() {
             Elevate Your HR Management to New Heights.
           </Typography>
         </div>
-        <img src={banner} alt="banner" width={450} id='banner-img' />
+        <img src={banner} alt="banner" id='banner-img' />
       </Container>
       <Typography variant='h3' align='center' className='landing-header' mb={1} mt={20}>Collaborations</Typography>
       <div class="flex-container">
@@ -32,9 +49,8 @@ export default function LandingPage() {
         <div class="grid-item">
           <img src="https://mma.prnewswire.com/media/1688892/Clutch_Logo_Red__1.jpg?p=facebook" alt="Clutch" />
         </div>
-
-      </div><hr></hr>
-      <Typography align='center'>&copy; Made with love 	&hearts;</Typography>
     </div>
+        </ThemeProvider>
+        </div>
   );
 }

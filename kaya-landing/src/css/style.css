@@ -1,15 +1,12 @@
-#home{
-  height: 87vh;
-  padding: 40px;
-}
 #banner-content{
-  margin-top: 100px;
-  margin-left: 150px ;
+  margin-top: 10%;
+  margin-left: 15% ;
   max-width: 1000px;
 }
 #banner-img{
   float: right;
-  margin-right: 150px;
+  margin-right: 10%;
+  width: 35%;
 }
 
 #header-logo{
@@ -56,3 +53,25 @@
   letter-spacing: 10px;
 }
 
+@media only screen and (min-width: 100px) {
+  #banner-img{
+    margin-left: 50px;
+    width: 200px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  
+  #banner-img{
+  float: right;
+  margin-right: 10%;
+  width: 400px;
+}
+}
+
+@media only screen and (min-width: 1200px) {
+  #banner-img{
+  float: right;
+  margin-right: 10%;
+  width: 600px;
+}}
