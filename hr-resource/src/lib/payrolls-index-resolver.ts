@@ -19,8 +19,6 @@ const qResolverPayrollsIndex: QueryResolvers['payrollsIndex'] = async (
 
   const currentCycle = cronParser.parseExpression(organization.payrollCron, {
     startDate: organization.payrollStart ?? dayjs().startOf('month').toDate(),
-    currentDate: dayjs().toDate(),
-    tz: 'UTC',
   });
 
   const currentCycleStart = currentCycle.prev().toDate();
