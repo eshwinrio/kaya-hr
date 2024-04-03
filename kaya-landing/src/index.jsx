@@ -2,6 +2,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -12,7 +13,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <PayPalScriptProvider options={{
+      clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
+      currency: process.env.REACT_APP_PAYPAL_CURRENCY,
+    }}>
+      <App />
+    </PayPalScriptProvider>
   </React.StrictMode>
 );
 

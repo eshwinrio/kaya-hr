@@ -1,14 +1,23 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListSubheader from '@mui/material/ListSubheader';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import { ThemeProvider } from '@mui/material/styles';
-import { useState } from 'react';
+import { PayPalButtons } from '@paypal/react-paypal-js';
+import React, { useState } from 'react';
 import { Outlet } from "react-router";
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo-full.svg';
@@ -19,6 +28,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const open = Boolean(menuAnchorEl);
+
   const handleClick = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };
@@ -105,6 +115,48 @@ export default function Layout() {
         <MenuItem onClick={redirectAndClose.bind(null, '/features')}>Features</MenuItem>
         <MenuItem onClick={redirectAndClose.bind(null, '/contact-us')}>Contact us</MenuItem>
       </Menu>
+      <Box component='footer' sx={{ mt: 8 }}>
+        <Container>
+          <Divider sx={{ my: 4 }} />
+          <Grid2 container justifyContent='space-between' spacing={2}>
+            <Grid2>
+              <img src={logo} alt="logo" width={84} />
+            </Grid2>
+            <Grid2 xs={12} md={4}>
+              <List subheader={<ListSubheader>Pages</ListSubheader>}>
+                <ListItemButton onClick={redirectAndClose.bind(null, '/')}>Home</ListItemButton>
+                <ListItemButton onClick={redirectAndClose.bind(null, '/about')}>About</ListItemButton>
+                <ListItemButton onClick={redirectAndClose.bind(null, '/pricing')}>Pricing</ListItemButton>
+                <ListItemButton onClick={redirectAndClose.bind(null, '/features')}>Features</ListItemButton>
+                <ListItemButton onClick={redirectAndClose.bind(null, '/contact-us')}>Contact us</ListItemButton>
+              </List>
+            </Grid2>
+            <Grid2 xs={12} md={4}>
+              <List subheader={<ListSubheader>Console</ListSubheader>}>
+                <ListItemButton
+                  onClick={redirectAndClose.bind(null, null)}
+                  component='a' href={process.env.REACT_APP_PORTAL_HR_DOMAIN} target='_blank'>
+                  HR Panel
+                </ListItemButton>
+                <ListItemButton
+                  onClick={redirectAndClose.bind(null, null)}
+                  component='a' href={process.env.REACT_APP_PORTAL_HR_DOMAIN} target='_blank'>
+                  Admin Panel
+                </ListItemButton>
+                <ListItemButton
+                  onClick={redirectAndClose.bind(null, null)}
+                  component='a' href={process.env.REACT_APP_PORTAL_HR_DOMAIN} target='_blank'>
+                  Employee Client
+                </ListItemButton>
+              </List>
+              <PayPalButtons style={{ layout: 'horizontal' }} />
+            </Grid2>
+          </Grid2>
+          <Divider sx={{ my: 4 }} />
+          <Typography variant='body2'>© 2022 Kaya. All rights reserved.</Typography>
+          <Box id='paypal-button-container' sx={{ display: { xs: 'none', md: 'block' } }}></Box>
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 }
