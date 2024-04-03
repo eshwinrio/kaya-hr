@@ -1,5 +1,5 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import AppBar from '@mui/material/AppBar';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -21,6 +21,7 @@ import React, { useState } from 'react';
 import { Outlet } from "react-router";
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo-full.svg';
+import AppBar from '../components/AppBar';
 import { useMaterialTheme } from "../lib/material-theme";
 
 export default function Layout() {
@@ -41,7 +42,7 @@ export default function Layout() {
   return (
     <ThemeProvider theme={materialTheme}>
       <CssBaseline />
-      <AppBar position="static" elevation={0} color="transparent">
+      <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           <img src={logo} alt="logo" width={84} />
           <Stack direction='row' display={{ xs: 'none', md: 'flex' }}>
@@ -53,6 +54,7 @@ export default function Layout() {
           </Stack>
           <Stack direction='row'>
             <Button
+              startIcon={<TerminalIcon />}
               id="button-navigate-portals"
               aria-controls={open ? 'menu-navigate-portals' : undefined}
               aria-haspopup="true"
@@ -116,7 +118,7 @@ export default function Layout() {
         <MenuItem onClick={redirectAndClose.bind(null, '/contact-us')}>Contact us</MenuItem>
       </Menu>
       <Box component='footer' sx={{ mt: 8 }}>
-        <Container>
+        <Container maxWidth>
           <Divider sx={{ my: 4 }} />
           <Grid2 container justifyContent='space-between' spacing={2}>
             <Grid2>
