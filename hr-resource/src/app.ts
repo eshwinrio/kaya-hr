@@ -22,7 +22,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(httpLogStream);
-app.use(`${Express.routePrefix}${Api.routeMedia}`, express.static(Fs.outputDirectory));
+app.use(
+  `${Express.routePrefix}/v${Express.routeVersion + Api.routeMedia}`,
+  express.static(Fs.outputDirectory)
+);
 
 const bindExpressMiddleware = () => app.use(
   `${Express.routePrefix}/v${Express.routeVersion + Api.routeGraphQL}`,
