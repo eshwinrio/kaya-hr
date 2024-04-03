@@ -1,6 +1,6 @@
 {
   "name": "hr-resource",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "HR Resource module of Kaya HR",
   "main": "dist/bin/www/index.js",
   "type": "module",
