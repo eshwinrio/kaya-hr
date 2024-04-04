@@ -1,0 +1,190 @@
+services:
+  database-auth:
+    image: mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    environment:
+      - MYSQL_DATABASE=kayahr-auth
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    volumes:
+      - kaya-auth-production-mysql:/var/lib/mysql
+    ports:
+      - 3300:3306
+    networks:
+      - private
+
+  database-resource:
+    image: mysql
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    environment:
+      - MYSQL_DATABASE=kayahr-resource
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    volumes:
+      - kaya-resource-production-mysql:/var/lib/mysql
+    ports:
+      - 3301:3306
+    networks:
+      - private
+
+  auth-server:
+    build:
+      args:
+        - NODE_ENV=production
+      context: auth-server
+      dockerfile: Dockerfile
+      target: production
+    command: npm run start:prod
+    restart: on-failure:5
+    environment:
+      NODE_ENV: production
+    env_file:
+      - auth-server/.env.production.local
+    hostname: auth-server
+    ports:
+      - 8000:8000
+    depends_on:
+      - database-auth
+    networks:
+      - private
+
+  hr-resource:
+    build:
+      args:
+        - NODE_ENV=production
+      context: hr-resource
+      dockerfile: Dockerfile
+      target: production
+    command: npm run start:prod
+    restart: on-failure:5
+    environment:
+      NODE_ENV: production
+    env_file:
+      - hr-resource/.env.production.local
+    hostname: hr-resource
+    ports:
+      - 8001:8001
+    volumes:
+      - kaya-blob-storage:/app/uploads
+    depends_on:
+      - database-resource
+    networks:
+      - private
+
+  kaya-web:
+    build:
+      args:
+        - NODE_ENV=production
+      context: kaya-landing
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - kaya-landing/.env.production.local
+    hostname: kaya-web
+    ports:
+      - 3000:80
+    networks:
+      - private
+
+  admin-panel:
+    build:
+      args:
+        - NODE_ENV=production
+      context: admin-panel
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - admin-panel/.env.production.local
+    hostname: admin-panel
+    ports:
+      - 3001:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
+  hr-panel:
+    build:
+      args:
+        - NODE_ENV=production
+      context: hr-panel
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - hr-panel/.env.production.local
+    hostname: hr-panel
+    ports:
+      - 3002:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
+  employee-client-web:
+    build:
+      args:
+        - NODE_ENV=production
+      context: employee-client-web
+      dockerfile: Dockerfile
+    restart: on-failure:2
+    environment:
+      NODE_ENV: production
+    env_file:
+      - employee-client-web/.env.production.local
+    hostname: employee-client-web
+    ports:
+      - 3003:80
+    depends_on:
+      - auth-server
+      - hr-resource
+    networks:
+      - private
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - private
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - kaya-web
+      - hr-panel
+      - admin-panel
+      - employee-client-web
+    networks:
+      - public
+      - private
+
+volumes:
+  kaya-auth-production-mysql:
+    driver: local
+  kaya-resource-production-mysql:
+    driver: local
+  kaya-blob-storage:
+    driver: local
+
+networks:
+  private:
+  public:

@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  SUPER
+  ADMIN
+  MANAGER
+  LEAD
+  EMPLOYEE
+}
+
+enum SyncStatus {
+  NEVER
+  OK
+  FAIL
+}
+
+enum PaymentStatus {
+  CANCELED
+  PENDING
+  COMPLETED
+}
+
+enum PunchApprovalStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
+model Organization {
+  id               Int        @id @default(autoincrement())
+  name             String
+  summary          String?    @db.VarChar(1000)
+  webUrl           String?
+  bannerUrl        String?
+  logoUrl          String?
+  payrollCron      String     @default("0 0 0 * * 4/2")
+  payrollStart     DateTime?
+  enablePayrollJob Boolean    @default(false)
+  Users            User[]
+  Schedule         Schedule[]
+  Payroll          Payroll[]
+  Position         Position[]
+}
+
+model Position {
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?
+  hourlyWage      Decimal
+  organizationId  Int
+  organization    Organization      @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  UserScheduleMap UserScheduleMap[]
+  User            User[]
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  firstName       String
+  middleName      String?
+  lastName        String
+  email           String            @unique
+  dateOfBirth     DateTime
+  streetName      String
+  addressL2       String?
+  city            String
+  pincode         String
+  province        String
+  phone           String            @db.VarChar(20)
+  country         String
+  dateJoined      DateTime
+  status          String?
+  organizationId  Int
+  profileIconUrl  String?
+  bannerUrl       String?
+  positionId      Int?
+  syncStatus      SyncStatus        @default(NEVER)
+  organization    Organization      @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  position        Position?         @relation(fields: [positionId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  Schedule        Schedule[]
+  UserRoleMap     UserRoleMap[]
+  UserScheduleMap UserScheduleMap[]
+  ClockTime       ClockTime[]
+  Payslip         Payslip[]
+}
+
+model Schedule {
+  id              Int               @id @default(autoincrement())
+  title           String            @default("Untitled")
+  description     String?           @db.VarChar(255)
+  dateTimeStart   DateTime
+  dateTimeEnd     DateTime
+  organizationId  Int
+  createdByUserId Int?
+  notes           String?           @db.VarChar(255)
+  createdAt       DateTime
+  createdBy       User?             @relation(fields: [createdByUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  UserScheduleMap UserScheduleMap[]
+}
+
+model ClockTime {
+  id             Int                 @id @default(autoincrement())
+  userId         Int
+  startTime      DateTime
+  endTime        DateTime?
+  hourlyWage     Decimal
+  payslipId      Int?
+  approvalStatus PunchApprovalStatus @default(PENDING)
+  user           User                @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payslip        Payslip?            @relation(fields: [payslipId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Payslip {
+  id            Int           @id @default(autoincrement())
+  employeeId    Int
+  periodStart   DateTime
+  periodEnd     DateTime
+  generatedOn   DateTime
+  invoiceUuid   String?       @default(uuid())
+  dispensedOn   DateTime?
+  deductions    Decimal       @default(0)
+  paymentStatus PaymentStatus @default(PENDING)
+  payrollId     Int?
+  paymentMethod String?
+  employee      User          @relation(fields: [employeeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payroll       Payroll?      @relation(fields: [payrollId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  ClockTime     ClockTime[]
+
+  @@unique([employeeId, periodStart, periodEnd])
+}
+
+model Payroll {
+  id             Int          @id @default(autoincrement())
+  organizationId Int
+  periodStart    DateTime
+  periodEnd      DateTime
+  generatedOn    DateTime
+  organization   Organization @relation(fields: [organizationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  Payslip        Payslip[]
+
+  @@unique([organizationId, periodStart, periodEnd])
+}
+
+// Mapping models
+model UserRoleMap {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  role   Role
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, role])
+}
+
+model UserScheduleMap {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  scheduleId Int
+  positionId Int
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, scheduleId])
+}

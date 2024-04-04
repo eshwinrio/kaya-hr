@@ -1,0 +1,36 @@
+{
+	"folders": [
+		{
+			"name": "Admin Panel",
+			"path": "admin-panel"
+		},
+		{
+			"name": "Auth Server",
+			"path": "auth-server"
+		},
+		{
+			"name": "HR Panel",
+			"path": "hr-panel"
+		},
+		{
+			"name": "HR Resource Server",
+			"path": "hr-resource"
+		},
+		{
+			"name": "Employee Client",
+			"path": "employee-client-web"
+		},
+		{
+			"name": "Kaya Web",
+			"path": "kaya-landing"
+		}
+	],
+	"settings": {
+		"git.openRepositoryInParentFolders": "always",
+		"editor.tabSize": 2,
+		"files.autoSave": "onWindowChange",
+		"editor.minimap.scale": 1,
+		"workbench.activityBar.location": "top",
+		"workbench.iconTheme": "material-icon-theme"
+	}
+}
