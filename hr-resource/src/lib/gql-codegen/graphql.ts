@@ -69,6 +69,12 @@ export type GeneratePayrollOptions = {
   periodStart: Scalars['ISODate']['input'];
 };
 
+export type HrDashboardIndexPage = {
+  __typename?: 'HRDashboardIndexPage';
+  activeEmployees: Array<User>;
+  employeeCount: Scalars['Int']['output'];
+};
+
 export type ListPunchesFilter = {
   activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
   from?: InputMaybe<Scalars['ISODate']['input']>;
@@ -299,6 +305,7 @@ export enum PunchApprovalStatus {
 export type Query = {
   __typename?: 'Query';
   currentUser: User;
+  hrDashboardIndex?: Maybe<HrDashboardIndexPage>;
   payrollPeriods?: Maybe<PayrollPeriod>;
   payrolls: Array<Payroll>;
   payrollsIndex: PayrollsIndex;
@@ -549,6 +556,7 @@ export type ResolversTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
   GeneratePayrollOptions: GeneratePayrollOptions;
+  HRDashboardIndexPage: ResolverTypeWrapper<HrDashboardIndexPage>;
   ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ListPunchesFilter: ListPunchesFilter;
@@ -591,6 +599,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   Decimal: Scalars['Decimal']['output'];
   GeneratePayrollOptions: GeneratePayrollOptions;
+  HRDashboardIndexPage: HrDashboardIndexPage;
   ISODate: Scalars['ISODate']['output'];
   Int: Scalars['Int']['output'];
   ListPunchesFilter: ListPunchesFilter;
@@ -637,6 +646,12 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
 export interface DecimalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Decimal'], any> {
   name: 'Decimal';
 }
+
+export type HrDashboardIndexPageResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['HRDashboardIndexPage'] = ResolversParentTypes['HRDashboardIndexPage']> = ResolversObject<{
+  activeEmployees?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  employeeCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
 
 export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ISODate'], any> {
   name: 'ISODate';
@@ -750,6 +765,7 @@ export type PositionResolvers<ContextType = ApolloServerContext, ParentType exte
 
 export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, Partial<QueryCurrentUserArgs>>;
+  hrDashboardIndex?: Resolver<Maybe<ResolversTypes['HRDashboardIndexPage']>, ParentType, ContextType>;
   payrollPeriods?: Resolver<Maybe<ResolversTypes['PayrollPeriod']>, ParentType, ContextType>;
   payrolls?: Resolver<Array<ResolversTypes['Payroll']>, ParentType, ContextType>;
   payrollsIndex?: Resolver<ResolversTypes['PayrollsIndex'], ParentType, ContextType>;
@@ -820,6 +836,7 @@ export type UserSyncResultResolvers<ContextType = ApolloServerContext, ParentTyp
 export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
+  HRDashboardIndexPage?: HrDashboardIndexPageResolvers<ContextType>;
   ISODate?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;

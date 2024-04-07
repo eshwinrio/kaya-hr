@@ -32,6 +32,10 @@ export namespace Logger {
     process.env['LOGGER_ENABLE_STACK_TRACE'] === 'true';
 }
 
+export namespace OpenWeatherMap {
+  export const apiKey = process.env['OPENWEATHERMAP_API_KEY']!;
+}
+
 export namespace Seed {
   export const defaultOrganizationBannerUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_BANNER_URL']!);
   export const defaultOrganizationLogoUrl = new URL(process.env['SEED_DEFAULT_ORGANIZATION_LOGO_URL']!);

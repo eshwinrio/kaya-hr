@@ -16,6 +16,7 @@ import { qResolverCurrentUser, qResolverPayrollPeriods, qResolverPayrolls, qReso
 import { Decimal, ISODate } from "./scalars.js";
 import qResolverViewPayslip from "./view-payslip-resolver.js";
 import mGeneratePayslipResolver from "./page-mutation-resolvers.js";
+import { qResolverHRDashboardIndex } from "./hrdashboard-index-resolvers.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
@@ -65,10 +66,15 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
   }
 };
 
-const typeDefs = readFileSync('graphql/schema.graphql', { encoding: 'utf-8' });
+const typeDefs = [
+  readFileSync('graphql/schema.graphql', { encoding: 'utf-8' }),
+  readFileSync('graphql/openweathermap.graphql', { encoding: 'utf-8' }),
+];
+
 const resolvers: Resolvers<ApolloServerContext> = {
   Query: {
     currentUser: qResolverCurrentUser,
+    hrDashboardIndex: qResolverHRDashboardIndex,
     users: qResolverUsers,
     user: qResolverUser,
     schedule: qResolverSchedule,
