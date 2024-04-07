@@ -9,7 +9,7 @@ import store from './lib/redux-store';
 import EmployeesIndex, { employeesIndexLoader } from './pages/EmployeesIndex';
 import FinancialsIndex, { financialHomePageLoader } from './pages/FinancialsIndex';
 import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
-import HomePage, { homeLoader } from './pages/HomePage';
+import HomePage, { homeLoader } from './pages/Index';
 import Login, { loginAction } from './pages/Login';
 import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
