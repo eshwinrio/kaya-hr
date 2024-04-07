@@ -1,4 +1,3 @@
-import { ApolloQueryResult } from '@apollo/client';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LaunchIcon from '@mui/icons-material/Launch';
 import Box from '@mui/material/Box';
@@ -9,20 +8,22 @@ import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import DashCard from '../components/DashCard';
 import UserListItem from '../components/UserListItem';
 import WeatherWidget from '../components/WeatherWidget';
 import { apolloClient } from '../lib/apollo';
 import { gql } from '../lib/gql-codegen';
-import { ActiveUsersQuery } from '../lib/gql-codegen/graphql';
+import { IndexPageQuery } from '../lib/gql-codegen/graphql';
 import { useWhoAmI } from '../lib/whoami-provider';
+import { GraphQLError } from 'graphql';
 
 const HomePage: FC = () => {
   const whoAmI = useWhoAmI();
   const loaderData = useLoaderData() as HomePageLoader;
-  const activeUsers = useMemo(() => loaderData.activeUsers.data?.punches ?? [], [loaderData.activeUsers.data?.punches]);
+  const employeeCount = loaderData.hrDashboardIndex?.employeeCount;
+  const activeUsers = loaderData.hrDashboardIndex?.activeEmployees;
 
   return (
     <Container>
@@ -43,13 +44,13 @@ const HomePage: FC = () => {
           </Grid2>
           <Grid2 container xs={12}>
             {[
-              {
+              ...(employeeCount ? [{
                 title: 'Total employees',
                 icon: <AssignmentIndIcon />,
-                value: loaderData.activeUsers.data.punches.length,
+                value: employeeCount,
                 backgroundColor: "#CAB7EBD7",
                 color: "#482880"
-              },
+              }] : []),
               {
                 title: 'On leave',
                 icon: <AssignmentIndIcon />,
@@ -95,13 +96,13 @@ const HomePage: FC = () => {
                 <LaunchIcon fontSize='inherit' />
               </IconButton>
             </Toolbar>
-            {activeUsers.length > 0
+            {activeUsers && activeUsers.length > 0
               ? (
                 <List dense disablePadding>
-                  {activeUsers.filter(user => user.user).map(user => (
+                  {activeUsers.map(user => (
                     <UserListItem
                       key={user.id}
-                      user={user.user!}
+                      user={user}
                       disableGutters
                       disablePadding
                       divider
@@ -131,21 +132,25 @@ const HomePage: FC = () => {
 
 export default HomePage;
 
-const activeEmployeesQuery = gql(`
-  query ActiveUsers {
-    punches(filter: { activeOnly: true }) {
-      id
-      user { ...UserListItem }
+const query = gql(`
+  query IndexPage {
+    hrDashboardIndex {
+      employeeCount 
+      activeEmployees {
+        id
+        ...UserListItem
+      } 
     }
   }
 `);
 
-interface HomePageLoader {
-  readonly activeUsers: Awaited<ApolloQueryResult<ActiveUsersQuery>>;
-}
+type HomePageLoader = Awaited<IndexPageQuery>;
 
-export const homeLoader: LoaderFunction = async () => {
-  return {
-    activeUsers: await apolloClient.query({ query: activeEmployeesQuery })
-  };
+export const homeLoader: LoaderFunction = async (): Promise<HomePageLoader> => {
+  const result = await apolloClient.query({ query });
+  const { data, errors } = result;
+  if (errors) throw errors;
+  const { hrDashboardIndex } = data;
+  if (!hrDashboardIndex) throw new GraphQLError('Failed to fetch data');
+  return data;
 }

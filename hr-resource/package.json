@@ -1,6 +1,6 @@
 {
   "name": "hr-resource",
-  "version": "1.0.0-beta.1",
+  "version": "1.1.0",
   "description": "HR Resource module of Kaya HR",
   "main": "dist/bin/www/index.js",
   "type": "module",
@@ -52,6 +52,7 @@
     "mocha": "^10.2.0",
     "morgan": "^1.10.0",
     "node-cron": "^3.0.3",
+    "openweather-api-node": "^3.1.2",
     "pdf-lib": "^1.17.1",
     "validator": "^13.11.0",
     "winston": "^3.11.0"

@@ -101,6 +101,15 @@ describe('File system output configurations', () => {
     done();
   });
 });
+
+describe('OpenWeatherMap configurations', () => {
+  it('OPENWEATHERMAP_API_KEY', (done) => {
+    const value = process.env['OPENWEATHERMAP_API_KEY'];
+    expect(value).not.to.be.undefined;
+    done();
+  });
+});
+
 describe('Seed configurations', () => {
   it('SEED_DEFAULT_ORGANIZATION_BANNER_URL', (done) => {
     const url = new URL(process.env['SEED_DEFAULT_ORGANIZATION_BANNER_URL']!);

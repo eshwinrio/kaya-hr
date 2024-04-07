@@ -5,17 +5,18 @@ import { readFileSync } from "fs";
 import { GraphQLError } from "graphql";
 import httpErrors, { HttpError } from "http-errors";
 import { mResolverGeneratePayslips } from "./component-mutation-resolvers.js";
-import { qResolverPositionPicker } from "./component-query-resolvers.js";
+import { qResolverPositionPicker, qResolverWeatherData } from "./component-query-resolvers.js";
 import { getHeaders, verifyIdentity } from "./fetch-requests.js";
 import { Resolvers } from "./gql-codegen/graphql.js";
+import { qResolverHRDashboardIndex } from "./hrdashboard-index-resolvers.js";
 import { logHttp } from "./logger.js";
 import { mResolverAssignUserToSchedule, mResolverCreateOrganization, mResolverCreateSchedule, mResolverCreateUser, mResolverDeleteSchedule, mResolverRegisterPunch, mResolverSyncUsers, mResolverUpdateOrganization, mResolverUpdateSchedule, mResolverUpdateUser } from "./mutation-resolvers.js";
+import mGeneratePayslipResolver from "./page-mutation-resolvers.js";
 import qResolverPayrollsIndex from "./payrolls-index-resolver.js";
 import prisma from "./prisma.js";
 import { qResolverCurrentUser, qResolverPayrollPeriods, qResolverPayrolls, qResolverPunches, qResolverSchedule, qResolverScheduledShifts, qResolverSchedules, qResolverUser, qResolverUsers } from "./query-resolvers.js";
 import { Decimal, ISODate } from "./scalars.js";
 import qResolverViewPayslip from "./view-payslip-resolver.js";
-import mGeneratePayslipResolver from "./page-mutation-resolvers.js";
 
 export interface ApolloServerContext extends BaseContext {
   readonly user: User;
@@ -65,10 +66,15 @@ export const apolloServerContextFn: ExpressMiddlewareOptions<ApolloServerContext
   }
 };
 
-const typeDefs = readFileSync('graphql/schema.graphql', { encoding: 'utf-8' });
+const typeDefs = [
+  readFileSync('graphql/schema.graphql', { encoding: 'utf-8' }),
+  readFileSync('graphql/openweathermap.graphql', { encoding: 'utf-8' }),
+];
+
 const resolvers: Resolvers<ApolloServerContext> = {
   Query: {
     currentUser: qResolverCurrentUser,
+    hrDashboardIndex: qResolverHRDashboardIndex,
     users: qResolverUsers,
     user: qResolverUser,
     schedule: qResolverSchedule,
@@ -80,6 +86,7 @@ const resolvers: Resolvers<ApolloServerContext> = {
     payrollsIndex: qResolverPayrollsIndex,
     positionPicker: qResolverPositionPicker,
     viewPayslip: qResolverViewPayslip,
+    weatherData: qResolverWeatherData,
   },
   Mutation: {
     createUser: mResolverCreateUser,

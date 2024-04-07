@@ -1,0 +1,36 @@
+type CurrentTemperatures {
+  cur: Float!
+}
+
+type WindData {
+  speed: Float!
+  gust: Float
+  deg: Float!
+}
+
+type Icon {
+  url: String!
+  raw: String!
+}
+
+type CurrentConditions {
+  temp: CurrentTemperatures!
+  feelsLike: CurrentTemperatures!
+  pressure: Float!
+  humidity: Float!
+  dewPoint: Int
+  clouds: Float!
+  uvi: Int
+  visibility: Int!
+  wind: WindData!
+  rain: Float!
+  snow: Float!
+  conditionId: Int
+  main: String!
+  description: String!
+  icon: Icon!
+}
+
+type Query {
+  weatherData(lat: Float!, lon: Float!): CurrentConditions!
+}
