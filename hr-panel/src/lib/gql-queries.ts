@@ -88,102 +88,11 @@ export const UPDATE_ORGANIZATION = gql(`
   }
 `);
 
-export const LOAD_USERS = gql(`
-  query LoadAllUsers ($options: ListUsersFilter) {
-    users (options: $options) {
-      id
-      firstName
-      middleName
-      lastName
-      email
-      phone
-      city
-      country
-      province
-      roles
-      profileIconUrl
-      bannerUrl
-      dateOfBirth
-      dateJoined
-      streetName
-      pincode
-      syncStatus
-      positions {
-        id
-        title
-      }
-    }
-  }
-`);
-
 export const SYNC_USERS = gql(`
   mutation SyncUsers($force: Boolean) {
     syncUsers(force: $force) {
       accepted
       rejected
-    }
-  }
-`);
-
-export const VIEW_USER_WITH_SCHEDULES = gql(`
-  query ListUserSchedules ($userId: Int!) {
-    user(id: $userId) {
-      id
-      firstName
-      middleName
-      lastName
-      email
-      phone
-      city
-      country
-      province
-      roles
-      profileIconUrl
-      bannerUrl
-      schedules {
-        id
-        position {
-          id
-          title
-          description
-          hourlyWage
-        }
-        schedule {
-          id
-          title
-          dateTimeStart
-          dateTimeEnd
-          createdBy {
-            id
-            email
-            firstName
-            lastName
-            streetName
-            city
-            country
-            province
-            pincode
-            dateOfBirth
-            dateJoined
-            phone
-          }
-          createdAt
-        }
-        user {
-          id
-          email
-          firstName
-          lastName
-          streetName
-          city
-          country
-          province
-          pincode
-          dateOfBirth
-          dateJoined
-          phone
-        }
-      }
     }
   }
 `);
@@ -245,59 +154,6 @@ export const UPDATE_USER = gql(`
       positions {
         id
         title
-      }
-    }
-  }
-`);
-
-export const LIST_SCHEDULES = gql(`
-  query ListAllSchedules ($filters: ListScheduleFilter) {
-    scheduledShifts (filters: $filters) {
-      id
-      schedule {
-        id
-        title
-        dateTimeStart
-        dateTimeEnd
-        createdBy {
-          id
-          email
-          firstName
-          lastName
-          streetName
-          city
-          country
-          province
-          pincode
-          dateOfBirth
-          dateJoined
-          phone
-          profileIconUrl
-          bannerUrl
-        }
-        createdAt
-      }
-      user {
-        id
-        email
-        firstName
-        lastName
-        streetName
-        city
-        country
-        province
-        pincode
-        dateOfBirth
-        dateJoined
-        phone
-        profileIconUrl
-        bannerUrl
-      }
-      position {
-        id
-        title
-        description
-        hourlyWage
       }
     }
   }

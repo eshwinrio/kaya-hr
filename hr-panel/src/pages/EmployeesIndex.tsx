@@ -17,8 +17,9 @@ import SearchWidgetInputBase from '../components/SearchWidgetInputBase';
 import SyncInProgressIcon from '../components/SyncInProgressIcon';
 import UserList from '../components/UserList';
 import { apolloClient } from '../lib/apollo';
+import { gql } from '../lib/gql-codegen';
 import { LoadAllUsersQuery } from '../lib/gql-codegen/graphql';
-import { LOAD_USERS, SYNC_USERS } from '../lib/gql-queries';
+import { SYNC_USERS } from '../lib/gql-queries';
 import { useMaterialTheme } from '../lib/material-theme';
 
 const columns: GridColDef[] = [
@@ -163,11 +164,39 @@ export default function EmployeesIndex() {
   );
 }
 
+export const query = gql(`
+  query LoadAllUsers ($options: ListUsersFilter) {
+    users (options: $options) {
+      id
+      firstName
+      middleName
+      lastName
+      email
+      phone
+      city
+      country
+      province
+      roles
+      profileIconUrl
+      bannerUrl
+      dateOfBirth
+      dateJoined
+      streetName
+      pincode
+      syncStatus
+      positions {
+        id
+        title
+      }
+    }
+  }
+`);
+
 export const employeesIndexLoader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const searchTerm = url.searchParams.get('searchTerm');
   const loadUsersQuery = await apolloClient.query({
-    query: LOAD_USERS,
+    query,
     variables: { options: { searchTerm } }
   });
   return loadUsersQuery.data;

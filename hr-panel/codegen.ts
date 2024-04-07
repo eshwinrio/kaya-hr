@@ -1,7 +1,7 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: '../hr-resource/graphql/schema.graphql',
+  schema: '../hr-resource/graphql/**/*.graphql',
   documents: [
     'src/lib/gql-queries.ts',
     'src/components/**/*.{ts,tsx}',
