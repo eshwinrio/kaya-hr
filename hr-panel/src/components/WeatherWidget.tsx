@@ -4,98 +4,93 @@ import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { alpha } from "@mui/material/styles";
 import { FC, useEffect, useState } from "react";
-import { fetchWeather } from "../lib/fetch-requests";
 import DashCard from "./DashCard";
+import { gql } from "../lib/gql-codegen";
+import { useQuery } from "@apollo/client";
 
-interface OpenWeatherMapResponse {
-  coord: {
-    lon: number;
-    lat: number;
-  };
-  weather: [
-    {
-      id: number;
-      main: string;
-      description: string;
-      icon: string;
+
+const query = gql(`
+  query WeatherWidget($lat: Float!, $lon: Float!) {
+    weatherData(lat: $lat, lon: $lon) {
+      temp {
+        cur
+      }
+      feelsLike {
+        cur
+      }
+      pressure
+      humidity
+      dewPoint
+      clouds
+      uvi
+      visibility
+      wind {
+        speed
+        gust
+        deg
+      }
+      rain
+      snow
+      conditionId
+      main
+      description
+      icon {
+        url
+        raw
+      }
     }
-  ];
-  base: string;
-  main: {
-    temp: number;
-    feels_like: number;
-    temp_min: number;
-    temp_max: number;
-    pressure: number;
-    humidity: number;
   }
-  visibility: number;
-  wind: {
-    speed: number;
-    deg: number;
-  };
-  clouds: {
-    all: number;
-  };
-  dt: number;
-  sys: {
-    type: number;
-    id: number;
-    country: string;
-    sunrise: number;
-    sunset: number;
-  };
-  timezone: number;
-  id: number;
-  name: string;
-  cod: number;
-}
+`);
 
-interface WeatherWidgetProps extends PaperProps {
-
-}
+interface WeatherWidgetProps extends PaperProps {}
 
 const WeatherWidget: FC<WeatherWidgetProps> = function ({ children, ...props }) {
   const [geolocationPos, setGeoLocationPos] = useState<GeolocationPosition>();
-  const [weatherData, setWeatherData] = useState<OpenWeatherMapResponse>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<GeolocationPositionError>();
-  const [fetchError, setFetchError] = useState<string>();
+  const [geolocationPosError, setGeoLocationPosError] = useState<GeolocationPositionError>();
+  const { data, loading, error, refetch } = useQuery(query, {
+    variables: { lat: 0, lon: 0 },
+    skip: !geolocationPos && !geolocationPosError
+  });
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       position => setGeoLocationPos(position),
-      error => setError(error),
+      error => setGeoLocationPosError(error),
       { enableHighAccuracy: true }
     );
   }, []);
 
   useEffect(() => {
-    if (!geolocationPos) {
-      setLoading(false);
-      return;
+    if (geolocationPos && geolocationPos.coords.latitude && geolocationPos.coords.longitude) {
+      refetch({
+        lat: geolocationPos.coords.latitude,
+        lon: geolocationPos.coords.longitude,
+      });
     }
-    if (geolocationPos) {
-      fetchWeather(geolocationPos.coords.latitude, geolocationPos.coords.longitude)
-        .then(response => response.json())
-        .then(json => setWeatherData(json))
-        .catch(error => setFetchError(error.message))
-        .finally(() => setLoading(false));
-    }
-  }, [geolocationPos]);
+  }, [geolocationPos, refetch]);
 
-  if (!navigator.geolocation || error || fetchError) {
-    return <></>;
+  if (geolocationPosError) {
+    return (
+      <DashCard>
+        <Typography>{geolocationPosError.message}</Typography>
+      </DashCard>
+    );
   }
 
   if (loading) {
-    return <Skeleton variant="rectangular" width="100%" height={200} />;
+    return (
+      <Skeleton
+        animation="wave"
+        variant="rounded"
+        width="100%" height={120}
+      />
+    );
   }
 
-  if (weatherData) {
+  if (data) {
     return (
       <DashCard sx={({ palette }) => ({
-        backgroundImage: `url(https://source.unsplash.com/random/1600x900?${palette.mode === 'dark' ? 'night' : 'day'},${weatherData.weather[0].description.split(' ').join(',')})`,
+        backgroundImage: `url(https://source.unsplash.com/random/1600x900?${palette.mode === 'dark' ? 'night' : 'day'},${data.weatherData.description.split(' ').join(',')})`,
         backgroundPosition: 'bottom',
         color: palette.common.white,
         position: 'relative',
@@ -112,25 +107,29 @@ const WeatherWidget: FC<WeatherWidgetProps> = function ({ children, ...props }) 
         <Grid2 container justifyContent='flex-start' alignItems='center' position='inherit'>
           <Grid2>
             <img
-              src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+              src={data.weatherData.icon.url}
               alt="weather"
               width={64} height={64}
             />
           </Grid2>
           <Grid2>
             <Typography variant="h3" fontWeight={600}>
-              {Math.round(Math.floor((weatherData.main.temp - 273.15) * 100) / 100)}°
+              {Math.round(Math.floor((data.weatherData.temp.cur - 273.15) * 100) / 100)}°
             </Typography>
           </Grid2>
           <Grid2 xs={12} sx={{ pl: 8 }}>
-            <Typography variant="body2" fontWeight={600}>{weatherData.weather[0].main}</Typography>
+            <Typography variant="body2" fontWeight={600}>{data.weatherData.main}</Typography>
           </Grid2>
         </Grid2>
         <Typography align="right" fontStyle='italic' fontSize='0.5rem'>Image fetched from <a href="https://unsplash.com/">Unsplash</a></Typography>
       </DashCard >
     )
   } else {
-    return <></>;
+    return (
+      <DashCard>
+        <Typography>{error?.message}</Typography>
+      </DashCard>
+    );
   }
 }
 

@@ -68,11 +68,3 @@ export const resetPassword = (resetToken: string, password: string, requestInit?
     ...requestInit
   }
 );
-
-export const fetchWeather = async (lat: number, long: number, requestInit?: RequestInit) => {
-  const url = new URL(process.env['REACT_APP_OPENWEATHERMAP_WEATHER_API']!);
-  url.searchParams.append('lat', lat.toString());
-  url.searchParams.append('lon', long.toString());
-  url.searchParams.append('appid', process.env['REACT_APP_OPENWEATHERMAP_API_KEY']!);
-  return fetch(url, { ...requestInit });
-}

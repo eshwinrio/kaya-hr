@@ -63,6 +63,30 @@ export type CreateUserInput = {
   streetName: Scalars['String']['input'];
 };
 
+export type CurrentConditions = {
+  __typename?: 'CurrentConditions';
+  clouds: Scalars['Int']['output'];
+  conditionId?: Maybe<Scalars['Int']['output']>;
+  description: Scalars['String']['output'];
+  dewPoint?: Maybe<Scalars['Int']['output']>;
+  feelsLike: CurrentTemperatures;
+  humidity: Scalars['Int']['output'];
+  icon: Icon;
+  main: Scalars['String']['output'];
+  pressure: Scalars['Int']['output'];
+  rain: Scalars['Int']['output'];
+  snow: Scalars['Int']['output'];
+  temp: CurrentTemperatures;
+  uvi?: Maybe<Scalars['Int']['output']>;
+  visibility: Scalars['Int']['output'];
+  wind: WindData;
+};
+
+export type CurrentTemperatures = {
+  __typename?: 'CurrentTemperatures';
+  cur: Scalars['Float']['output'];
+};
+
 export type GeneratePayrollOptions = {
   employeeIds?: InputMaybe<Array<Scalars['Int']['input']>>;
   periodEnd: Scalars['ISODate']['input'];
@@ -73,6 +97,12 @@ export type HrDashboardIndexPage = {
   __typename?: 'HRDashboardIndexPage';
   activeEmployees: Array<User>;
   employeeCount: Scalars['Int']['output'];
+};
+
+export type Icon = {
+  __typename?: 'Icon';
+  raw: Scalars['String']['output'];
+  url: Scalars['String']['output'];
 };
 
 export type ListPunchesFilter = {
@@ -318,6 +348,7 @@ export type Query = {
   user: User;
   users: Array<User>;
   viewPayslip?: Maybe<PayslipPage>;
+  weatherData: CurrentConditions;
 };
 
 
@@ -364,6 +395,12 @@ export type QueryUsersArgs = {
 
 export type QueryViewPayslipArgs = {
   payslipId: Scalars['Int']['input'];
+};
+
+
+export type QueryWeatherDataArgs = {
+  lat: Scalars['Float']['input'];
+  lon: Scalars['Float']['input'];
 };
 
 export enum Role {
@@ -478,6 +515,13 @@ export type ViewUserOptions = {
   scheduleFilters?: InputMaybe<ListScheduleFilter>;
 };
 
+export type WindData = {
+  __typename?: 'WindData';
+  deg: Scalars['Int']['output'];
+  gust?: Maybe<Scalars['Int']['output']>;
+  speed: Scalars['Float']['output'];
+};
+
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -554,10 +598,14 @@ export type ResolversTypes = ResolversObject<{
   ClockTime: ResolverTypeWrapper<ClockTime>;
   CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
+  CurrentConditions: ResolverTypeWrapper<CurrentConditions>;
+  CurrentTemperatures: ResolverTypeWrapper<CurrentTemperatures>;
   Decimal: ResolverTypeWrapper<Scalars['Decimal']['output']>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GeneratePayrollOptions: GeneratePayrollOptions;
   HRDashboardIndexPage: ResolverTypeWrapper<HrDashboardIndexPage>;
   ISODate: ResolverTypeWrapper<Scalars['ISODate']['output']>;
+  Icon: ResolverTypeWrapper<Icon>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
@@ -589,6 +637,7 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>;
   UserSyncResult: ResolverTypeWrapper<UserSyncResult>;
   ViewUserOptions: ViewUserOptions;
+  WindData: ResolverTypeWrapper<WindData>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -597,10 +646,14 @@ export type ResolversParentTypes = ResolversObject<{
   ClockTime: ClockTime;
   CreateOrganizationInput: CreateOrganizationInput;
   CreateUserInput: CreateUserInput;
+  CurrentConditions: CurrentConditions;
+  CurrentTemperatures: CurrentTemperatures;
   Decimal: Scalars['Decimal']['output'];
+  Float: Scalars['Float']['output'];
   GeneratePayrollOptions: GeneratePayrollOptions;
   HRDashboardIndexPage: HrDashboardIndexPage;
   ISODate: Scalars['ISODate']['output'];
+  Icon: Icon;
   Int: Scalars['Int']['output'];
   ListPunchesFilter: ListPunchesFilter;
   ListScheduleFilter: ListScheduleFilter;
@@ -628,6 +681,7 @@ export type ResolversParentTypes = ResolversObject<{
   User: User;
   UserSyncResult: UserSyncResult;
   ViewUserOptions: ViewUserOptions;
+  WindData: WindData;
 }>;
 
 export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['ClockTime'] = ResolversParentTypes['ClockTime']> = ResolversObject<{
@@ -640,6 +694,30 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
   payroll?: Resolver<Maybe<ResolversTypes['Payroll']>, ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['ISODate'], ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CurrentConditionsResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['CurrentConditions'] = ResolversParentTypes['CurrentConditions']> = ResolversObject<{
+  clouds?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  conditionId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dewPoint?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  feelsLike?: Resolver<ResolversTypes['CurrentTemperatures'], ParentType, ContextType>;
+  humidity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  icon?: Resolver<ResolversTypes['Icon'], ParentType, ContextType>;
+  main?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  pressure?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  rain?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  snow?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  temp?: Resolver<ResolversTypes['CurrentTemperatures'], ParentType, ContextType>;
+  uvi?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  visibility?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  wind?: Resolver<ResolversTypes['WindData'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CurrentTemperaturesResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['CurrentTemperatures'] = ResolversParentTypes['CurrentTemperatures']> = ResolversObject<{
+  cur?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -656,6 +734,12 @@ export type HrDashboardIndexPageResolvers<ContextType = ApolloServerContext, Par
 export interface IsoDateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ISODate'], any> {
   name: 'ISODate';
 }
+
+export type IconResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Icon'] = ResolversParentTypes['Icon']> = ResolversObject<{
+  raw?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
 
 export type MutationResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   assignUserToSchedule?: Resolver<ResolversTypes['ScheduleAssignment'], ParentType, ContextType, RequireFields<MutationAssignUserToScheduleArgs, 'positionId' | 'scheduleId' | 'userId'>>;
@@ -778,6 +862,7 @@ export type QueryResolvers<ContextType = ApolloServerContext, ParentType extends
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType, Partial<QueryUsersArgs>>;
   viewPayslip?: Resolver<Maybe<ResolversTypes['PayslipPage']>, ParentType, ContextType, RequireFields<QueryViewPayslipArgs, 'payslipId'>>;
+  weatherData?: Resolver<ResolversTypes['CurrentConditions'], ParentType, ContextType, RequireFields<QueryWeatherDataArgs, 'lat' | 'lon'>>;
 }>;
 
 export type ScheduleResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = ResolversObject<{
@@ -833,11 +918,21 @@ export type UserSyncResultResolvers<ContextType = ApolloServerContext, ParentTyp
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type WindDataResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['WindData'] = ResolversParentTypes['WindData']> = ResolversObject<{
+  deg?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  gust?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  speed?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ClockTime?: ClockTimeResolvers<ContextType>;
+  CurrentConditions?: CurrentConditionsResolvers<ContextType>;
+  CurrentTemperatures?: CurrentTemperaturesResolvers<ContextType>;
   Decimal?: GraphQLScalarType;
   HRDashboardIndexPage?: HrDashboardIndexPageResolvers<ContextType>;
   ISODate?: GraphQLScalarType;
+  Icon?: IconResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Organization?: OrganizationResolvers<ContextType>;
   Payroll?: PayrollResolvers<ContextType>;
@@ -852,5 +947,6 @@ export type Resolvers<ContextType = ApolloServerContext> = ResolversObject<{
   ScheduleAssignment?: ScheduleAssignmentResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserSyncResult?: UserSyncResultResolvers<ContextType>;
+  WindData?: WindDataResolvers<ContextType>;
 }>;
 
