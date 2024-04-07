@@ -65,17 +65,17 @@ export type CreateUserInput = {
 
 export type CurrentConditions = {
   __typename?: 'CurrentConditions';
-  clouds: Scalars['Int']['output'];
+  clouds: Scalars['Float']['output'];
   conditionId?: Maybe<Scalars['Int']['output']>;
   description: Scalars['String']['output'];
   dewPoint?: Maybe<Scalars['Int']['output']>;
   feelsLike: CurrentTemperatures;
-  humidity: Scalars['Int']['output'];
+  humidity: Scalars['Float']['output'];
   icon: Icon;
   main: Scalars['String']['output'];
-  pressure: Scalars['Int']['output'];
-  rain: Scalars['Int']['output'];
-  snow: Scalars['Int']['output'];
+  pressure: Scalars['Float']['output'];
+  rain: Scalars['Float']['output'];
+  snow: Scalars['Float']['output'];
   temp: CurrentTemperatures;
   uvi?: Maybe<Scalars['Int']['output']>;
   visibility: Scalars['Int']['output'];
@@ -517,8 +517,8 @@ export type ViewUserOptions = {
 
 export type WindData = {
   __typename?: 'WindData';
-  deg: Scalars['Int']['output'];
-  gust?: Maybe<Scalars['Int']['output']>;
+  deg: Scalars['Float']['output'];
+  gust?: Maybe<Scalars['Float']['output']>;
   speed: Scalars['Float']['output'];
 };
 
@@ -698,17 +698,17 @@ export type ClockTimeResolvers<ContextType = ApolloServerContext, ParentType ext
 }>;
 
 export type CurrentConditionsResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['CurrentConditions'] = ResolversParentTypes['CurrentConditions']> = ResolversObject<{
-  clouds?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  clouds?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   conditionId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   dewPoint?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   feelsLike?: Resolver<ResolversTypes['CurrentTemperatures'], ParentType, ContextType>;
-  humidity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  humidity?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   icon?: Resolver<ResolversTypes['Icon'], ParentType, ContextType>;
   main?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  pressure?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  rain?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  snow?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pressure?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  rain?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  snow?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   temp?: Resolver<ResolversTypes['CurrentTemperatures'], ParentType, ContextType>;
   uvi?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   visibility?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -919,8 +919,8 @@ export type UserSyncResultResolvers<ContextType = ApolloServerContext, ParentTyp
 }>;
 
 export type WindDataResolvers<ContextType = ApolloServerContext, ParentType extends ResolversParentTypes['WindData'] = ResolversParentTypes['WindData']> = ResolversObject<{
-  deg?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  gust?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  deg?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  gust?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   speed?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

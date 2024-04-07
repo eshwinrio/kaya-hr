@@ -4,8 +4,8 @@ type CurrentTemperatures {
 
 type WindData {
   speed: Float!
-  gust: Int
-  deg: Int!
+  gust: Float
+  deg: Float!
 }
 
 type Icon {
@@ -16,15 +16,15 @@ type Icon {
 type CurrentConditions {
   temp: CurrentTemperatures!
   feelsLike: CurrentTemperatures!
-  pressure: Int!
-  humidity: Int!
+  pressure: Float!
+  humidity: Float!
   dewPoint: Int
-  clouds: Int!
+  clouds: Float!
   uvi: Int
   visibility: Int!
   wind: WindData!
-  rain: Int!
-  snow: Int!
+  rain: Float!
+  snow: Float!
   conditionId: Int
   main: String!
   description: String!
