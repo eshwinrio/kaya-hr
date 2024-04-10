@@ -15,6 +15,7 @@ import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee'
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
 import PayrollsIndex, { payrollsPageLoader } from './pages/PayrollsIndex';
 import PayrollViewerPage from './pages/PayrollViewerPage';
+import PayslipsIndex, { payslipsIndexLoader, PayslipsView, viewPayslipLoader } from './pages/payslips';
 import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
@@ -23,12 +24,14 @@ import UpdateEmployee, { updateEmployeeAction, updateEmployeeLoader } from './pa
 import ViewEmployee, { viewEmployeeLoader } from './pages/ViewEmployee';
 import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
 import Layout from './shared/Layout';
-import ViewPayslip, { viewPayslipLoader } from './pages/ViewPayslip';
+import RootErrorBoundary from './shared/RootErrorBoundary';
+
 
 const router = createBrowserRouter([
   {
     id: 'root',
     Component: Layout,
+    ErrorBoundary: RootErrorBoundary,
     children: [
       {
         id: 'dashboard',
@@ -115,8 +118,13 @@ const router = createBrowserRouter([
                 path: "payslips",
                 children: [
                   {
+                    index: true,
+                    Component: PayslipsIndex,
+                    loader: payslipsIndexLoader,
+                  },
+                  {
                     path: ":id",
-                    Component: ViewPayslip,
+                    Component: PayslipsView,
                     loader: viewPayslipLoader,
                   }
                 ]

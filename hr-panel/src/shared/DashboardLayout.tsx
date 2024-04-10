@@ -7,6 +7,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MenuIcon from '@mui/icons-material/Menu';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import SettingsIcon from "@mui/icons-material/Settings";
 import WindowIcon from '@mui/icons-material/Window';
 import AppBar from "@mui/material/AppBar";
@@ -48,35 +49,40 @@ export default function DashboardLayout() {
     {
       title: 'Dashboard',
       path: '/',
-      icon: <WindowIcon />,
+      icon: WindowIcon,
     },
     {
       title: 'Employees',
       path: '/employees',
-      icon: <GroupsIcon />,
+      icon: GroupsIcon,
       children: [
         {
           title: 'Onboard',
           path: '/employees/editor',
-          icon: <GroupAddIcon />,
+          icon: GroupAddIcon,
         },
       ]
     },
     {
       title: 'Schedules',
       path: '/scheduler',
-      icon: <ChecklistIcon />,
+      icon: ChecklistIcon,
     },
     {
       title: 'Financial',
       path: '/financial',
-      icon: <MonetizationOnIcon />,
+      icon: MonetizationOnIcon,
       children: [
         {
           title: 'Payrolls',
           path: '/financial/payrolls',
-          icon: <CurrencyExchangeIcon />,
+          icon: CurrencyExchangeIcon,
         },
+        {
+          title: 'Payslips',
+          path: '/financial/payslips',
+          icon: RequestQuoteIcon,
+        }
       ]
     },
   ];

@@ -1,12 +1,12 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import { GraphQLError } from "graphql/error/GraphQLError.js";
-import { PaymentStatus, PunchApprovalStatus, QueryResolvers, SyncStatus } from "./gql-codegen/graphql.js";
-import prisma from "./prisma.js";
-import { clocktimeEarningReducer } from "./utilities.js";
+import { PaymentStatus, PunchApprovalStatus, QueryResolvers, SyncStatus } from "../../../gql-codegen/graphql.js";
+import prisma from "../../../prisma.js";
+import { clocktimeEarningReducer } from "../../../utilities.js";
 
-const qResolverViewPayslip: QueryResolvers['viewPayslip'] = async (
+const qResolverViewPayslip: QueryResolvers['payslipsView'] = async (
   _root,
-  { payslipId },
+  { id },
   { roles, organization },
 ) => {
 
@@ -15,9 +15,7 @@ const qResolverViewPayslip: QueryResolvers['viewPayslip'] = async (
   }
 
   const mixedPayslipDocument = await prisma.payslip.findUnique({
-    where: {
-      id: payslipId
-    },
+    where: { id },
     include: {
       ClockTime: true,
       employee: !roles.some(role => role === "EMPLOYEE" || role === "LEAD"),

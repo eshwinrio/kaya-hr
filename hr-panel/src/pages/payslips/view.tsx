@@ -6,13 +6,14 @@ import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import { FC, useEffect } from "react";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
-import { apolloClient } from "../lib/apollo";
-import { gql } from "../lib/gql-codegen";
-import { ViewPayslipQuery } from "../lib/gql-codegen/graphql";
+import { apolloClient } from "../../lib/apollo";
+import { gql } from "../../lib/gql-codegen";
+import { ViewPayslipQuery } from "../../lib/gql-codegen/graphql";
+
 
 const query = gql(`
   query ViewPayslip($payslipId: Int!) {
-    viewPayslip(payslipId: $payslipId) {
+    payslipsView(id: $payslipId) {
       id
       generatedOn
       invoiceUuid
@@ -41,7 +42,7 @@ const generateInvoiceMutation = gql(`
 
 const ViewPayslip: FC = () => {
   const loaderData = useLoaderData() as ViewPayslipLoader;
-  const payslip = loaderData.payslip.data?.viewPayslip;
+  const payslip = loaderData.payslip.data?.payslipsView;
   const [generateInvoice, { data, loading }] = useMutation(generateInvoiceMutation, { variables: { payslipId: payslip?.id ?? 0 } });
 
   useEffect(() => {

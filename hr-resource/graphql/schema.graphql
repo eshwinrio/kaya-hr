@@ -73,7 +73,7 @@ type Payslip {
   generatedOn: ISODate!
   dispensedOn: ISODate
   deductions: Decimal
-  netPay: Decimal!
+  netPay: Decimal
   paymentMethod: String
   paymentStatus: PaymentStatus!
   employee: User!
@@ -258,12 +258,6 @@ input ListPunchesFilter {
   pagination: Pagination
 }
 
-input PayslipsFilter {
-  employeeId: Int
-  onlyPending: Boolean
-  onlyCurrentPeriod: Boolean
-}
-
 input GeneratePayrollOptions {
   employeeIds: [Int!]
   periodStart: ISODate!
@@ -299,19 +293,6 @@ type PayrollsIndex {
   activePayslips: [Payslip!]!
   currentPayrollSummary: PayrollSummary
 }
-
-type PayslipPage {
-  id: Int!
-  generatedOn: ISODate!
-  dispensedOn: ISODate
-  deductions: Decimal
-  netPay: Decimal!
-  paymentMethod: String
-  paymentStatus: PaymentStatus!
-  invoiceUuid: String
-  employee: User
-  clockTimes: [ClockTime!]!
-}
 # </PageSpecificQueries>
 
 
@@ -331,12 +312,10 @@ type Query {
   punches(filter: ListPunchesFilter): [ClockTime!]!
   payrollPeriods: PayrollPeriod
   payrolls: [Payroll!]!
-  payslips(filter: PayslipsFilter): [Payslip!]!
 
   # PageSpecificQueries
   hrDashboardIndex: HRDashboardIndexPage
   payrollsIndex: PayrollsIndex!
-  viewPayslip(payslipId: Int!): PayslipPage
 
   # ComponentSpecificQueries
   positionPicker: [Position!]!
