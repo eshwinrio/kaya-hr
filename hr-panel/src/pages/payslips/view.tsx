@@ -11,35 +11,6 @@ import { gql } from "../../lib/gql-codegen";
 import { ViewPayslipQuery } from "../../lib/gql-codegen/graphql";
 
 
-const query = gql(`
-  query ViewPayslip($payslipId: Int!) {
-    payslipsView(id: $payslipId) {
-      id
-      generatedOn
-      invoiceUuid
-      dispensedOn
-      deductions
-      netPay
-      paymentMethod
-      paymentStatus
-      employee {
-        id
-        firstName
-        lastName
-      }
-      clockTimes {
-        ...PunchTiming
-      }
-    }
-  }
-`);
-
-const generateInvoiceMutation = gql(`
-  mutation GenerateInvoice($payslipId: Int!) {
-    generateInvoice(payslipId: $payslipId)
-  }
-`);
-
 const ViewPayslip: FC = () => {
   const loaderData = useLoaderData() as ViewPayslipLoader;
   const payslip = loaderData.payslip.data?.payslipsView;
@@ -80,6 +51,35 @@ const ViewPayslip: FC = () => {
 };
 
 export default ViewPayslip;
+
+const query = gql(`
+  query ViewPayslip($payslipId: Int!) {
+    payslipsView(id: $payslipId) {
+      id
+      generatedOn
+      invoiceUuid
+      dispensedOn
+      deductions
+      netPay
+      paymentMethod
+      paymentStatus
+      employee {
+        id
+        firstName
+        lastName
+      }
+      clockTimes {
+        ...PunchTiming
+      }
+    }
+  }
+`);
+
+const generateInvoiceMutation = gql(`
+  mutation GenerateInvoice($payslipId: Int!) {
+    generateInvoice(payslipId: $payslipId)
+  }
+`);
 
 interface ViewPayslipLoader {
   readonly payslip: Awaited<ApolloQueryResult<ViewPayslipQuery>>;

@@ -6,13 +6,13 @@ import Typography from "@mui/material/Typography";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { FC, useMemo } from "react";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
-import ActivePayslipsCard from '../components/ActivePayslipsCard';
-import OutstandingAmountCard from '../components/OutstandingAmountCard';
-import PayrollSummaryCard from '../components/PayrollSummaryCard';
-import { apolloClient } from "../lib/apollo";
-import dayjs from '../lib/dayjs';
-import { gql } from "../lib/gql-codegen";
-import { PayrollsIndexQuery } from '../lib/gql-codegen/graphql';
+import ActivePayslipsCard from '../../components/ActivePayslipsCard';
+import OutstandingAmountCard from '../../components/OutstandingAmountCard';
+import PayrollSummaryCard from '../../components/PayrollSummaryCard';
+import { apolloClient } from "../../lib/apollo";
+import dayjs from '../../lib/dayjs';
+import { gql } from "../../lib/gql-codegen";
+import { PayrollsIndexQuery } from '../../lib/gql-codegen/graphql';
 
 
 const PayrollsIndex: FC = () => {
@@ -50,8 +50,6 @@ const PayrollsIndex: FC = () => {
   );
 };
 
-export default PayrollsIndex;
-
 export const query = gql(`
   query PayrollsIndex {
     payrollsIndex {
@@ -70,4 +68,7 @@ export const query = gql(`
 
 type PayrollsIndexLoader = Awaited<ApolloQueryResult<PayrollsIndexQuery>>;
 
-export const payrollsPageLoader: LoaderFunction = async () => await apolloClient.query({ query });
+export default PayrollsIndex;
+export const payrollsIndexLoader: LoaderFunction = async () => await apolloClient.query({ query });
+
+export { default as PayrollsView, viewPayrollLoader } from "./view";

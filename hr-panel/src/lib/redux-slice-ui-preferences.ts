@@ -6,7 +6,7 @@ interface UIPreferences {
 }
 
 const initialState: UIPreferences = {
-  mode: 'light',
+  mode: localStorage.getItem('mode') === 'dark' ? 'dark' : 'light',
 };
 
 export const uiPreferencesSlice = createSlice({
@@ -15,6 +15,7 @@ export const uiPreferencesSlice = createSlice({
   reducers: {
     setMode: (state, action: PayloadAction<PaletteMode>) => {
       state.mode = action.payload;
+      localStorage.setItem('mode', action.payload);
     },
   },
 });

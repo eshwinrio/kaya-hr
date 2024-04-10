@@ -13,8 +13,7 @@ import HomePage, { homeLoader } from './pages/Index';
 import Login, { loginAction } from './pages/Login';
 import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
-import PayrollsIndex, { payrollsPageLoader } from './pages/PayrollsIndex';
-import PayrollViewerPage from './pages/PayrollViewerPage';
+import PayrollsIndex, { payrollsIndexLoader, PayrollsView, viewPayrollLoader } from './pages/payrolls';
 import PayslipsIndex, { payslipsIndexLoader, PayslipsView, viewPayslipLoader } from './pages/payslips';
 import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
@@ -106,11 +105,12 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     Component: PayrollsIndex,
-                    loader: payrollsPageLoader,
+                    loader: payrollsIndexLoader,
                   },
                   {
                     path: ":id",
-                    Component: PayrollViewerPage
+                    Component: PayrollsView,
+                    loader: viewPayrollLoader,
                   }
                 ]
               },
