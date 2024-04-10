@@ -6,16 +6,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
 import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
+import Index, { indexLoader } from './pages';
+import AuthIndex, { authIndexAction, ForgotPassword, forgotPasswordAction, ResetPassword, resetPasswordAction } from './pages/auth';
 import EmployeesIndex, { employeesIndexLoader } from './pages/EmployeesIndex';
 import FinancialsIndex, { financialHomePageLoader } from './pages/FinancialsIndex';
-import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
-import HomePage, { homeLoader } from './pages/Index';
-import Login, { loginAction } from './pages/Login';
 import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
 import PayrollsIndex, { payrollsIndexLoader, PayrollsView, viewPayrollLoader } from './pages/payrolls';
 import PayslipsIndex, { payslipsIndexLoader, PayslipsView, viewPayslipLoader } from './pages/payslips';
-import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
 import SettingsPage from './pages/SettingsPage';
@@ -39,8 +37,8 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: HomePage,
-            loader: homeLoader,
+            Component: Index,
+            loader: indexLoader,
           },
           {
             path: "employees",
@@ -153,8 +151,8 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: Login,
-            action: loginAction
+            Component: AuthIndex,
+            action: authIndexAction
           },
           {
             path: 'signout',
@@ -162,12 +160,12 @@ const router = createBrowserRouter([
           },
           {
             path: 'forgot-password',
-            Component: ForgotPasswordPage,
+            Component: ForgotPassword,
             action: forgotPasswordAction,
           },
           {
             path: 'reset-password',
-            Component: ResetPasswordPage,
+            Component: ResetPassword,
             action: resetPasswordAction,
           }
         ],

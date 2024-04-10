@@ -6,20 +6,20 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, Link, useActionData, useNavigate } from 'react-router-dom';
 import validator from 'validator';
-import logo from '../assets/logo-full.svg';
-import InputPassword from '../components/InputPassword';
-import { fetchAccessToken } from '../lib/fetch-requests';
-import { useMaterialTheme } from '../lib/material-theme';
+import logo from '../../assets/logo-full.svg';
+import InputPassword from '../../components/InputPassword';
+import { fetchAccessToken } from '../../lib/fetch-requests';
+import { useMaterialTheme } from '../../lib/material-theme';
 
 const initialFormData: Record<'username' | 'password', string> = {
   username: '',
   password: ''
 }
 
-export default function Login(d: any) {
+const AuthIndex: FC = (d: any) => {
   const { breakpoints } = useMaterialTheme();
   const actionData = useActionData() as { message: string };
   const navigate = useNavigate();
@@ -101,9 +101,13 @@ export default function Login(d: any) {
   );
 }
 
-export const loginAction: ActionFunction = async ({ request }) => {
+export default AuthIndex;
+export const authIndexAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const username = formData.get('username')!.toString();
   const password = formData.get('password')!.toString();
   return await fetchAccessToken(username, password);
 }
+
+export { default as ForgotPassword, forgotPasswordAction } from './forgot-password';
+export { default as ResetPassword, resetPasswordAction } from './reset-password';

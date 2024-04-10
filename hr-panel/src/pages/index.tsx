@@ -8,6 +8,7 @@ import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import { GraphQLError } from 'graphql';
 import { FC } from 'react';
 import { Link, LoaderFunction, useLoaderData } from 'react-router-dom';
 import DashCard from '../components/DashCard';
@@ -17,11 +18,10 @@ import { apolloClient } from '../lib/apollo';
 import { gql } from '../lib/gql-codegen';
 import { IndexPageQuery } from '../lib/gql-codegen/graphql';
 import { useWhoAmI } from '../lib/whoami-provider';
-import { GraphQLError } from 'graphql';
 
-const HomePage: FC = () => {
+const Index: FC = () => {
   const whoAmI = useWhoAmI();
-  const loaderData = useLoaderData() as HomePageLoader;
+  const loaderData = useLoaderData() as IndexLoader;
   const employeeCount = loaderData.hrDashboardIndex?.employeeCount;
   const activeUsers = loaderData.hrDashboardIndex?.activeEmployees;
 
@@ -130,7 +130,7 @@ const HomePage: FC = () => {
   );
 }
 
-export default HomePage;
+export default Index;
 
 const query = gql(`
   query IndexPage {
@@ -144,9 +144,9 @@ const query = gql(`
   }
 `);
 
-type HomePageLoader = Awaited<IndexPageQuery>;
+type IndexLoader = Awaited<IndexPageQuery>;
 
-export const homeLoader: LoaderFunction = async (): Promise<HomePageLoader> => {
+export const indexLoader: LoaderFunction = async (): Promise<IndexLoader> => {
   const result = await apolloClient.query({ query });
   const { data, errors } = result;
   if (errors) throw errors;

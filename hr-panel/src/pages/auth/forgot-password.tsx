@@ -9,15 +9,15 @@ import Typography from '@mui/material/Typography';
 import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, useActionData } from 'react-router-dom';
 import validator from 'validator';
-import logo from '../assets/logo-full.svg';
-import { forgotPassword } from '../lib/fetch-requests';
-import { useMaterialTheme } from '../lib/material-theme';
+import logo from '../../assets/logo-full.svg';
+import { forgotPassword } from '../../lib/fetch-requests';
+import { useMaterialTheme } from '../../lib/material-theme';
 
 const initialFormData = {
   email: '',
 }
 
-const ForgotPasswordPage: FC = () => {
+const ForgotPassword: FC = () => {
   const { breakpoints } = useMaterialTheme();
   const actionData = useActionData() as { message: string };
   const [formData, setFormData] = useState({...initialFormData});
@@ -88,7 +88,7 @@ const ForgotPasswordPage: FC = () => {
   );
 }
 
-export default ForgotPasswordPage;
+export default ForgotPassword;
 
 export const forgotPasswordAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
