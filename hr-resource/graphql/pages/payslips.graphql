@@ -1,0 +1,22 @@
+type PayslipsIndexPage {
+  totalPayslipCount: Int!
+  currentPeriodPayslipCount: Int!
+}
+
+type ViewPayslipPage {
+  id: Int!
+  generatedOn: ISODate!
+  dispensedOn: ISODate
+  deductions: Decimal
+  netPay: Decimal!
+  paymentMethod: String
+  paymentStatus: PaymentStatus!
+  invoiceUuid: String
+  employee: User
+  clockTimes: [ClockTime!]!
+}
+
+type Query {
+  payslipsIndex: PayslipsIndexPage!
+  payslipsView(id: Int!): ViewPayslipPage!
+}

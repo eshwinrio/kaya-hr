@@ -6,42 +6,14 @@ import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import { FC, useEffect } from "react";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
-import { apolloClient } from "../lib/apollo";
-import { gql } from "../lib/gql-codegen";
-import { ViewPayslipQuery } from "../lib/gql-codegen/graphql";
+import { apolloClient } from "../../lib/apollo";
+import { gql } from "../../lib/gql-codegen";
+import { ViewPayslipQuery } from "../../lib/gql-codegen/graphql";
 
-const query = gql(`
-  query ViewPayslip($payslipId: Int!) {
-    viewPayslip(payslipId: $payslipId) {
-      id
-      generatedOn
-      invoiceUuid
-      dispensedOn
-      deductions
-      netPay
-      paymentMethod
-      paymentStatus
-      employee {
-        id
-        firstName
-        lastName
-      }
-      clockTimes {
-        ...PunchTiming
-      }
-    }
-  }
-`);
-
-const generateInvoiceMutation = gql(`
-  mutation GenerateInvoice($payslipId: Int!) {
-    generateInvoice(payslipId: $payslipId)
-  }
-`);
 
 const ViewPayslip: FC = () => {
   const loaderData = useLoaderData() as ViewPayslipLoader;
-  const payslip = loaderData.payslip.data?.viewPayslip;
+  const payslip = loaderData.payslip.data?.payslipsView;
   const [generateInvoice, { data, loading }] = useMutation(generateInvoiceMutation, { variables: { payslipId: payslip?.id ?? 0 } });
 
   useEffect(() => {
@@ -79,6 +51,35 @@ const ViewPayslip: FC = () => {
 };
 
 export default ViewPayslip;
+
+const query = gql(`
+  query ViewPayslip($payslipId: Int!) {
+    payslipsView(id: $payslipId) {
+      id
+      generatedOn
+      invoiceUuid
+      dispensedOn
+      deductions
+      netPay
+      paymentMethod
+      paymentStatus
+      employee {
+        id
+        firstName
+        lastName
+      }
+      clockTimes {
+        ...PunchTiming
+      }
+    }
+  }
+`);
+
+const generateInvoiceMutation = gql(`
+  mutation GenerateInvoice($payslipId: Int!) {
+    generateInvoice(payslipId: $payslipId)
+  }
+`);
 
 interface ViewPayslipLoader {
   readonly payslip: Awaited<ApolloQueryResult<ViewPayslipQuery>>;

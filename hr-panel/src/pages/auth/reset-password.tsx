@@ -8,17 +8,17 @@ import Typography from '@mui/material/Typography';
 import { FC, useEffect, useState } from 'react';
 import { ActionFunction, Form, useActionData } from 'react-router-dom';
 import validator from 'validator';
-import logo from '../assets/logo-full.svg';
-import InputPassword from '../components/InputPassword';
-import { resetPassword } from '../lib/fetch-requests';
-import { useMaterialTheme } from '../lib/material-theme';
+import logo from '../../assets/logo-full.svg';
+import InputPassword from '../../components/InputPassword';
+import { resetPassword } from '../../lib/fetch-requests';
+import { useMaterialTheme } from '../../lib/material-theme';
 
 const initialFormData = {
   tryPassword: '',
   password: ''
 }
 
-const ResetPasswordPage: FC = function Login() {
+const ResetPassword: FC = function Login() {
   const { breakpoints } = useMaterialTheme();
   const actionData = useActionData() as { message: string };
   const [formData, setFormData] = useState({ ...initialFormData });
@@ -106,7 +106,7 @@ const ResetPasswordPage: FC = function Login() {
   );
 }
 
-export default ResetPasswordPage;
+export default ResetPassword;
 
 export const resetPasswordAction: ActionFunction = async ({ request }) => {
   const resetToken = new URL(request.url).searchParams.get('token');

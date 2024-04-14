@@ -4,11 +4,13 @@ import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import { useModal } from 'mui-modal-provider';
 import { useState } from 'react';
 import { ActionFunction, Form, useLoaderData } from 'react-router-dom';
 import validator from 'validator';
@@ -16,9 +18,7 @@ import InputPassword from '../components/InputPassword';
 import { apolloClient } from '../lib/apollo';
 import { PositionPickerQuery, User, ViewUserQuery } from '../lib/gql-codegen/graphql';
 import { CREATE_USER } from '../lib/gql-queries';
-import { useModal } from 'mui-modal-provider';
 import PositionPicker from '../shared/PositionPicker';
-import Input from '@mui/material/Input';
 
 type FormKeys =
   | 'firstName'

@@ -10,12 +10,12 @@ import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import { FC, useState } from "react";
-import { PickUserDialogQuery, Role } from "../lib/gql-codegen/graphql";
 import SearchIconWrapper from "../components/SearchIconWrapper";
 import SearchWidget from "../components/SearchWidget";
 import SearchWidgetInputBase from "../components/SearchWidgetInputBase";
-import { gql } from '../lib/gql-codegen';
 import UserAvatar from '../components/UserAvatar';
+import { gql } from '../lib/gql-codegen';
+import { PickUserDialogQuery, Role } from "../lib/gql-codegen/graphql";
 
 interface PickUserDialogProps extends DialogProps {
   children?: never;

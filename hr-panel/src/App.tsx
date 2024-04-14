@@ -6,16 +6,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { signoutLoader } from './components/PopoverProfile';
 import { apolloClient } from './lib/apollo';
 import store from './lib/redux-store';
+import Index, { indexLoader } from './pages';
+import AuthIndex, { authIndexAction, ForgotPassword, forgotPasswordAction, ResetPassword, resetPasswordAction } from './pages/auth';
 import EmployeesIndex, { employeesIndexLoader } from './pages/EmployeesIndex';
 import FinancialsIndex, { financialHomePageLoader } from './pages/FinancialsIndex';
-import ForgotPasswordPage, { forgotPasswordAction } from './pages/ForgotPasswordPage';
-import HomePage, { homeLoader } from './pages/Index';
-import Login, { loginAction } from './pages/Login';
 import OnboardEmployee, { onboardEmployeeAction } from './pages/OnboardEmployee';
 import OrganizationSettingsPage, { organizationSettingsAction } from './pages/OrganizationSettingsPage';
-import PayrollsIndex, { payrollsPageLoader } from './pages/PayrollsIndex';
-import PayrollViewerPage from './pages/PayrollViewerPage';
-import ResetPasswordPage, { resetPasswordAction } from './pages/ResetPasswordPage';
+import PayrollsIndex, { payrollsIndexLoader, PayrollsView, viewPayrollLoader } from './pages/payrolls';
+import PayslipsIndex, { payslipsIndexLoader, PayslipsView, viewPayslipLoader } from './pages/payslips';
 import ScheduleEditorPage, { scheduleEditorAction } from './pages/ScheduleEditorPage';
 import ScheduleViewerPage, { scheduleViewerLoader } from './pages/ScheduleViewer';
 import SettingsPage from './pages/SettingsPage';
@@ -23,12 +21,14 @@ import UpdateEmployee, { updateEmployeeAction, updateEmployeeLoader } from './pa
 import ViewEmployee, { viewEmployeeLoader } from './pages/ViewEmployee';
 import DashboardLayout, { dashboardLayoutLoader } from './shared/DashboardLayout';
 import Layout from './shared/Layout';
-import ViewPayslip, { viewPayslipLoader } from './pages/ViewPayslip';
+import RootErrorBoundary from './shared/RootErrorBoundary';
+
 
 const router = createBrowserRouter([
   {
     id: 'root',
     Component: Layout,
+    ErrorBoundary: RootErrorBoundary,
     children: [
       {
         id: 'dashboard',
@@ -37,8 +37,8 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: HomePage,
-            loader: homeLoader,
+            Component: Index,
+            loader: indexLoader,
           },
           {
             path: "employees",
@@ -103,11 +103,12 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     Component: PayrollsIndex,
-                    loader: payrollsPageLoader,
+                    loader: payrollsIndexLoader,
                   },
                   {
                     path: ":id",
-                    Component: PayrollViewerPage
+                    Component: PayrollsView,
+                    loader: viewPayrollLoader,
                   }
                 ]
               },
@@ -115,8 +116,13 @@ const router = createBrowserRouter([
                 path: "payslips",
                 children: [
                   {
+                    index: true,
+                    Component: PayslipsIndex,
+                    loader: payslipsIndexLoader,
+                  },
+                  {
                     path: ":id",
-                    Component: ViewPayslip,
+                    Component: PayslipsView,
                     loader: viewPayslipLoader,
                   }
                 ]
@@ -145,8 +151,8 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: Login,
-            action: loginAction
+            Component: AuthIndex,
+            action: authIndexAction
           },
           {
             path: 'signout',
@@ -154,12 +160,12 @@ const router = createBrowserRouter([
           },
           {
             path: 'forgot-password',
-            Component: ForgotPasswordPage,
+            Component: ForgotPassword,
             action: forgotPasswordAction,
           },
           {
             path: 'reset-password',
-            Component: ResetPasswordPage,
+            Component: ResetPassword,
             action: resetPasswordAction,
           }
         ],
